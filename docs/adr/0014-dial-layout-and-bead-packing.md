@@ -1,0 +1,93 @@
+# ADR-0014: Pack beads per ring, not across the whole dial
+
+**Status:** Accepted
+**Date:** 2026-09-07
+
+## Context
+
+[ADR-0009](0009-derived-phase-and-overdue-queue.md) gives one ordered list of friends. Overdue
+friends stop at 12:00. The UI must now place beads on three rings.
+
+Two problems appear.
+
+**Beads overlap.** Several overdue friends all want 12:00. Beads have a size, so they need space
+between them.
+
+**Space differs per ring.** Run the numbers for a 390px phone with 28px avatars:
+
+| Ring | Radius | Circumference | Beads that fit | Arc needed per bead |
+|---|---|---|---|---|
+| Inner | 60px | 377px | 11 | 65 dial-minutes |
+| Middle | 100px | 628px | 19 | 38 dial-minutes |
+| Outer | 140px | 880px | 27 | 27 dial-minutes |
+
+Those numbers rule out one tempting idea. A rule such as "one queue slot equals one day equals one
+minute of arc" would sound like a domain rule. The geometry needs 65 minutes on the inner ring and
+27 on the outer. No business reason could ever explain those two numbers. Spacing is geometry, and
+geometry belongs to the UI.
+
+## Decision
+
+Keep the ordering in the domain. Keep the spacing in the UI.
+
+Take the ordered list. Split it by ring with a **stable** partition, so each ring keeps the global
+order. Then pack each ring on its own:
+
+```
+for each ring r:
+    members = orderedFriends where ring == r
+    cursor  = 1.0                              # 12:00, in phase units
+    for f in members:
+        placed(f) = min(phase(f), cursor)
+        cursor    = placed(f) - minGap(r)      # gap for THIS ring
+```
+
+`minGap(r) = (beadDiameter + padding) / circumference(r)`.
+
+The packer returns two things: the placed beads, and the beads that did not fit. See
+[ADR-0015](0015-dial-overflow-treatment.md).
+
+Mark the globally first friend with **emphasis**, not with position. Use a glow or a highlight
+ring. Do not move the bead to show priority.
+
+## Consequences
+
+### Positive
+
+- One expression, `min(phase, cursor)`, gives both behaviours. Overdue beads clamp to 12:00. An
+  on-track bead that catches the queue slows into the back of it. Overdue needs no special case.
+- A stable partition of a sorted list means ring order can never contradict global order. That
+  holds by construction, so no test has to guard it.
+- A friend who is first on their ring parks at 12:00 on that ring. Rings do not compete for space
+  they do not share.
+- Ring-local gaps roughly quintuple capacity, from about 11 beads to about 57.
+- The packer is a pure function of friends, `now`, and geometry. It tests without a widget tree.
+
+### Negative
+
+- Up to three beads sit at 12:00, one per ring. Only one is the true next friend. The highlight
+  must carry that difference, and a user may miss it.
+- `minGap` depends on real measurements. Change the avatar size and the packing changes.
+- The layout runs three passes instead of one. At this data size the cost is nothing.
+
+## Alternatives Considered
+
+### One global cursor across all rings
+
+**Why rejected:** It was proposed and it is wrong. A lone overdue friend on the outer ring would be
+pushed several slots back from 12:00 because unrelated beads on other rings outrank it. That friend
+is first on their ring and belongs at the top of it. Rings are separate tracks, so there is no
+overlap to avoid and no reason to spend arc avoiding it. Position already carries time. Global
+priority belongs on a different channel.
+
+### Put slot spacing in the domain as "one meeting per day"
+
+**Why rejected:** The rule would need a different number per ring, tuned by avatar size and screen
+width. A domain rule that changes when the avatar grows is a layout constant in disguise. As a
+product feature, a one-per-day catch-up plan is worth considering on its own merits. It is deferred,
+and it is not a layout mechanism.
+
+### Give overdue friends their own ring outside the others
+
+**Why rejected:** It removes crowding and it mixes rings together. It also loses the look
+the product owner wants, where beads park on the ring they already travel.
