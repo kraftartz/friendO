@@ -1,5 +1,43 @@
 # Agent Instructions
 
+Read this file first. It holds the rules for working here, and it points at everything else.
+
+## Where things live
+
+Each file owns one thing. Nothing below repeats what another file says; it links instead.
+
+| File | Owns | Read it when |
+|---|---|---|
+| `AGENTS.md` | The rules, and this map. | First, always. |
+| [CONTEXT.md](CONTEXT.md) | The words, and the words you may not use. | Before you name anything. |
+| [README.md](README.md) | What friendO is, for a person arriving at the repository. | You want the one-paragraph version. |
+| [docs/prd.md](docs/prd.md) | What the product must do, screen by screen. | You are building a screen. |
+| [docs/architecture.md](docs/architecture.md) | The shape of the system, and where code goes. | Before you add a file. |
+| [docs/adr/](docs/adr/README.md) | Why each choice won, and what lost. | Before you change a choice. |
+| [docs/feature-backlog.md](docs/feature-backlog.md) | What the designs need that no record covers yet. | You are picking up new work. |
+| [docs/DESIGN.md](docs/DESIGN.md) | The visual design system: colours, type, spacing. | You are writing a widget. |
+| [docs/initial-design/](docs/initial-design/README.md) | The first mockups. Frozen on purpose, and not kept current. | You want to see the original intent. |
+| [docs/agents/issue-tracker.md](docs/agents/issue-tracker.md) | How beads expresses an operation, as commands. | You are creating or resolving an issue. |
+| [docs/agents/domain.md](docs/agents/domain.md) | How an agent skill should read the documents above. | You arrived through a skill. |
+
+`CLAUDE.md` holds one line that includes this file. Put nothing in it.
+
+## What wins
+
+When two of them disagree:
+
+1. **`CONTEXT.md`** beats everything, including code and text shown to an owner.
+2. **An accepted record in `docs/adr/`** beats `architecture.md`, `prd.md`, and any plan. The
+   record holds the reasoning; the others hold a summary of it.
+3. **This file** beats a skill's own default habit.
+
+A newer record beats an older one only where its header says so.
+
+Never override a record quietly. Say which record you contradict and why it is worth reopening,
+then follow [ADR-0019](docs/adr/0019-correcting-and-partly-superseding-a-record.md).
+
+## Issue tracking
+
 This project uses **bd** (beads) for issue tracking. Run `bd prime` for full workflow context.
 
 ## Quick Reference
@@ -173,3 +211,22 @@ Use [Conventional Commits](https://www.conventionalcommits.org/): `feat:`, `fix:
 
 Ask before committing. The repository owner usually handles git themselves. This qualifies the
 push step in the beads block above, which was written for a different working style.
+
+## Agent skills
+
+Configuration that the engineering skills in the `mattpocock-skills` plugin read.
+
+### Issue tracker
+
+Issues live in **beads** (`bd`), local to the machine and never committed. The wayfinder map is an
+epic labelled `wayfinder:map`, and its tickets are child issues. See
+[docs/agents/issue-tracker.md](docs/agents/issue-tracker.md), which holds the exact commands for
+the map, blocking, the frontier query, claiming and resolution.
+
+The Beads section above states the rules. That file states the operations.
+
+### Domain docs
+
+Single context: one `CONTEXT.md` and one `docs/adr/`, both at the repo root. See
+[docs/agents/domain.md](docs/agents/domain.md) for the reading order, what wins when two documents
+disagree, and what to do when your output contradicts a record.
