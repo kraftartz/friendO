@@ -1,0 +1,7 @@
+{
+  "database": "dolt",
+  "backend": "dolt",
+  "dolt_mode": "embedded",
+  "dolt_database": "friendO",
+  "project_id": "a4678f17-183c-48c2-a8e9-1faa5e3fbb1d"
+}
