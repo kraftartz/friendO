@@ -1,0 +1,48 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # Flutter 3.41.7 needs JDK 17 or newer. Pinning it stops a change to the
+      # runner image from moving the Java version underneath the build.
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      # Pinned, not `channel: stable`. A moving SDK turns an unrelated push into
+      # a red build. Raising this pin is a deliberate change, and it moves
+      # together with the widgetbook constraint in friendo_ui_book.
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: 3.41.7
+          cache: true
+
+      # flutter_secure_storage compiles against Android SDK 37, and the runner
+      # image does not ship it. Install it here rather than leaving it to
+      # Gradle's auto-download, which needs accepted licences and fails with a
+      # stack trace instead of a clear message.
+      - name: Install Android SDK 37
+        run: sdkmanager "platforms;android-37"
+
+      - name: Fetch dependencies
+        run: ./tool/get.sh
+
+      - name: Format and analyse
+        run: ./tool/lint.sh
+
+      - name: Test
+        run: ./tool/test.sh
+
+      # The only step that proves the native Android side links. The Dart code
+      # compiles even when a plugin's Gradle configuration is wrong.
+      - name: Build the Android app
+        run: flutter build apk --debug
