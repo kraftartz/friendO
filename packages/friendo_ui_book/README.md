@@ -1,17 +1,25 @@
 # friendo_ui_book
 
-Widgetbook workspace for friendo_ui.
+The Widgetbook workspace for `friendo_ui`. It draws every widget on its own, at every size and in
+every state, with no app and no data around it.
 
-## Getting Started
+## Running it
 
-This project is a starting point for a Flutter application.
+```bash
+flutter run -d chrome
+```
 
-A few resources to get you started if this is your first Flutter project:
+## Why it is a separate package
 
-- [Learn Flutter](https://docs.flutter.dev/get-started/learn-flutter)
-- [Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Flutter learning resources](https://docs.flutter.dev/reference/learning-resources)
+This workspace sees `friendo_ui` and nothing else. That import list is a test in itself: if a
+widget ever grows a dependency on `flutter_bloc` or on the domain, this package stops compiling and
+CI reports it. See [ADR-0018](../../docs/adr/0018-ui-package-and-widgetbook.md).
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+The widget tree in `lib/` is written by hand. No generator runs here. See
+[ADR-0018](../../docs/adr/0018-ui-package-and-widgetbook.md) for why the generator was dropped.
+
+## Version pins
+
+`widgetbook` is held at 3.23.x. Version 3.24.0 and above need Flutter 3.44.0, and this project
+builds on 3.41.7. Raise the widgetbook constraint, the CI pin and the project pin together, or
+raise none of them.

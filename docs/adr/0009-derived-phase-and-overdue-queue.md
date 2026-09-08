@@ -1,6 +1,8 @@
 # ADR-0009: Derive phase, order overdue friends by due date
 
-**Status:** Accepted
+**Status:** Accepted. `overdue(f) = phase > 1` is superseded by
+[ADR-0021](0021-civil-date-time-model.md), which compares two Civil Dates. "One list" is held as
+two groups by [ADR-0028](0028-priority-order-as-two-groups.md). The ordering rules are unchanged.
 **Date:** 2026-09-07
 
 ## Context

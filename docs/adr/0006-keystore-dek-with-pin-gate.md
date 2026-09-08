@@ -1,6 +1,8 @@
 # ADR-0006: Keep the data key in the Keystore, gate it with a PIN
 
-**Status:** Accepted
+**Status:** Accepted. The decision stands.
+[ADR-0024](0024-keystore-holds-a-wrapping-key.md) describes it accurately: the Keystore holds a
+non-exportable **wrapping key**, and the data key is stored wrapped.
 **Date:** 2026-09-07
 
 ## Context

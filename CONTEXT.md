@@ -28,32 +28,70 @@ _Avoid_: user, account, login, identity
 
 ### Timing
 
+**Civil Date**:
+One day on a calendar, with no time and no zone. A Meeting happens on one. It stays the same day
+when the owner flies to another zone.
+_Avoid_: date, day, timestamp, datetime
+
 **Cadence**:
 How often you want to see a Friend, held as a length of time.
 _Avoid_: cycle, interval, frequency, tempo, period, rhythm, schedule
 
 **Meeting**:
-A recorded occasion when you saw a Friend, on any date up to today. The newest one starts that
-Friend's current Cadence.
+A recorded occasion when you saw a Friend, on a Civil Date up to today. The newest one starts that
+Friend's current Cadence. A Meeting may also carry a time of day. That time is optional, the app
+shows it, and the Dial ignores it.
 _Avoid_: meet, catch-up, hangout, visit, interaction, touchpoint, event
 
 **Due Date**:
-When a Friend's next Meeting is wanted. It falls one Cadence after the last Meeting.
+The Civil Date when a Friend's next Meeting is wanted. It falls one Cadence after the last Meeting.
+A Friend is not yet Overdue on it.
 _Avoid_: next date, target, deadline, expiry
 
 **Phase**:
 How far a Friend has travelled through their current Cadence, as a fraction. It is zero at the last
-Meeting and one at the Due Date.
+Meeting and one at the start of the Due Date. It is never below zero.
 _Avoid_: progress, elapsed, completion, angle, position
 
+**Standing**:
+The same reading as a name. Every Friend has exactly one of the four below, so the Dial counts add
+up to every Friend. Phase gives the number; Standing gives the name.
+_Avoid_: bucket, health, urgency, category
+
+**Freshly Reset**:
+The Standing of a Friend seen lately. Phase below a quarter.
+_Avoid_: recent, fresh, new, just met
+
+**In Orbit**:
+The Standing of a Friend who is travelling with no call to act. Phase from a quarter to three
+quarters.
+_Avoid_: healthy, fine, normal, coasting
+
+**Nearing**:
+The Standing of a Friend close to their Due Date, or resting on it. Phase from three quarters up to
+the end of the Due Date.
+_Avoid_: due soon, approaching, upcoming, imminent
+
 **Overdue**:
-The state of a Friend whose Due Date has passed.
+The Standing of a Friend whose Due Date has passed.
 _Avoid_: drifting, late, lapsed, missed, neglected, due
 
 **Priority Order**:
 The single ranking of every Friend, from the one to see next down to the one least in need. Overdue
 Friends come first, oldest Due Date first.
 _Avoid_: queue, ranking, backlog, sort order, list
+The banned `queue` is the bare word. The **Beads Queue** is a different thing with its own entry: a
+drawing, not a ranking.
+
+**On Track**:
+Every Friend who is not Overdue. It is the second half of the Priority Order, ranked by highest
+Phase. It covers three Standings and is not the same as In Orbit.
+_Avoid_: healthy, safe, ok, current
+
+**Placing**:
+One Friend reduced to what the Dial needs: their Cadence, Due Date, Phase and Standing. The app
+works one out on read and never stores one.
+_Avoid_: item, row, entry, record, DTO
 
 ### The Dial
 
@@ -72,13 +110,22 @@ One of the three tracks a Bead travels. A short Cadence puts a Friend on an inne
 lap is quick.
 _Avoid_: ring, tier, band, lane, level, circle
 
-**Queue**:
-The line of Overdue Beads resting at the top of an Orbit, in Priority Order.
-_Avoid_: stack, pile, cluster, waiting list
+**Beads Queue**:
+The line of Beads resting at the top of an Orbit, in Priority Order. A Bead joins it when its Phase
+reaches one, so the line holds the Overdue Friends and the ones due today.
+Always both words. The bare `queue` is banned under Priority Order, which is a ranking rather than a
+drawing.
+_Avoid_: queue, stack, pile, cluster, waiting list
 
 **Overflow**:
 The Beads that an Orbit has no room to draw.
 _Avoid_: excess, remainder, hidden beads, spillover
+
+**dial-minute**:
+The unit of arc on the Dial. One lap is 720 of them, because the Dial reads like a 12-hour face and
+each hour holds 60. It measures spacing between Beads and nothing else. It is not a length of time
+and never reaches the domain.
+_Avoid_: minute, degree, tick, slot
 
 ### What You Remember
 

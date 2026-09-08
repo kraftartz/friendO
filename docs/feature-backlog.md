@@ -54,9 +54,12 @@ The Meeting record today holds a date. The designs add four fields.
 Seen on: Friend Detail (`October 14 ... at Blue Bottle Coffee`, `Duration 1.5 hrs`,
 `Vibe: Warm & Energized`, a free text recap, `0:38 audio reflection`).
 
-    meetings(id, friend_id, happened_on, place, minutes, vibe, recap, audio_id)
+    meetings(id, friend_id, happened_on, happened_at_minute, created_at,
+             place, minutes, vibe, recap, audio_id)
 
-All four fields are optional. `happened_on` stays the only field that the Dial reads.
+All four design fields are optional. `happened_on` is a civil date and stays the
+only field that the Dial reads. `happened_at_minute` is the optional time of day
+from [ADR-0021](adr/0021-civil-date-time-model.md); it is shown and never drawn.
 
 ### Note state
 A Note carries a date and a label already. The designs add a done mark and a
@@ -69,7 +72,7 @@ Seen on: Friend Detail (`3 active`, `Noted Oct 22 · Travel & Arts`, done and di
 This does not break ADR-0017. The app still never clears a Note. The owner sets
 `resolved_on`, and the owner alone.
 
-## 2. Attachments — the largest change
+## 2. Attachments — settled by ADR-0026
 
 The designs store two kinds of binary file:
 - an avatar photo per Friend (Add Friend, `photo_camera`),
@@ -79,22 +82,17 @@ The designs store two kinds of binary file:
 An avatar written to app storage sits there in clear bytes. This defeats the
 threat model in ADR-0006.
 
-Two ways to fix it:
+[ADR-0026](adr/0026-attachments-as-blobs-and-a-framed-backup.md) decides both
+halves. Attachments are BLOB columns in the database. The backup becomes a
+framed file: an encrypted JSON manifest, then encrypted raw bytes, one frame at
+a time. Base64 is gone, and so is the out-of-memory crash it caused.
 
-| Option | Cost |
-|---|---|
-| Store the bytes as a BLOB in the database | SQLCipher covers them. The database grows. The backup grows. Simple. |
-| Write an encrypted file store | Keeps the database small. Adds a key path, a file layout, and a delete rule. |
-
-For 100 Friends with one avatar each, and short audio, the BLOB option is enough.
-Pick it unless a real size problem appears.
-
-Consequences either way:
+Still to do when the feature is built:
+- Downscale an avatar to 512 px on capture. Cap the audio bitrate and length.
+  Audio drives the size, not avatars, and nothing ever deletes a recap.
+- Read attachment columns on their own. A list query must never pull a BLOB.
 - Audio capture needs the microphone permission. The manifest still holds no
   INTERNET permission, so ADR-0003 holds.
-- ADR-0010 exports logical JSON. JSON cannot hold raw bytes. The backup needs
-  base64 fields, or a container with a JSON part and a blob part. **ADR-0010 must
-  change before any attachment ships.**
 
 ## 3. Derived views — no new storage
 
@@ -102,8 +100,10 @@ Consequences either way:
 Home shows three buckets: `1 Nearing 12:00`, `4 In Orbit`, `2 Freshly Reset`.
 Directory shows counts per orbit and a `Due Soon` count.
 
-These are aggregates over the same ordered list that the Dial reads. The domain
-package can return them. Nothing new is stored.
+[ADR-0029](adr/0029-name-the-dial-counts.md) names the four Standings and sets
+their boundaries in Phase. `PriorityOrder.counts` returns them. Nothing new is
+stored. `Due Soon` on the Directory is the Nearing count under another name;
+use the glossary word.
 
 ### Meeting history
 The designs show only the newest Meeting. A full history per Friend is the
@@ -119,8 +119,12 @@ Each row shows the newest Meeting date, its place, one Note, and progress
 Seen on: Vault (`fingerprint`).
 
 The fingerprint opens the same key that the PIN opens. It is a second gate, not a
-second key. ADR-0006 does not change. ADR-0011 needs an amendment that states:
-the PIN always stays available, because biometrics fail.
+second key. ADR-0006 does not change, and ADR-0011 already states that the PIN
+always stays available.
+
+Binding the biometric to the Keystore entry itself is deferred. See
+[ADR-0024](adr/0024-keystore-holds-a-wrapping-key.md): it only helps against an
+attacker who already owns the running OS, which ADR-0006 puts out of scope.
 
 ### Guest profile
 Seen on: Vault (`Create Guest Orbit`, `Temporary visitor?`).
@@ -136,7 +140,8 @@ a restart.
 | Bead motion | `animate-orbit-*` spins the beads | Angle means phase | Drop the animation |
 | Last seen date | No field on Add Friend | ADR-0016 needs one | Add the field |
 | Overdue | No mock shows it | ADR-0015 open | Resolve ADR-0015 |
+| Meeting time | `October 14 ... at Blue Bottle`, no hour | ADR-0021 allows an optional one | Show the hour only when the owner set it |
 | Dial capacity | 57 slots | Cap is ~100 Friends | Resolve ADR-0015 |
 | Bead size | 32px outer, 28px inner | — | Use 28px everywhere |
-| Orbit radii | 62 / 102 / 142 | 60 / 100 / 140 | Correct ADR-0014 |
+| Orbit radii | 62 / 102 / 142 | 62 / 102 / 142 | Settled. ADR-0014 already agrees. |
 | Cadence presets | 7/30/90 and 7/14/30/60 | Free duration | Pick one preset list |

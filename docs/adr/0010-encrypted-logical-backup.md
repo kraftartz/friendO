@@ -1,6 +1,8 @@
 # ADR-0010: Export an encrypted logical backup
 
-**Status:** Accepted
+**Status:** Accepted. The container format is superseded by
+[ADR-0026](0026-attachments-as-blobs-and-a-framed-backup.md), which writes framed sections instead
+of one JSON document. The passphrase, the KDF header and the re-entry rule stand.
 **Date:** 2026-09-07
 
 ## Context

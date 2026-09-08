@@ -1,6 +1,7 @@
 # ADR-0004: Pure domain core, feature-first shell
 
-**Status:** Accepted
+**Status:** Accepted. The sentence "Each feature holds `bloc/`, `view/`, and a repository" is
+superseded by [ADR-0022](0022-one-repository-per-aggregate.md). Everything else stands.
 **Date:** 2026-09-07
 
 ## Context
