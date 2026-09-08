@@ -1,8 +1,17 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- No OS-level backup of any kind. See ADR-0020.
+
+         allowBackup="false" stops the Google Drive backup. It does not stop
+         the Android 12+ device-to-device transfer, which reads
+         dataExtractionRules instead, so both attributes are needed and both
+         exclude everything. fullBackupContent serves Android 11 and below. -->
     <application
         android:label="friendo"
         android:name="${applicationName}"
-        android:icon="@mipmap/ic_launcher">
+        android:icon="@mipmap/ic_launcher"
+        android:allowBackup="false"
+        android:dataExtractionRules="@xml/data_extraction_rules"
+        android:fullBackupContent="@xml/backup_rules">
         <activity
             android:name=".MainActivity"
             android:exported="true"
