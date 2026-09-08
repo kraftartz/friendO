@@ -100,7 +100,7 @@ Consequences either way:
 
 ### Counts
 Home shows three buckets: `1 Nearing 12:00`, `4 In Orbit`, `2 Freshly Reset`.
-Directory shows counts per ring and a `Due Soon` count.
+Directory shows counts per orbit and a `Due Soon` count.
 
 These are aggregates over the same ordered list that the Dial reads. The domain
 package can return them. Nothing new is stored.
@@ -138,5 +138,5 @@ a restart.
 | Overdue | No mock shows it | ADR-0015 open | Resolve ADR-0015 |
 | Dial capacity | 57 slots | Cap is ~100 Friends | Resolve ADR-0015 |
 | Bead size | 32px outer, 28px inner | — | Use 28px everywhere |
-| Ring radii | 62 / 102 / 142 | 60 / 100 / 140 | Correct ADR-0014 |
+| Orbit radii | 62 / 102 / 142 | 60 / 100 / 140 | Correct ADR-0014 |
 | Cadence presets | 7/30/90 and 7/14/30/60 | Free duration | Pick one preset list |

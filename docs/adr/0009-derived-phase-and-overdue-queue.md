@@ -39,7 +39,7 @@ The domain sorts every friend into **one list**:
 
 Overdue friends always come before on-track friends. The first item is the friend the banner names.
 
-The domain returns an ordered list and nothing else. It does not know about rings, angles, or
+The domain returns an ordered list and nothing else. It does not know about orbits, angles, or
 pixels. See [ADR-0014](0014-dial-layout-and-bead-packing.md).
 
 ## Consequences
@@ -52,7 +52,7 @@ pixels. See [ADR-0014](0014-dial-layout-and-bead-packing.md).
   [ADR-0016](0016-derive-lastmet-from-meetings.md).
 - 12:00 always means one thing: due now. The dial cannot mislead.
 - `phase` is a pure function. Tests call it with a fixed `now` and no mocks.
-- One list serves the banner, the rings, and any future list view.
+- One list serves the banner, the orbits, and any future list view.
 
 ### Negative
 

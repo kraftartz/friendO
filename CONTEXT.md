@@ -1,6 +1,6 @@
 # friendO
 
-friendO keeps the people you care about on a repeating rhythm. You say how often you want to see
+friendO keeps the people you care about on a repeating Cadence. You say how often you want to see
 each of them. The app tells you who is next.
 
 This repository holds one context. There is no `CONTEXT-MAP.md`.
@@ -13,7 +13,7 @@ normal prose casing.
 ### People
 
 **Friend**:
-A person you have chosen to see on a repeating rhythm. The word covers family, old friends, and
+A person you have chosen to see on a repeating Cadence. The word covers family, old friends, and
 colleagues alike.
 _Avoid_: contact, person, connection, relationship, entry
 
@@ -26,7 +26,7 @@ One private space on a shared phone, belonging to one of its owners. Two Profile
 other's Friends.
 _Avoid_: user, account, login, identity
 
-### Rhythm
+### Timing
 
 **Cadence**:
 How often you want to see a Friend, held as a length of time.
@@ -67,20 +67,17 @@ Reserve **Clock** for the source of the current time. Never use it for this scre
 One Friend drawn on the Dial.
 _Avoid_: dot, marker, token, node, planet, point
 
-**Ring**:
-One of the three tracks a Bead travels. A short Cadence puts a Friend on an inner Ring, so their lap
-is quick.
-_Avoid_: orbit, tier, band, lane, level, circle
-
-**Orbit** is the metaphor behind the Dial and is fine in words shown to the user. Use **Ring** for
-the three tracks everywhere else.
+**Orbit**:
+One of the three tracks a Bead travels. A short Cadence puts a Friend on an inner Orbit, so their
+lap is quick.
+_Avoid_: ring, tier, band, lane, level, circle
 
 **Queue**:
-The line of Overdue Beads resting at the top of a Ring, in Priority Order.
+The line of Overdue Beads resting at the top of an Orbit, in Priority Order.
 _Avoid_: stack, pile, cluster, waiting list
 
 **Overflow**:
-The Beads that a Ring has no room to draw.
+The Beads that an Orbit has no room to draw.
 _Avoid_: excess, remainder, hidden beads, spillover
 
 ### What You Remember
@@ -98,6 +95,25 @@ _Avoid_: what's new, news, life event, change
 **Note**:
 Free text about a Friend that is neither a Topic nor an Update.
 _Avoid_: comment, memo, remark, description
+
+### About a Friend
+
+These three describe a Friend rather than a Meeting. The app never invents one; the owner writes
+them.
+
+**Fact**:
+A small piece of standing information about a Friend, held as a label and a value. Where they live,
+what they drink, the name of their dog. The owner writes both halves and chooses the label.
+_Avoid_: field, attribute, property, detail, trait
+
+**Affinity**:
+Something a Friend is into, taken from a shared set that the owner can add to. Two Friends who
+share one can be found together.
+_Avoid_: tag, category, interest, hobby
+
+**Milestone**:
+A day in a Friend's life worth coming back to, such as a birthday. It returns every year.
+_Avoid_: event, reminder, key date
 
 ### Privacy
 

@@ -1,0 +1,392 @@
+<!DOCTYPE html><html class="dark" lang="en"><head><meta charset="utf-8"><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport"><link href="https://fonts.googleapis.com" rel="preconnect"><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"><link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700&amp;display=swap" rel="stylesheet"><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"><style>@layer base{html,body{width:100%;margin:0;padding:0;min-height:100vh;}body{overscroll-behavior:none;}.pb-safe{padding-bottom:env(safe-area-inset-bottom,0px);}.pt-safe{padding-top:env(safe-area-inset-top,0px);}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config = { darkMode: "class", theme: { extend: { colors: { "on-primary-container": "#340080", "secondary": "#ccbeff", "tertiary-fixed-dim": "#7bd0ff", "surface-container": "#211c33", "primary-container": "#a078ff", "on-error": "#690005", "tertiary-container": "#009bd1", "tertiary": "#7bd0ff", "secondary-fixed-dim": "#ccbeff", "background": "#141026", "surface-container-high": "#2b273e", "on-secondary-fixed-variant": "#4a3d7c", "on-secondary": "#332664", "primary-fixed": "#e9ddff", "inverse-surface": "#e6defd", "surface-tint": "#d0bcff", "tertiary-fixed": "#c4e7ff", "on-tertiary-fixed-variant": "#004c69", "on-primary-fixed": "#23005c", "outline": "#958ea0", "on-tertiary-fixed": "#001e2c", "outline-variant": "#494454", "surface-bright": "#3a364e", "surface": "#141026", "surface-container-highest": "#363249", "on-surface": "#e6defd", "on-background": "#e6defd", "primary-fixed-dim": "#d0bcff", "on-secondary-fixed": "#1e0e4e", "surface-dim": "#141026", "surface-variant": "#363249", "primary": "#d0bcff", "on-error-container": "#ffdad6", "surface-container-low": "#1c182f", "on-surface-variant": "#cbc3d7", "inverse-on-surface": "#322d45", "error": "#ffb4ab", "on-primary-fixed-variant": "#5516be", "on-secondary-container": "#baabf3", "on-tertiary": "#00354a", "inverse-primary": "#6d3bd7", "on-primary": "#3c0091", "secondary-fixed": "#e7deff", "on-tertiary-container": "#002d40", "secondary-container": "#4a3d7c", "surface-container-lowest": "#0f0b21", "error-container": "#93000a" }, borderRadius: { "DEFAULT": "1rem", "lg": "2rem", "xl": "3rem", "full": "9999px" }, spacing: { "space-sm": "0.75rem", "space-3xl": "4rem", "space-2xl": "3rem", "gutter-mobile": "1rem", "gutter-desktop": "1.5rem", "container-max": "72rem", "space-lg": "1.5rem", "space-xs": "0.5rem", "space-2xs": "0.25rem", "space-xl": "2rem", "space-md": "1rem" }, fontFamily: { "body-lg": ["Plus Jakarta Sans"], "body-md": ["Plus Jakarta Sans"], "headline-sm": ["Plus Jakarta Sans"], "headline-lg": ["Plus Jakarta Sans"], "label-sm": ["Plus Jakarta Sans"], "label-md": ["Plus Jakarta Sans"], "display-lg-mobile": ["Plus Jakarta Sans"], "headline-md": ["Plus Jakarta Sans"], "label-lg": ["Plus Jakarta Sans"], "body-sm": ["Plus Jakarta Sans"], "display-lg": ["Plus Jakarta Sans"] }, fontSize: { "body-lg": ["16px", { "lineHeight": "24px", "letterSpacing": "0em", "fontWeight": "400" }], "body-md": ["14px", { "lineHeight": "22px", "letterSpacing": "0.005em", "fontWeight": "400" }], "headline-sm": ["18px", { "lineHeight": "26px", "letterSpacing": "0em", "fontWeight": "600" }], "headline-lg": ["28px", { "lineHeight": "36px", "letterSpacing": "-0.01em", "fontWeight": "600" }], "label-sm": ["10px", { "lineHeight": "14px", "letterSpacing": "0.05em", "fontWeight": "700" }], "label-md": ["12px", { "lineHeight": "16px", "letterSpacing": "0.02em", "fontWeight": "600" }], "display-lg-mobile": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "700" }], "headline-md": ["22px", { "lineHeight": "30px", "letterSpacing": "-0.005em", "fontWeight": "600" }], "label-lg": ["14px", { "lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "600" }], "body-sm": ["12px", { "lineHeight": "18px", "letterSpacing": "0.01em", "fontWeight": "400" }], "display-lg": ["40px", { "lineHeight": "48px", "letterSpacing": "-0.02em", "fontWeight": "700" }] } } } };</script><style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head><body class="bg-background font-body-md text-on-surface min-h-screen relative flex flex-col selection:bg-primary-container selection:text-on-primary-container"><header class="fixed top-0 inset-x-0 z-50 bg-surface-container-lowest/80 backdrop-blur-xl pt-safe shadow-[0_4px_20px_rgba(6,5,12,0.45)]"><div class="h-16 px-gutter-mobile flex items-center justify-between"><div class="flex items-center gap-space-xs"><button aria-label="Go back" class="min-w-[44px] min-h-[44px] flex items-center justify-center rounded-full bg-surface-container-low shadow-[inset_1px_1px_3px_rgba(6,5,12,0.8),inset_-1px_-1px_2px_rgba(43,34,82,0.3)] text-on-surface-variant hover:text-primary transition-colors" onclick="history.back()"><span class="material-symbols-outlined text-[20px]">arrow_back_ios_new</span></button><img alt="friendO App Logo" class="h-8 w-auto object-contain" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD7F2pPA0ZKQMqFxhiDLzE4wLpaNtaan6b9M_mTUoXkjeGrhyJuul-cJWLMu4llkEAGTbPhaQ42J9b_5M7X9xNUJDA1MxZuRVNmcpv-90br68ndEER5sYwjNkPOp3tLT9uO85xa2mOxqKY5-Ue2lqLE4QCw6i3XwtjtSXxZVKj-4bj4N9nfLJtTuBx7TBFI3ezu9ZsNm6wrBYLYSmIHafq9lWuM6TN5Tzz_iz-uom0FuLJDOLeTFpe5xw"><h1 class="font-headline-sm text-headline-sm text-on-surface tracking-tight font-semibold truncate max-w-[160px]">Friend Detail</h1></div><div class="flex items-center gap-space-xs"><div class="flex items-center gap-space-2xs bg-surface-container-low/90 px-space-xs py-space-2xs rounded-full shadow-[inset_1px_1px_3px_rgba(6,5,12,0.8),inset_-1px_-1px_2px_rgba(43,34,82,0.3)]"><span class="material-symbols-outlined text-tertiary text-[14px]">lock</span><span class="font-label-sm text-label-sm text-tertiary-fixed-dim uppercase tracking-wider hidden sm:inline">100% On-Device</span></div><button aria-label="Profile" class="min-w-[44px] min-h-[44px] flex items-center justify-center p-space-2xs rounded-full bg-surface-container-low shadow-[inset_1px_1px_3px_rgba(6,5,12,0.8),inset_-1px_-1px_2px_rgba(43,34,82,0.3)] hover:opacity-95 transition-opacity"><img alt="Profile" class="w-8 h-8 rounded-full object-cover shadow-[0_0_12px_rgba(160,120,255,0.4)]" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDHogisuBAGdrsx81NMV6-Jzed-Q5zUYhRfiDMfObO2HsCIe6SqLOoHo724ItN0oiO3Uye3pqcx_vRsMjgOLmSFvChVS-OfrGG37HB7_H6A5khpt4reONzi9vFPyGavFa5qx6Go5QR9GUinHJKvr8UDZEWp9n0dpPhSTdKf-rOAUj8qlwWVmSwBM9mfQB6nQRuyVyi09OM5gOSXJIpeMZzmmzki5B3Q4lcIQMtmUZvPzLyOMRBpdH6cPQ"></button></div></div></header><main class="flex-1 flex flex-col relative w-full pt-16 pb-safe bg-surface text-on-surface overflow-x-hidden"><div class="flex flex-col w-full px-gutter-mobile py-space-sm space-y-space-md">
+<!-- Friend Profile & Ambient Orbital Glow Card -->
+<section class="w-full rounded-lg bg-surface-container-low p-space-md shadow-[6px_6px_18px_rgba(6,5,12,0.85),-4px_-4px_14px_rgba(43,34,82,0.35)] relative overflow-hidden">
+<div class="absolute -top-16 -right-16 w-44 h-44 rounded-full bg-primary-container/10 blur-3xl pointer-events-none"></div>
+<div class="absolute -bottom-10 -left-10 w-36 h-36 rounded-full bg-tertiary-container/15 blur-2xl pointer-events-none"></div>
+<div class="flex items-start justify-between relative z-10">
+<div class="flex items-center gap-space-sm">
+<div class="relative">
+<div class="w-16 h-16 rounded-full p-space-2xs bg-gradient-to-br from-secondary-container via-surface-container to-surface-container-lowest shadow-[inset_2px_2px_4px_rgba(6,5,12,0.9),inset_-2px_-2px_4px_rgba(74,61,124,0.3)] flex items-center justify-center">
+<img class="w-14 h-14 rounded-full object-cover shadow-[0_0_16px_rgba(160,120,255,0.45)]" data-alt="Warm natural portrait of Sarah Miller, a smiling woman in her late twenties with curly brown hair, bathed in soft golden lavender dusk lighting, wearing a minimalist cozy knit sweater, gentle celestial ambient tone, professional photography" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCgkK0x4PwbRf-3FNy8HpuNfPAQpUTxbUS4Azy22Q3rxXdVm7CNeP921g7nG46sjWBig3yDj-qlmMFPg4CmDy7S0eTEyEmb7GJK7WJm5RgfJU6cxXgkyDv_9kdY1Tt5gC5_yIaHTCHEAw887SFtl6JkDtjFE5vG8H3uYi4MMWgXwp7hrKAL5tZq9h2UQx0tN9-x3n4hQuBrYqqlWeQwl7tTWi2LsYPBya42yQCPXzG1_s9fx_84Of__iw">
+</div>
+<span class="absolute bottom-0 right-0 w-4 h-4 rounded-full bg-primary flex items-center justify-center shadow-[0_0_8px_rgba(208,188,255,0.8)]">
+<span class="material-symbols-outlined text-[10px] text-on-primary" style="font-variation-settings: 'FILL' 1;">auto_awesome</span>
+</span>
+</div>
+<div class="flex flex-col min-w-0">
+<div class="flex items-center gap-space-2xs">
+<h2 class="font-headline-md text-headline-md text-on-surface font-semibold tracking-tight truncate">Sarah Miller</h2>
+<span class="material-symbols-outlined text-tertiary text-[18px]" style="font-variation-settings: 'FILL' 1;" title="Pinned Orbit">favorite</span>
+</div>
+<p class="font-label-md text-label-md text-secondary">Close Friends · Monthly Orbit</p>
+<div class="flex items-center gap-space-2xs mt-space-2xs">
+<span class="inline-flex items-center gap-1 px-space-xs py-0.5 rounded-full bg-surface-container-highest text-tertiary-fixed font-label-sm text-label-sm shadow-[inset_1px_1px_3px_rgba(6,5,12,0.8)]">
+<span class="w-1.5 h-1.5 rounded-full bg-tertiary animate-pulse"></span>
+              Figma · Bay Area
+            </span>
+</div>
+</div>
+</div>
+<!-- Tactile Orbital Clock Dial (Day 28 of 30) -->
+<div class="flex flex-col items-center flex-shrink-0 ml-space-xs">
+<div class="relative w-14 h-14 flex items-center justify-center rounded-full bg-surface-container-lowest shadow-[inset_3px_3px_8px_rgba(6,5,12,0.9),inset_-2px_-2px_6px_rgba(43,34,82,0.25)]">
+<svg class="w-12 h-12 -rotate-90" viewBox="0 0 48 48">
+<circle class="stroke-surface-container-highest" cx="24" cy="24" fill="none" r="19" stroke-width="3"></circle>
+<circle class="stroke-primary" cx="24" cy="24" fill="none" id="orbit-progress" r="19" stroke-dasharray="119.38" stroke-dashoffset="7.95" stroke-linecap="round" stroke-width="3" style="filter: drop-shadow(0 0 5px rgba(208, 188, 255, 0.65)); transition: stroke-dashoffset 0.8s ease;"></circle>
+<circle class="fill-primary" cx="39.8" cy="13.5" id="orbit-indicator" r="2.8" style="filter: drop-shadow(0 0 6px rgba(208, 188, 255, 0.9)); transition: all 0.8s ease;"></circle>
+</svg>
+<div class="absolute flex flex-col items-center justify-center">
+<span class="font-headline-sm text-headline-sm text-on-surface font-semibold leading-none" id="orbit-day-count">28</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant leading-none scale-90">/30d</span>
+</div>
+</div>
+<span class="font-label-sm text-label-sm text-on-surface-variant mt-1">11:40 orbit</span>
+</div>
+</div>
+<!-- Orbit Dynamic Status + Primary Cycle Reset Action -->
+<div class="mt-space-md pt-space-xs flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-space-xs relative z-10">
+<div class="flex items-center gap-space-xs">
+<div class="flex items-center gap-space-2xs px-space-sm py-1.5 rounded-full bg-surface-container-high shadow-[0_0_16px_rgba(251,191,36,0.25)] text-on-surface" id="cadence-status-pill">
+<span class="w-2 h-2 rounded-full bg-amber-400 animate-ping"></span>
+<span class="font-label-md text-label-md text-amber-300 font-semibold tracking-wide" id="cadence-status-text">Due in 2 Days</span>
+</div>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Optimal reachout cadence</span>
+</div>
+<!-- Tactile Raised Pill Button -->
+<button class="min-h-[44px] px-space-md py-space-xs rounded-full bg-gradient-to-r from-primary-container via-primary to-secondary text-on-primary font-label-lg text-label-lg flex items-center justify-center gap-space-xs shadow-[4px_4px_14px_rgba(6,5,12,0.9),-3px_-3px_10px_rgba(74,61,124,0.4)] active:shadow-[inset_2px_2px_6px_rgba(6,5,12,0.9),inset_-1px_-1px_4px_rgba(74,61,124,0.3)] transition-all" id="catchup-btn">
+<span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">cycle</span>
+<span class="">Just Caught Up with Sarah</span>
+</button>
+</div>
+</section>
+<!-- Curated Memory Bank: Debossed Notepad -->
+<section class="w-full rounded-lg bg-surface-container-lowest p-space-md shadow-[inset_4px_4px_12px_rgba(6,5,12,0.95),inset_-2px_-2px_8px_rgba(43,34,82,0.25)] relative">
+<div class="flex items-center justify-between mb-space-sm">
+<div class="flex items-center gap-space-xs">
+<div class="w-8 h-8 rounded-full bg-surface-container-high flex items-center justify-center shadow-[inset_1px_1px_3px_rgba(6,5,12,0.8)]">
+<span class="material-symbols-outlined text-primary text-[18px]">bookmark_heart</span>
+</div>
+<div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface font-semibold">What's New &amp; Topics</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Subtle touchstones for next coffee</p>
+</div>
+</div>
+<span class="px-space-xs py-0.5 rounded-full bg-surface-container-low text-secondary font-label-sm text-label-sm shadow-[inset_1px_1px_2px_rgba(6,5,12,0.8)]">3 active</span>
+</div>
+<!-- Notepad Cards List -->
+<ul class="space-y-space-xs" id="topic-list">
+<li class="group flex items-start gap-space-xs p-space-sm bg-surface-container-low shadow-[3px_3px_10px_rgba(6,5,12,0.8),-2px_-2px_8px_rgba(43,34,82,0.25)] transition-all hover:bg-surface-container rounded-lg">
+<button aria-label="Mark completed" class="topic-check min-w-[28px] min-h-[28px] mt-0.5 rounded-full bg-surface-container-lowest flex items-center justify-center shadow-[inset_2px_2px_4px_rgba(6,5,12,0.9)] text-outline hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-[16px]">done</span>
+</button>
+<div class="flex-1 min-w-0">
+<p class="topic-text font-body-md text-body-md text-on-surface">Ask about her recent trip to Kyoto &amp; pottery workshop</p>
+<span class="font-label-sm text-label-sm text-on-surface-variant mt-0.5 inline-block">Noted Oct 22 · Travel &amp; Arts</span>
+</div>
+<button aria-label="Remove topic" class="topic-delete min-w-[28px] min-h-[28px] flex items-center justify-center text-outline-variant hover:text-error transition-colors">
+<span class="material-symbols-outlined text-[18px]">close</span>
+</button>
+</li>
+<li class="group flex items-start gap-space-xs p-space-sm bg-surface-container-low shadow-[3px_3px_10px_rgba(6,5,12,0.8),-2px_-2px_8px_rgba(43,34,82,0.25)] transition-all hover:bg-surface-container rounded-lg">
+<button aria-label="Mark completed" class="topic-check min-w-[28px] min-h-[28px] mt-0.5 rounded-full bg-surface-container-lowest flex items-center justify-center shadow-[inset_2px_2px_4px_rgba(6,5,12,0.9)] text-outline hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-[16px]">done</span>
+</button>
+<div class="flex-1 min-w-0">
+<p class="topic-text font-body-md text-body-md text-on-surface">Follow up on her sister Maya’s grad school decision</p>
+<span class="font-label-sm text-label-sm text-on-surface-variant mt-0.5 inline-block">Noted Oct 16 · Family milestone</span>
+</div>
+<button aria-label="Remove topic" class="topic-delete min-w-[28px] min-h-[28px] flex items-center justify-center text-outline-variant hover:text-error transition-colors">
+<span class="material-symbols-outlined text-[18px]">close</span>
+</button>
+</li>
+<li class="group flex items-start gap-space-xs p-space-sm bg-surface-container-low shadow-[3px_3px_10px_rgba(6,5,12,0.8),-2px_-2px_8px_rgba(43,34,82,0.25)] transition-all hover:bg-surface-container rounded-lg">
+<button aria-label="Mark completed" class="topic-check min-w-[28px] min-h-[28px] mt-0.5 rounded-full bg-surface-container-lowest flex items-center justify-center shadow-[inset_2px_2px_4px_rgba(6,5,12,0.9)] text-outline hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-[16px]">done</span>
+</button>
+<div class="flex-1 min-w-0">
+<p class="topic-text font-body-md text-body-md text-on-surface">Recommend the sci-fi book "Children of Time"</p>
+<span class="font-label-sm text-label-sm text-on-surface-variant mt-0.5 inline-block">Noted Oct 14 · Book exchange</span>
+</div>
+<button aria-label="Remove topic" class="topic-delete min-w-[28px] min-h-[28px] flex items-center justify-center text-outline-variant hover:text-error transition-colors">
+<span class="material-symbols-outlined text-[18px]">close</span>
+</button>
+</li>
+</ul>
+<!-- Tactile Debossed Input Bar -->
+<form class="mt-space-sm flex items-center gap-space-xs" id="topic-form">
+<div class="flex-1 relative flex items-center rounded-full bg-surface-container-lowest shadow-[inset_3px_3px_8px_rgba(6,5,12,0.9),inset_-1px_-1px_3px_rgba(43,34,82,0.25)] px-space-md py-space-xs">
+<span class="material-symbols-outlined text-outline-variant text-[20px] mr-space-2xs">add_circle_outline</span>
+<input class="w-full bg-transparent text-on-surface font-body-md text-body-md placeholder-outline-variant focus:outline-none focus:text-primary-fixed" id="topic-input" placeholder="+ Add topic to bring up next time..." type="text">
+</div>
+<button aria-label="Save topic" class="min-w-[44px] min-h-[44px] rounded-full bg-surface-container-high shadow-[3px_3px_8px_rgba(6,5,12,0.8),-2px_-2px_6px_rgba(43,34,82,0.3)] hover:bg-surface-bright active:shadow-[inset_2px_2px_4px_rgba(6,5,12,0.9)] flex items-center justify-center text-primary transition-all" type="submit">
+<span class="material-symbols-outlined text-[20px]">arrow_upward</span>
+</button>
+</form>
+</section>
+<!-- Last Conversation Recap (Tactile Memory Capsule) -->
+<section class="w-full rounded-lg bg-surface-container-low p-space-md shadow-[6px_6px_18px_rgba(6,5,12,0.85),-4px_-4px_14px_rgba(43,34,82,0.35)] relative">
+<div class="flex items-center justify-between mb-space-sm">
+<div class="flex items-center gap-space-xs">
+<div class="w-8 h-8 rounded-full bg-secondary-container flex items-center justify-center shadow-[inset_1px_1px_3px_rgba(6,5,12,0.7)]">
+<span class="material-symbols-outlined text-secondary text-[18px]">history_edu</span>
+</div>
+<div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface font-semibold">Last Conversation Recap</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant">October 14 (28 days ago) at Blue Bottle Coffee</p>
+</div>
+</div>
+<button aria-label="Edit recap" class="min-w-[36px] min-h-[36px] rounded-full bg-surface-container shadow-[inset_1px_1px_3px_rgba(6,5,12,0.8),inset_-1px_-1px_2px_rgba(43,34,82,0.3)] text-on-surface-variant hover:text-primary flex items-center justify-center transition-colors">
+<span class="material-symbols-outlined text-[18px]">edit_note</span>
+</button>
+</div>
+<!-- Capsule Attributes Grid -->
+<div class="grid grid-cols-2 gap-space-xs mb-space-sm">
+<div class="p-space-xs bg-surface-container-lowest shadow-[inset_2px_2px_6px_rgba(6,5,12,0.85)] flex items-center gap-space-xs rounded-lg">
+<span class="material-symbols-outlined text-tertiary text-[20px]">schedule</span>
+<div class="flex flex-col min-w-0">
+<span class="font-label-sm text-label-sm text-on-surface-variant uppercase">Duration</span>
+<span class="font-label-lg text-label-lg text-on-surface font-semibold">1.5 hrs</span>
+</div>
+</div>
+<div class="p-space-xs bg-surface-container-lowest shadow-[inset_2px_2px_6px_rgba(6,5,12,0.85)] flex items-center gap-space-xs rounded-lg">
+<span class="material-symbols-outlined text-secondary text-[20px]" style="font-variation-settings: 'FILL' 1;">sentiment_very_satisfied</span>
+<div class="flex flex-col min-w-0">
+<span class="font-label-sm text-label-sm text-on-surface-variant uppercase">Vibe</span>
+<span class="font-label-lg text-label-lg text-secondary font-semibold">Warm &amp; Energized</span>
+</div>
+</div>
+</div>
+<!-- Memory Body Box with Visual Anchor -->
+<div class="bg-surface-container p-space-sm shadow-[inset_2px_2px_5px_rgba(6,5,12,0.7)] relative overflow-hidden rounded-lg">
+<div class="flex items-start gap-space-sm">
+<div class="w-12 h-12 flex-shrink-0 rounded-lg overflow-hidden shadow-[inset_1px_1px_3px_rgba(6,5,12,0.8)]">
+<img class="w-full h-full object-cover" data-alt="Warm aesthetic coffee table setup with artisanal latte art in ceramic mugs, open journal notebook and gentle cafe shadows in a quiet neighborhood cafe, cozy muted violet ambient tones" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDoyCp-aVBuoEIbelL4t1xOr-OXem3jmYPePbqgezw1BkrdeawCKMHyF0uo8Q58nrNbNQ282CMiw7I7o0eiI98MO0lIj9AgewN422FTOC4ADumecKcfuBSMiHrvmlQJEOaQBKpx4zIuI9a4gc6-16SVYm9Gf6BCy47GQGa72PeUZ_g4GFT0jScUmF9wGcN6NSLYsROX78gfKul0UMX0WNbIrh3Jycycojmu43d0tAbEqLcvggsEgijUeQ">
+</div>
+<p class="font-body-md text-body-md text-on-surface leading-relaxed">
+          “She just adopted a rescue corgi named <strong class="text-primary-fixed font-semibold">Miso</strong>! Switched to a remote lead role at Figma. Looking to do a ceramic weekend soon in Mendocino.”
+        </p>
+</div>
+<!-- Quick Audio Voice Note Pill (Local Delight) -->
+<div class="mt-space-xs pt-space-xs flex items-center justify-between">
+<div class="flex items-center gap-space-xs">
+<button aria-label="Play voice note" class="w-7 h-7 rounded-full bg-primary-container text-on-primary-container flex items-center justify-center shadow-[2px_2px_6px_rgba(6,5,12,0.7)]">
+<span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">play_arrow</span>
+</button>
+<div class="flex items-center gap-1">
+<span class="w-1 h-2.5 rounded-full bg-primary animate-pulse"></span>
+<span class="w-1 h-4 rounded-full bg-primary"></span>
+<span class="w-1 h-3 rounded-full bg-primary"></span>
+<span class="w-1 h-5 rounded-full bg-primary"></span>
+<span class="w-1 h-2 rounded-full bg-primary"></span>
+<span class="font-label-sm text-label-sm text-on-surface-variant ml-1">0:38 audio reflection</span>
+</div>
+</div>
+<span class="font-label-sm text-label-sm text-tertiary-fixed-dim">Blue Bottle Hayes</span>
+</div>
+</div>
+</section>
+<!-- Orbit Cadence & Frequency Settings -->
+<section class="w-full rounded-lg bg-surface-container-low p-space-md shadow-[6px_6px_18px_rgba(6,5,12,0.85),-4px_-4px_14px_rgba(43,34,82,0.35)] space-y-space-md">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-space-xs">
+<div class="w-8 h-8 rounded-full bg-surface-container-high flex items-center justify-center shadow-[inset_1px_1px_3px_rgba(6,5,12,0.8)]">
+<span class="material-symbols-outlined text-tertiary text-[18px]">timelapse</span>
+</div>
+<div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface font-semibold">Orbit Cadence Tuning</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Adjust Sarah's cyclical rhythm</p>
+</div>
+</div>
+<span class="px-space-xs py-1 rounded-full bg-surface-container-highest text-primary-fixed font-label-md text-label-md shadow-[inset_1px_1px_3px_rgba(6,5,12,0.8)]" id="cadence-display-badge">Every 30 Days</span>
+</div>
+<!-- Stepped Frequency Selector (7d, 14d, 30d, 60d, 90d) -->
+<div class="space-y-space-2xs">
+<div class="p-space-2xs rounded-full bg-surface-container-lowest shadow-[inset_3px_3px_8px_rgba(6,5,12,0.9),inset_-1px_-1px_3px_rgba(43,34,82,0.25)] flex items-center justify-between">
+<button class="cadence-btn flex-1 py-1.5 rounded-full text-center font-label-sm text-label-sm text-on-surface-variant transition-all hover:text-on-surface" data-days="7" type="button">7d</button>
+<button class="cadence-btn flex-1 py-1.5 rounded-full text-center font-label-sm text-label-sm text-on-surface-variant transition-all hover:text-on-surface" data-days="14" type="button">14d</button>
+<button class="cadence-btn active-cadence flex-1 py-1.5 rounded-full text-center font-label-sm text-label-sm bg-gradient-to-r from-primary-container to-secondary-container text-primary-fixed shadow-[2px_2px_6px_rgba(6,5,12,0.8)] transition-all" data-days="30" type="button">30d</button>
+<button class="cadence-btn flex-1 py-1.5 rounded-full text-center font-label-sm text-label-sm text-on-surface-variant transition-all hover:text-on-surface" data-days="60" type="button">60d</button>
+<button class="cadence-btn flex-1 py-1.5 rounded-full text-center font-label-sm text-label-sm text-on-surface-variant transition-all hover:text-on-surface" data-days="90" type="button">90d</button>
+</div>
+<div class="flex justify-between px-space-xs text-outline-variant font-label-sm text-label-sm">
+<span class="">Weekly</span>
+<span class="">Bi-weekly</span>
+<span class="">Monthly</span>
+<span class="">Bimonthly</span>
+<span class="">Seasonal</span>
+</div>
+</div>
+<!-- Gentle Nudge Toggle Switch -->
+<div class="p-space-sm bg-surface-container-lowest shadow-[inset_2px_2px_6px_rgba(6,5,12,0.9)] flex items-center justify-between rounded-lg">
+<div class="flex items-center gap-space-xs">
+<span class="material-symbols-outlined text-secondary text-[20px]">notifications_active</span>
+<div>
+<p class="font-label-lg text-label-lg text-on-surface font-semibold">Gentle Celestial Nudge</p>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Alert 3 days before 12:00 full orbit</p>
+</div>
+</div>
+<button aria-checked="true" class="w-12 h-6 rounded-full bg-primary-container p-0.5 transition-colors focus:outline-none shadow-[inset_1px_1px_3px_rgba(6,5,12,0.8)] flex items-center justify-end" id="nudge-toggle" role="switch" type="button">
+<span class="w-5 h-5 rounded-full bg-on-primary-container shadow-[1px_1px_3px_rgba(0,0,0,0.5)] transition-transform" id="nudge-thumb"></span>
+</button>
+</div>
+<!-- Private Local Memory Safe Vault Note -->
+<div class="p-space-sm bg-surface-container shadow-[inset_2px_2px_6px_rgba(6,5,12,0.85)] flex items-start gap-space-xs rounded-lg">
+<span class="material-symbols-outlined text-tertiary text-[20px] mt-0.5">lock_person</span>
+<div class="flex-1 min-w-0">
+<div class="flex items-center justify-between">
+<span class="font-label-sm text-label-sm text-tertiary uppercase tracking-wider">Private Local Vault</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">On-Device Encrypted</span>
+</div>
+<p class="font-body-md text-body-md text-on-surface mt-1">
+<span class="font-semibold text-primary-fixed">Birthday:</span> March 22 &nbsp;·&nbsp;
+          <span class="font-semibold text-primary-fixed">Favorite drink:</span> Oat Matcha Latte (unsweetened)
+        </p>
+</div>
+</div>
+</section>
+</div>
+<script>
+  (function() {
+    // Reset cycle on "Just Caught Up"
+    const catchupBtn = document.getElementById('catchup-btn');
+    const dayCount = document.getElementById('orbit-day-count');
+    const orbitProgress = document.getElementById('orbit-progress');
+    const orbitIndicator = document.getElementById('orbit-indicator');
+    const cadencePill = document.getElementById('cadence-status-pill');
+    const cadenceText = document.getElementById('cadence-status-text');
+
+    let currentDay = 28;
+    let maxDays = 30;
+
+    function updateOrbitVisual(day, max) {
+      dayCount.textContent = day;
+      const circumference = 119.38;
+      const offset = circumference - (day / max) * circumference;
+      orbitProgress.style.strokeDashoffset = offset;
+
+      // Indicator approximate position
+      const angle = (day / max) * 2 * Math.PI - Math.PI / 2;
+      const cx = 24 + 19 * Math.cos(angle);
+      const cy = 24 + 19 * Math.sin(angle);
+      orbitIndicator.setAttribute('cx', cx.toFixed(1));
+      orbitIndicator.setAttribute('cy', cy.toFixed(1));
+
+      if (day >= max - 3) {
+        cadencePill.className = "flex items-center gap-space-2xs px-space-sm py-1.5 rounded-full bg-surface-container-high shadow-[0_0_16px_rgba(251,191,36,0.3)] text-on-surface";
+        cadenceText.className = "font-label-md text-label-md text-amber-300 font-semibold tracking-wide";
+        cadenceText.textContent = `Due in ${Math.max(1, max - day)} Days`;
+      } else {
+        cadencePill.className = "flex items-center gap-space-2xs px-space-sm py-1.5 rounded-full bg-surface-container-high shadow-[0_0_16px_rgba(123,208,255,0.25)] text-on-surface";
+        cadenceText.className = "font-label-md text-label-md text-tertiary-fixed font-semibold tracking-wide";
+        cadenceText.textContent = `Orbit Refreshed · Day ${day}`;
+      }
+    }
+
+    if (catchupBtn) {
+      catchupBtn.addEventListener('click', () => {
+        currentDay = 1;
+        updateOrbitVisual(currentDay, maxDays);
+        catchupBtn.classList.add('scale-95');
+        setTimeout(() => catchupBtn.classList.remove('scale-95'), 150);
+      });
+    }
+
+    // Interactive topic list (Add, Strike, Remove)
+    const topicForm = document.getElementById('topic-form');
+    const topicInput = document.getElementById('topic-input');
+    const topicList = document.getElementById('topic-list');
+
+    if (topicForm) {
+      topicForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const val = topicInput.value.trim();
+        if (!val) return;
+
+        const li = document.createElement('li');
+        li.className = 'group flex items-start gap-space-xs p-space-sm rounded-DEFAULT bg-surface-container-low shadow-[3px_3px_10px_rgba(6,5,12,0.8),-2px_-2px_8px_rgba(43,34,82,0.25)] transition-all hover:bg-surface-container';
+        li.innerHTML = `
+          <button class="topic-check min-w-[28px] min-h-[28px] mt-0.5 rounded-full bg-surface-container-lowest flex items-center justify-center shadow-[inset_2px_2px_4px_rgba(6,5,12,0.9)] text-outline hover:text-primary transition-colors" aria-label="Mark completed">
+            <span class="material-symbols-outlined text-[16px]">done</span>
+          </button>
+          <div class="flex-1 min-w-0">
+            <p class="topic-text font-body-md text-body-md text-on-surface">${val}</p>
+            <span class="font-label-sm text-label-sm text-on-surface-variant mt-0.5 inline-block">Noted just now · Fresh touchpoint</span>
+          </div>
+          <button class="topic-delete min-w-[28px] min-h-[28px] flex items-center justify-center text-outline-variant hover:text-error transition-colors" aria-label="Remove topic">
+            <span class="material-symbols-outlined text-[18px]">close</span>
+          </button>
+        `;
+        topicList.prepend(li);
+        topicInput.value = '';
+      });
+    }
+
+    if (topicList) {
+      topicList.addEventListener('click', (e) => {
+        const checkBtn = e.target.closest('.topic-check');
+        if (checkBtn) {
+          const item = checkBtn.closest('li');
+          const txt = item.querySelector('.topic-text');
+          txt.classList.toggle('line-through');
+          txt.classList.toggle('opacity-50');
+          checkBtn.classList.toggle('text-primary');
+          return;
+        }
+
+        const deleteBtn = e.target.closest('.topic-delete');
+        if (deleteBtn) {
+          const item = deleteBtn.closest('li');
+          item.remove();
+        }
+      });
+    }
+
+    // Stepped Cadence Tuning
+    const cadenceButtons = document.querySelectorAll('.cadence-btn');
+    const cadenceBadge = document.getElementById('cadence-display-badge');
+
+    cadenceButtons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        cadenceButtons.forEach(b => {
+          b.classList.remove('active-cadence', 'bg-gradient-to-r', 'from-primary-container', 'to-secondary-container', 'text-primary-fixed', 'shadow-[2px_2px_6px_rgba(6,5,12,0.8)]');
+          b.classList.add('text-on-surface-variant');
+        });
+        btn.classList.add('active-cadence', 'bg-gradient-to-r', 'from-primary-container', 'to-secondary-container', 'text-primary-fixed', 'shadow-[2px_2px_6px_rgba(6,5,12,0.8)]');
+        btn.classList.remove('text-on-surface-variant');
+
+        const d = parseInt(btn.getAttribute('data-days'), 10);
+        maxDays = d;
+        cadenceBadge.textContent = `Every ${d} Days`;
+        if (currentDay > maxDays) currentDay = maxDays - 1;
+        updateOrbitVisual(currentDay, maxDays);
+      });
+    });
+
+    // Nudge Toggle Switch
+    const nudgeToggle = document.getElementById('nudge-toggle');
+    const nudgeThumb = document.getElementById('nudge-thumb');
+    let nudgeEnabled = true;
+
+    if (nudgeToggle) {
+      nudgeToggle.addEventListener('click', () => {
+        nudgeEnabled = !nudgeEnabled;
+        nudgeToggle.setAttribute('aria-checked', nudgeEnabled);
+        if (nudgeEnabled) {
+          nudgeToggle.className = "w-12 h-6 rounded-full bg-primary-container p-0.5 transition-colors focus:outline-none shadow-[inset_1px_1px_3px_rgba(6,5,12,0.8)] flex items-center justify-end";
+          nudgeThumb.className = "w-5 h-5 rounded-full bg-on-primary-container shadow-[1px_1px_3px_rgba(0,0,0,0.5)] transition-transform";
+        } else {
+          nudgeToggle.className = "w-12 h-6 rounded-full bg-surface-container-high p-0.5 transition-colors focus:outline-none shadow-[inset_1px_1px_3px_rgba(6,5,12,0.8)] flex items-center justify-start";
+          nudgeThumb.className = "w-5 h-5 rounded-full bg-outline shadow-[1px_1px_3px_rgba(0,0,0,0.5)] transition-transform";
+        }
+      });
+    }
+  })();
+</script></main>
+
+</body></html>

@@ -57,7 +57,7 @@ That import list is the boundary. A widget that cannot import `flutter_bloc` can
 `context.read()`. The rule holds by compilation, not by review.
 
 **The package holds treatments. It does not hold concepts.** `SoftCard`, `SoftWell`, `SoftButton`,
-`Pill`, `Glow` and `AvatarRing` belong in it. `DialView`, `FriendBead` and `MeetingCard` do not.
+`Pill`, `Glow` and `AvatarHalo` belong in it. `DialView`, `FriendBead` and `MeetingCard` do not.
 The test is simple: if `friendo_ui` needs `friendo_domain`, something is filed wrong.
 
 The tokens must live here. The widgets read them, so the package must see the type. Putting `Soft`

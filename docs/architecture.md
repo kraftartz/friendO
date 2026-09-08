@@ -10,14 +10,16 @@ decision records follow it.
 
 ## Contents
 
-- [What the app does](#what-the-app-does)
-- [Constraints](#constraints)
-- [System context](#system-context)
-- [Containers](#containers)
-- [The domain core](#the-domain-core)
-- [Data and keys](#data-and-keys)
-- [Module map](#module-map)
-- [Decision records](#decision-records)
+- [friendO Architecture](#friendo-architecture)
+  - [Contents](#contents)
+  - [What the app does](#what-the-app-does)
+  - [Constraints](#constraints)
+  - [System context](#system-context)
+  - [Containers](#containers)
+  - [The domain core](#the-domain-core)
+  - [Data and keys](#data-and-keys)
+  - [Module map](#module-map)
+  - [Decision records](#decision-records)
 
 ## What the app does
 
@@ -29,7 +31,7 @@ From those two facts the app works out who is due next.
 
 The home screen shows a dial. Each friend is a bead that orbits the centre. A bead travels
 from 12:00 all the way round and back to 12:00. One full lap equals one cadence. Close friends sit
-on a small ring, so their lap is short. Distant friends sit on a large ring, so their lap is long.
+on a small orbit, so their lap is short. Distant friends sit on a large orbit, so their lap is long.
 
 When you log a meeting, that friend's bead jumps back to 12:00 and starts again.
 
@@ -109,7 +111,7 @@ those.
   meetings : [Instant]    ---->   dueAt   = lastMet + cadence
                           ---->   phase   = (now - lastMet) / cadence
        plus injected now  ---->   overdue = phase > 1
-                          ---->   ring    = bucket(cadence)
+                          ---->   orbit    = bucket(cadence)
                           ---->   order   = sort all friends by priority
 ```
 
@@ -124,7 +126,7 @@ The domain sorts every friend into one list:
 The first item in that list is the friend the banner names. See
 [ADR-0009](adr/0009-derived-phase-and-overdue-queue.md).
 
-The domain knows nothing about rings, pixels, or angles. The UI turns the list into bead
+The domain knows nothing about orbits, pixels, or angles. The UI turns the list into bead
 positions. See [ADR-0014](adr/0014-dial-layout-and-bead-packing.md).
 
 ## Data and keys
@@ -161,13 +163,13 @@ friendO/
 |
 +-- packages/
 |   +-- friendo_domain/          Pure Dart. No Flutter. No file access. No clock.
-|   |   +-- cadence.dart         Cadence duration and ring bucketing
+|   |   +-- cadence.dart         Cadence duration and orbit bucketing
 |   |   +-- phase.dart           phase, dueAt, overdue, priority order, counts
 |   |   +-- friend.dart          Friend, Meeting, Note, Fact, Affinity, Milestone
 |   |
 |   +-- friendo_ui/              Flutter. No BLoC. No repository. No domain.
 |   |   +-- tokens/              Soft theme extension. Colours, shadows, radii.
-|   |   +-- widgets/             SoftCard, SoftWell, SoftButton, Pill, Glow, AvatarRing
+|   |   +-- widgets/             SoftCard, SoftWell, SoftButton, Pill, Glow, AvatarHalo
 |   |
 |   +-- friendo_ui_book/         Widgetbook workspace. Sees friendo_ui and nothing else.
 |

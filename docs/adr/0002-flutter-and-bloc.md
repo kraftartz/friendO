@@ -8,7 +8,7 @@
 friendO is a phone app. It should run on Android and iOS. One person builds it in spare time, so
 two native codebases are not realistic.
 
-The app has one screen with heavy custom drawing. The dial has moving beads, rings, and glow
+The app has one screen with heavy custom drawing. The dial has moving beads, orbits, and glow
 effects. The UI framework must draw custom shapes well.
 
 The author picked the stack before design started. The choice is fixed and not open for debate.

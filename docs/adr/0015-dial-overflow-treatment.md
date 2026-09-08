@@ -1,17 +1,17 @@
-# ADR-0015: Handle beads that do not fit on a ring
+# ADR-0015: Handle beads that do not fit on an orbit
 
 **Status:** Proposed
 **Date:** 2026-09-07
 
 ## Context
 
-[ADR-0014](0014-dial-layout-and-bead-packing.md) packs beads with a gap between them. Each ring
+[ADR-0014](0014-dial-layout-and-bead-packing.md) packs beads with a gap between them. Each orbit
 therefore holds a limited number: 12 inner, 20 middle, 27 outer. That is 59 beads in total.
 
 **The app allows about 100 friends. The dial holds 59.** A full roster cannot fit, whatever the
 phases are. This is not only a queue problem that appears after a long absence. It is a ceiling.
 
-Most people will stay under the per-ring limits. Twelve close friends is already a lot. So a normal
+Most people will stay under the per-orbit limits. Twelve close friends is already a lot. So a normal
 roster still fits, and the overflow path stays rare.
 
 It still needs an answer. Two cases reach it. A user who ignores the app for a year will have every
