@@ -16,11 +16,11 @@ class DialPage extends StatelessWidget {
   Widget build(BuildContext context) {
     // Fixed dates rather than DateTime.now(). The domain takes `now` as an
     // argument, so this screen reads the same on every run and in every test.
-    final lastMet = DateTime.utc(2026, 1, 1);
+    final lastMet = CivilDate(2026, 1, 1);
     final phase = phaseOf(
       lastMet: lastMet,
-      cadence: const Duration(days: 30),
-      now: lastMet.add(const Duration(days: 12)),
+      cadence: Cadence.ofDays(30),
+      now: lastMet.startOfDayLocal().add(const Duration(days: 12)),
     );
 
     return Center(
@@ -30,7 +30,7 @@ class DialPage extends StatelessWidget {
           children: [
             const Text('Phase'),
             Text(
-              phase.toStringAsFixed(2),
+              phase.value.toStringAsFixed(2),
               key: const Key('dial-phase'),
               style: const TextStyle(fontSize: 32),
             ),

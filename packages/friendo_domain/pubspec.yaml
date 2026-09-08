@@ -12,6 +12,13 @@ publish_to: "none"
 environment:
   sdk: ^3.11.5
 
+# equatable is pure Dart. It brings no Flutter, no clock and no file access, so
+# it does not weaken the boundary above. The rule for this package is "no
+# Flutter, no clock, no input and no output", and never "no dependencies".
+# See ADR-0027.
+dependencies:
+  equatable: ^2.1.0
+
 dev_dependencies:
   lints: ^6.0.0
   test: ^1.25.0
