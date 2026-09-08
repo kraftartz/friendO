@@ -46,3 +46,14 @@ jobs:
       # compiles even when a plugin's Gradle configuration is wrong.
       - name: Build the Android app
         run: flutter build apk --debug
+
+      # The release APK, and only the release APK, carries the two promises the
+      # next step reads. The debug and profile manifests declare INTERNET on
+      # purpose for hot reload, so checking a debug build would fail on a clean
+      # tree. Release signs with the debug key, which is enough to read a
+      # manifest and must never reach a store. See ADR-0023.
+      - name: Build the release APK
+        run: flutter build apk --release
+
+      - name: Check the release manifest
+        run: ./tool/manifest_guard.sh

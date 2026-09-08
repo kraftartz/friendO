@@ -16,3 +16,6 @@ dart format --output=none --set-exit-if-changed .
 # Verified by probe on 2026-09-08.
 echo "==> analyze"
 flutter analyze
+
+echo "==> boundaries"
+"$REPO_ROOT/tool/boundaries.sh"
