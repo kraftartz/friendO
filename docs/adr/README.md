@@ -35,6 +35,7 @@ instead and set the old one to `Superseded`.
 | [0015](0015-dial-overflow-treatment.md) | Handle beads that do not fit on a ring | **Proposed** |
 | [0016](0016-derive-lastmet-from-meetings.md) | Derive lastMet from meeting dates | Accepted |
 | [0017](0017-note-kinds-are-labels.md) | Note kinds are labels, and nothing clears itself | Accepted |
+| [0018](0018-ui-package-and-widgetbook.md) | Put design tokens and dumb widgets in their own package | Accepted |
 
 ## Template
 

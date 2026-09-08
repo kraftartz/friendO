@@ -77,6 +77,7 @@ The user then picks the destination. See [ADR-0010](adr/0010-encrypted-logical-b
 graph TB
     subgraph Phone["One phone"]
         UI["Feature modules<br/>Widgets + BLoC"]
+        UIP["friendo_ui<br/>tokens + dumb widgets"]
         DOM["friendo_domain<br/>pure Dart, no Flutter"]
         REPO["Repositories<br/>drift"]
         DB[("SQLCipher database<br/>one file per profile")]
@@ -84,6 +85,7 @@ graph TB
         NOTIF["Local notifications"]
     end
 
+    UI -->|"builds from"| UIP
     UI -->|"asks who is due"| DOM
     UI -->|"reads and writes"| REPO
     REPO -->|"maps rows to entities"| DOM
@@ -92,6 +94,7 @@ graph TB
     UI -->|"schedules reminders"| NOTIF
 
     style DOM fill:#1c182f,stroke:#7bd0ff,color:#e6defd
+    style UIP fill:#1c182f,stroke:#d0bcff,color:#e6defd
 ```
 
 ## The domain core
@@ -158,16 +161,22 @@ friendO/
 |
 +-- packages/
 |   +-- friendo_domain/          Pure Dart. No Flutter. No file access. No clock.
-|       +-- cadence.dart         Cadence duration and ring bucketing
-|       +-- phase.dart           phase, dueAt, overdue, priority order, counts
-|       +-- friend.dart          Friend, Meeting, Note, Fact, Affinity, Milestone
+|   |   +-- cadence.dart         Cadence duration and ring bucketing
+|   |   +-- phase.dart           phase, dueAt, overdue, priority order, counts
+|   |   +-- friend.dart          Friend, Meeting, Note, Fact, Affinity, Milestone
+|   |
+|   +-- friendo_ui/              Flutter. No BLoC. No repository. No domain.
+|   |   +-- tokens/              Soft theme extension. Colours, shadows, radii.
+|   |   +-- widgets/             SoftCard, SoftWell, SoftButton, Pill, Glow, AvatarRing
+|   |
+|   +-- friendo_ui_book/         Widgetbook workspace. Sees friendo_ui and nothing else.
 |
 +-- lib/
 |   +-- core/                    Shared services used by many features
 |   |   +-- crypto/              Data key, Argon2id, AES-GCM
 |   |   +-- db/                  drift tables, SQLCipher setup, migrations
-|   |   +-- security/            App lock, screen privacy, auto-lock
 |   |   +-- media/               Avatar images and audio recaps. Stored as blobs.
+|   |   +-- security/            App lock, screen privacy, auto-lock
 |   |   +-- time/                Clock. Every "now" comes from here.
 |   |
 |   +-- features/                One folder per user-facing area
@@ -178,13 +187,18 @@ friendO/
 |   |   +-- backup/              Export and import
 |   |   +-- settings/            Reminder switch and app options
 |   |
-|   +-- app/                     Wiring only: routes, dependency setup, theme
+|   +-- app/                     Wiring only: routes, dependency setup, Soft.dark()
 |
 +-- docs/                        This file and the decision records
 ```
 
-Each feature folder holds its own `bloc/`, `view/`, and repository. A feature may use `core/` and
-`friendo_domain`. A feature must not import another feature.
+Each feature folder holds its own `bloc/`, `view/`, and repository. A feature may use `core/`,
+`friendo_domain` and `friendo_ui`. A feature must not import another feature.
+
+Two rules hold by compilation, not by review. `friendo_domain` never imports Flutter.
+`friendo_ui` never imports a BLoC, a repository, or the domain. `friendo_ui` therefore holds
+treatments such as `SoftCard`, never concepts such as `FriendBead`. See
+[ADR-0018](adr/0018-ui-package-and-widgetbook.md).
 
 ## Decision records
 
