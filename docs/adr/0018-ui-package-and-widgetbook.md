@@ -74,8 +74,13 @@ nothing else.
 A Widgetbook workspace. It depends on `friendo_ui` and nothing else. This matches the layout that
 Widgetbook documents for a design system in a monorepo.
 
-Use the code generator: `@UseCase` annotations with `build_runner`. drift already needs
-`build_runner`, so the generator costs one dev dependency and no new tooling.
+Write the tree of folders and use cases by hand, in `main.dart`. Do not use the code generator.
+
+`widgetbook` and `widgetbook_generator` are separate packages, and the runtime one works alone.
+`Widgetbook.material` takes a plain list of nodes and does not care who wrote that list. One use
+case costs about four lines in it.
+
+The tree lists what is worth previewing. It does not try to cover every widget.
 
 ## Consequences
 
@@ -86,13 +91,16 @@ Use the code generator: `@UseCase` annotations with `build_runner`. drift alread
 - The workspace tests the boundary. It can reach `friendo_ui` alone. Add a BLoC to a primitive and
   the workspace stops compiling, so CI catches it.
 - Widgetbook knobs bind properties to sliders. Shadow offset, blur and opacity can be tuned against
-  a real surface. This replaces a cycle of edit, save and reload.
+  a real surface. This replaces a cycle of edit, save and reload. Knobs come from the Widgetbook
+  runtime, so they work without the code generator.
 - Six widgets replace 272 inline declarations.
 - The inset shadow problem, once solved, is solved in one file.
 
 ### Negative
 
 - Two more `pubspec.yaml` files and two more path dependencies.
+- A new use case needs an edit in `main.dart`. Nothing reminds you, and nothing fails if you skip
+  it. The workspace simply does not show the widget.
 - Use cases go stale when nobody opens them.
 - A UI package invites a component library that nobody needs. The rule above is the only guard, and
   it needs discipline.
@@ -117,8 +125,24 @@ way. The choice is only how many times it appears.
 **Why rejected:** It adds a hook with one caller. The brief fixes the app to dark, so no second set
 of values exists. Add `Soft.light()` beside `Soft.dark()` if a second theme ever appears.
 
-### A hand-written Widgetbook tree, no code generation
+### Code generation for the Widgetbook tree
 
-**Why rejected:** The tree needs an edit for every new use case, and it falls behind in silence.
-The generator reads the annotations instead. `build_runner` is already required, so the objection
-to code generation does not apply here.
+`widgetbook_generator` reads `@UseCase` annotations and writes the tree. An earlier version of this
+record chose it, on the grounds that drift already needs `build_runner`, so the generator would add
+no new tooling.
+
+**Why rejected:** That reason was wrong. The packages resolve independently, each with its own
+lockfile, so drift's `build_runner` sits in the app package and never reaches this one. The
+generator brings `build_runner`, `widgetbook_annotation` and a build step of its own.
+
+What it buys is auto-discovery, and its entire output is a list literal of about four lines per use
+case. Nor can it fall behind in silence: a use case exists to be looked at, so a missing entry
+shows itself the moment you open the workspace.
+
+It also ships a `telemetry` builder that posts to `api-eu.mixpanel.com` on every local build. The
+report carries a SHA-1 of the git user's email address, the first commit's SHA and the `origin`
+remote's owner. It can be turned off in `build.yaml`, but a guard that one deleted file defeats
+suits an app whose point is that data stays on the phone poorly.
+
+`friendo_ui` is a facet of this app, not a product of its own. Tooling built for a design system
+with full coverage is the wrong size for six widgets.
