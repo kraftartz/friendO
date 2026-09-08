@@ -1,0 +1,11 @@
+# The shared rules for every Flutter package in this repository.
+#
+# packages/friendo_ui and packages/friendo_ui_book include this file by path, so
+# the rules are written once. packages/friendo_domain cannot: it is pure Dart
+# and has no flutter_lints, so it keeps its own file.
+include: package:flutter_lints/flutter.yaml
+
+linter:
+  rules:
+    - prefer_single_quotes
+    - require_trailing_commas

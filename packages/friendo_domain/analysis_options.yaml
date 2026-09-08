@@ -1,0 +1,15 @@
+# This package is pure Dart, so it uses `lints` rather than `flutter_lints` and
+# cannot include the root file.
+include: package:lints/recommended.yaml
+
+analyzer:
+  errors:
+    # An import of a package that this pubspec does not declare is an error
+    # here, not a hint. This package must stay free of Flutter, and a warning
+    # that CI prints but tolerates would not keep it that way.
+    depend_on_referenced_packages: error
+
+linter:
+  rules:
+    - prefer_single_quotes
+    - require_trailing_commas

@@ -1,0 +1,17 @@
+name: friendo_domain
+description: >-
+  The friendO domain core. It holds Cadence, Phase, Due Date and Priority Order.
+  It is pure Dart. It has no Flutter, no clock, no file access and no database.
+version: 0.0.1
+publish_to: "none"
+
+# There is deliberately no `flutter` dependency and no `environment: flutter`
+# key here. Their absence is the boundary. Without them this package has no
+# package_config entry for Flutter, so `import 'package:flutter/...'` fails to
+# compile rather than merely raising a lint.
+environment:
+  sdk: ^3.11.5
+
+dev_dependencies:
+  lints: ^6.0.0
+  test: ^1.25.0

@@ -1,0 +1,28 @@
+name: friendo_ui_book
+description: "Widgetbook workspace for friendo_ui."
+publish_to: "none"
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.11.5
+
+# This workspace sees friendo_ui and nothing else. That import list is a test in
+# itself: if a primitive ever grows a dependency on flutter_bloc or on the
+# domain, this package stops compiling and CI reports it.
+dependencies:
+  cupertino_icons: ^1.0.9
+  flutter:
+    sdk: flutter
+  friendo_ui:
+    path: ../friendo_ui
+  # Held at 3.23.x on purpose. widgetbook >=3.24.0 requires Flutter >=3.44.0,
+  # and this project builds on 3.41.7. Raise both together or neither.
+  widgetbook: ^3.23.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+
+flutter:
+  uses-material-design: true

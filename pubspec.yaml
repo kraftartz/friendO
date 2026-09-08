@@ -1,0 +1,49 @@
+name: friendo
+description: "A private notepad and reminder for friendships."
+publish_to: "none"
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.11.5
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  # The local packages. Path dependencies resolve into this lockfile, so this
+  # single `pub get` must satisfy every package's constraints at once. That is
+  # where a version clash between the packages would show up.
+  friendo_domain:
+    path: packages/friendo_domain
+  friendo_ui:
+    path: packages/friendo_ui
+
+  # Used in code today.
+  flutter_bloc: ^9.1.1
+  equatable: ^2.1.0
+  cupertino_icons: ^1.0.8
+
+  # Declared, and not used yet. These are the runtime packages the accepted
+  # decision records commit the app to. They are listed early on purpose: a
+  # version conflict between them is far cheaper to find now, against an empty
+  # app, than later against a half-built feature.
+  #
+  # Absent on purpose: an Argon2id implementation, because ADR-0006 still marks
+  # the candidate package unverified, and declaring it would be a guess.
+  crypto: ^3.0.7
+  drift: ^2.34.4
+  flutter_local_notifications: ^22.3.0
+  flutter_secure_storage: ^11.0.0
+  path_provider: ^2.1.6
+  sqlite3: ^3.5.2
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  bloc_test: ^10.0.0
+  build_runner: ^2.15.1
+  drift_dev: ^2.34.0
+  flutter_lints: ^6.0.0
+
+flutter:
+  uses-material-design: true

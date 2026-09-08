@@ -1,0 +1,23 @@
+name: friendo_ui
+description: >-
+  Design tokens and dumb widgets for friendO. It holds treatments such as
+  SoftCard, never concepts such as FriendBead.
+version: 0.0.1
+publish_to: "none"
+
+# This package depends on Flutter and on nothing else. It must never depend on
+# flutter_bloc, on drift or on friendo_domain. A widget that cannot import
+# flutter_bloc cannot call context.read(), so the dumb-widget rule holds by
+# compilation instead of by review.
+environment:
+  sdk: ^3.11.5
+  flutter: ">=1.17.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+dev_dependencies:
+  flutter_lints: ^6.0.0
+  flutter_test:
+    sdk: flutter
