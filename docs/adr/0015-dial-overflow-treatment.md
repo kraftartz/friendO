@@ -6,13 +6,16 @@
 ## Context
 
 [ADR-0014](0014-dial-layout-and-bead-packing.md) packs beads with a gap between them. Each ring
-therefore holds a limited number: about 11 inner, 19 middle, 27 outer.
+therefore holds a limited number: 12 inner, 20 middle, 27 outer. That is 59 beads in total.
 
-The app allows about 100 friends. Most people will stay under the per-ring limits. Eleven close
-friends is already a lot. So this is a graceful-degradation problem, not a common one.
+**The app allows about 100 friends. The dial holds 59.** A full roster cannot fit, whatever the
+phases are. This is not only a queue problem that appears after a long absence. It is a ceiling.
 
-It still needs an answer. A user who ignores the app for a year will have every friend overdue at
-once.
+Most people will stay under the per-ring limits. Twelve close friends is already a lot. So a normal
+roster still fits, and the overflow path stays rare.
+
+It still needs an answer. Two cases reach it. A user who ignores the app for a year will have every
+friend overdue at once. A user who fills the roster will pass the ceiling even while up to date.
 
 The choice is open. This record exists to hold the problem in view.
 

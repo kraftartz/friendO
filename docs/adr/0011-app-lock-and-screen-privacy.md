@@ -31,11 +31,23 @@ connection.
 
 Use `inactive` on iOS, not `paused`. The system takes its snapshot before `paused` arrives.
 
+**Allow biometric unlock as a shortcut.** A fingerprint or a face opens the same key that the PIN
+opens. It is a second gate on one key, not a second key, so [ADR-0006](0006-keystore-dek-with-pin-gate.md)
+does not change.
+
+Three rules bound it:
+
+- The PIN always stays available. Biometrics fail on wet hands, on a new face, and after a reboot.
+- The biometric prompt names the profile it unlocks. One finger cannot choose between two profiles,
+  so the user picks the profile first and authenticates second.
+- Each profile enables biometrics on its own. One profile using a fingerprint never opens another.
+
 ## Consequences
 
 ### Positive
 
 - A borrowed phone shows a PIN screen, not somebody's notes.
+- A biometric shortcut removes the daily cost of a PIN without weakening the key.
 - The task switcher shows nothing readable on either platform.
 - `FLAG_SECURE` blocks screenshots and screen recording on Android at no extra cost.
 
@@ -63,4 +75,4 @@ nothing and is simpler to build.
 ### Biometric unlock instead of a PIN
 
 **Why rejected as the only method:** Two profiles share one phone, and one fingerprint cannot pick
-between them. Biometrics may be added later as a shortcut, with the PIN kept as the fallback.
+between them. Biometrics are accepted as a shortcut above, with the PIN kept as the fallback.

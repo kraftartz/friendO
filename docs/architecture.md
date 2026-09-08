@@ -128,7 +128,12 @@ positions. See [ADR-0014](adr/0014-dial-layout-and-bead-packing.md).
 
 ```mermaid
 graph LR
-    PIN["User types the PIN"] --> CHECK{"Argon2id hash matches?"}
+    PROF["User picks a profile"] --> PIN["User types the PIN"]
+    PROF --> BIO["Biometric prompt"]
+    PIN --> CHECK{"Argon2id hash matches?"}
+    BIO --> CHECK2{"OS confirms?"}
+    CHECK2 -->|"no"| PIN
+    CHECK2 -->|"yes"| KS
     CHECK -->|"no"| LOCK["Stay locked"]
     CHECK -->|"yes"| KS["Keystore / Keychain"]
     KS -->|"returns the data key"| OPEN["Open the SQLCipher file"]
@@ -154,20 +159,21 @@ friendO/
 +-- packages/
 |   +-- friendo_domain/          Pure Dart. No Flutter. No file access. No clock.
 |       +-- cadence.dart         Cadence duration and ring bucketing
-|       +-- orbit.dart           phase, dueAt, overdue, priority order
-|       +-- friend.dart          Friend, Meeting, Note
+|       +-- phase.dart           phase, dueAt, overdue, priority order, counts
+|       +-- friend.dart          Friend, Meeting, Note, Fact, Affinity, Milestone
 |
 +-- lib/
 |   +-- core/                    Shared services used by many features
 |   |   +-- crypto/              Data key, Argon2id, AES-GCM
 |   |   +-- db/                  drift tables, SQLCipher setup, migrations
 |   |   +-- security/            App lock, screen privacy, auto-lock
+|   |   +-- media/               Avatar images and audio recaps. Stored as blobs.
 |   |   +-- time/                Clock. Every "now" comes from here.
 |   |
 |   +-- features/                One folder per user-facing area
 |   |   +-- dial/                The dial. The main screen.
 |   |   +-- friends/             Add, edit, delete people
-|   |   +-- journal/             Notes, topics, what is new
+|   |   +-- journal/             Meetings, notes, topics, what is new
 |   |   +-- auth/                Profiles, PIN, session
 |   |   +-- backup/              Export and import
 |   |   +-- settings/            Reminder switch and app options

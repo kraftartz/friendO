@@ -13,17 +13,18 @@ Two problems appear.
 **Beads overlap.** Several overdue friends all want 12:00. Beads have a size, so they need space
 between them.
 
-**Space differs per ring.** Run the numbers for a 390px phone with 28px avatars:
+**Space differs per ring.** The design fixes the geometry. The dial is a 340x340 square. The
+three ring radii are 62, 102 and 142. Beads are 28px avatars. Add 4px of padding between them:
 
 | Ring | Radius | Circumference | Beads that fit | Arc needed per bead |
 |---|---|---|---|---|
-| Inner | 60px | 377px | 11 | 65 dial-minutes |
-| Middle | 100px | 628px | 19 | 38 dial-minutes |
-| Outer | 140px | 880px | 27 | 27 dial-minutes |
+| Inner | 62px | 390px | 12 | 59 dial-minutes |
+| Middle | 102px | 641px | 20 | 36 dial-minutes |
+| Outer | 142px | 892px | 27 | 26 dial-minutes |
 
 Those numbers rule out one tempting idea. A rule such as "one queue slot equals one day equals one
-minute of arc" would sound like a domain rule. The geometry needs 65 minutes on the inner ring and
-27 on the outer. No business reason could ever explain those two numbers. Spacing is geometry, and
+minute of arc" would sound like a domain rule. The geometry needs 59 minutes on the inner ring and
+26 on the outer. No business reason could ever explain those two numbers. Spacing is geometry, and
 geometry belongs to the UI.
 
 ## Decision
@@ -47,6 +48,11 @@ for each ring r:
 The packer returns two things: the placed beads, and the beads that did not fit. See
 [ADR-0015](0015-dial-overflow-treatment.md).
 
+**Use one bead size on every ring.** All beads are 28px. Bead size buys arc, and the outer ring
+needs arc most: it holds the longest cadences, so it holds the most friends. A larger bead on the
+outer ring spends capacity where capacity is scarcest. One size also keeps `minGap` a function of
+the radius alone.
+
 Mark the globally first friend with **emphasis**, not with position. Use a glow or a highlight
 ring. Do not move the bead to show priority.
 
@@ -60,14 +66,15 @@ ring. Do not move the bead to show priority.
   holds by construction, so no test has to guard it.
 - A friend who is first on their ring parks at 12:00 on that ring. Rings do not compete for space
   they do not share.
-- Ring-local gaps roughly quintuple capacity, from about 11 beads to about 57.
+- Ring-local gaps roughly quintuple capacity, from about 12 beads to about 59.
 - The packer is a pure function of friends, `now`, and geometry. It tests without a widget tree.
 
 ### Negative
 
 - Up to three beads sit at 12:00, one per ring. Only one is the true next friend. The highlight
   must carry that difference, and a user may miss it.
-- `minGap` depends on real measurements. Change the avatar size and the packing changes.
+- `minGap` depends on real measurements. Change the avatar size and the packing changes. The
+  numbers above come from the design. Measure them again if the dial is resized.
 - The layout runs three passes instead of one. At this data size the cost is nothing.
 
 ## Alternatives Considered
