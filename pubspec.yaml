@@ -47,3 +47,17 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+
+# Build the bundled SQLite with encryption support.
+#
+# package:sqlite3 fetches a prebuilt binary through a Dart build hook. This
+# switches which one. sqlite3mc is SQLite3MultipleCiphers.
+#
+# Not sqlcipher: that build links OpenSSL on Android, and its own documentation
+# warns it may ship an older SQLite than the other two. sqlite3mc needs no
+# extra native library, tracks current SQLite, and still reads a SQLCipher file
+# after the compatibility pragmas.
+hooks:
+  user_defines:
+    sqlite3:
+      source: sqlite3mc

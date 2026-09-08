@@ -22,7 +22,7 @@ instead and set the old one to `Superseded`.
 | [0002](0002-flutter-and-bloc.md) | Use Flutter and BLoC | Accepted |
 | [0003](0003-offline-only-no-internet-permission.md) | Ship without the INTERNET permission | Accepted |
 | [0004](0004-pure-domain-core-feature-shell.md) | Pure domain core, feature-first shell | Accepted |
-| [0005](0005-drift-and-sqlcipher.md) | Store data in drift over SQLCipher | Accepted |
+| [0005](0005-drift-and-encrypted-sqlite.md) | Store data in drift over an encrypted SQLite | Accepted |
 | [0006](0006-keystore-dek-with-pin-gate.md) | Keep the data key in the Keystore, gate it with a PIN | Accepted |
 | [0007](0007-database-per-profile.md) | Give each profile its own database file | Accepted |
 | [0008](0008-cadence-as-duration.md) | Store cadence as a duration, derive the ring | Accepted |

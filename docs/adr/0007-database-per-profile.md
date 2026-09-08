@@ -60,4 +60,4 @@ A's rows are readable in memory, and only application code stops them being show
 ### One database, with the second profile's rows encrypted per field
 
 **Why rejected:** It mixes both models and gains nothing. It still shares a file, and it adds
-field-level crypto code that [ADR-0005](0005-drift-and-sqlcipher.md) already rejected.
+field-level crypto code that [ADR-0005](0005-drift-and-encrypted-sqlite.md) already rejected.
