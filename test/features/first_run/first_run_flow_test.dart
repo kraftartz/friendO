@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:friendo/app/app.dart';
+import 'package:friendo/app/boot.dart';
 import 'package:friendo/core/db/database_session.dart';
 import 'package:friendo/core/profiles/data_key_store.dart';
 import 'package:friendo/core/profiles/profile_creator.dart';
@@ -40,20 +41,24 @@ void main() {
   testWidgets('a phone with no Profile starts on the creation screen', (
     tester,
   ) async {
-    await tester.pumpWidget(FriendoApp(firstRunCreator: creator));
+    await tester.pumpWidget(
+      FriendoApp(creator: creator, firstScreen: const StartFirstRun()),
+    );
 
     expect(find.byType(FirstRunPage), findsOneWidget);
   });
 
   testWidgets('a phone with a Profile starts on the Dial', (tester) async {
-    await tester.pumpWidget(const FriendoApp());
+    await tester.pumpWidget(FriendoApp(creator: creator));
 
     expect(find.byType(FirstRunPage), findsNothing);
     expect(find.text('Dial'), findsOneWidget);
   });
 
   testWidgets('the cost screen leads to the Dial', (tester) async {
-    await tester.pumpWidget(FriendoApp(firstRunCreator: creator));
+    await tester.pumpWidget(
+      FriendoApp(creator: creator, firstScreen: const StartFirstRun()),
+    );
 
     final cubit = BlocProvider.of<FirstRunCubit>(
       tester.element(find.byType(FirstRunPage)),
