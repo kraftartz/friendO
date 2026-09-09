@@ -7,4 +7,5 @@
 library;
 
 export 'src/tokens/soft.dart';
+export 'src/widgets/pin_keypad.dart';
 export 'src/widgets/soft_card.dart';
