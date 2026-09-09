@@ -3,6 +3,7 @@ import 'dart:typed_data';
 
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:friendo/core/crypto/pin_hash.dart';
 import 'package:friendo/core/db/database_session.dart';
 import 'package:friendo/core/profiles/data_key_store.dart';
 import 'package:friendo/core/profiles/profile.dart';
@@ -221,6 +222,137 @@ void main() {
       await session.unlock(theirs.id, '654321');
 
       expect(await databases.state.first, DatabaseState.open);
+    });
+  });
+
+  group('the rest after wrong PINs', () {
+    Matcher restingFor(Duration rest) => isA<Resting>().having(
+      (outcome) => outcome.remaining,
+      'remaining',
+      allOf(
+        greaterThan(rest - const Duration(seconds: 1)),
+        lessThanOrEqualTo(rest),
+      ),
+    );
+
+    Future<void> missTimes(String profileId, int times) async {
+      for (var i = 0; i < times; i++) {
+        session.arriveAtKeypad();
+        await session.unlock(profileId, '000000');
+      }
+    }
+
+    test('costs nothing for the first four mistakes', () async {
+      final profile = await aProfile();
+
+      await missTimes(profile.id, 4);
+      session.arriveAtKeypad();
+
+      expect(await session.unlock(profile.id, '123456'), const Unlocked());
+      expect(await attemptsOf(profile.id), 0);
+    });
+
+    test('refuses the next arrival for 30 seconds after the fifth', () async {
+      final profile = await aProfile();
+
+      await missTimes(profile.id, 5);
+      session.arriveAtKeypad();
+
+      expect(
+        await session.unlock(profile.id, '123456'),
+        restingFor(const Duration(seconds: 30)),
+      );
+      expect(await databases.state.first, DatabaseState.locked);
+    });
+
+    test('counts no further attempt while it refuses', () async {
+      final profile = await aProfile();
+      await missTimes(profile.id, 5);
+
+      session.arriveAtKeypad();
+      await session.unlock(profile.id, '000000');
+
+      expect(await attemptsOf(profile.id), 5);
+    });
+
+    test('hashes no PIN while it refuses', () async {
+      final profile = await aProfile();
+      await missTimes(profile.id, 5);
+      await profiles.write([
+        Profile(
+          id: profile.id,
+          displayName: profile.displayName,
+          pinHash: profile.pinHash,
+          kdfParams: KdfParams(
+            algorithm: profile.kdfParams.algorithm,
+            version: 999,
+            m: profile.kdfParams.m,
+            t: profile.kdfParams.t,
+            p: profile.kdfParams.p,
+            salt: profile.kdfParams.salt,
+          ),
+          failedAttempts: 5,
+        ),
+      ]);
+
+      session.arriveAtKeypad();
+
+      expect(
+        await session.unlock(profile.id, '123456'),
+        restingFor(const Duration(seconds: 30)),
+      );
+    });
+
+    test('rests one Profile and not the other', () async {
+      final mine = await aProfile('Michal', '123456');
+      final theirs = await aProfile('Ola', '654321');
+
+      await missTimes(mine.id, 5);
+      session.arriveAtKeypad();
+
+      expect(await session.unlock(theirs.id, '654321'), const Unlocked());
+      expect(await attemptsOf(theirs.id), 0);
+    });
+
+    test('survives a restart of the app', () async {
+      final profile = await aProfile();
+      await missTimes(profile.id, 5);
+
+      final started = ProfileSession(
+        profiles: profiles,
+        databases: databases,
+        dataKeys: dataKeys,
+      );
+      started.arriveAtKeypad();
+
+      expect(
+        await started.unlock(profile.id, '123456'),
+        restingFor(const Duration(seconds: 30)),
+      );
+    });
+
+    test('tells the keypad what is left of it', () async {
+      final profile = await aProfile();
+      await missTimes(profile.id, 5);
+
+      session.arriveAtKeypad();
+
+      expect(
+        await session.restLeftFor(profile.id),
+        lessThanOrEqualTo(const Duration(seconds: 30)),
+      );
+      expect(
+        await session.restLeftFor(profile.id),
+        greaterThan(const Duration(seconds: 29)),
+      );
+    });
+
+    test('leaves nothing of it when no mistake was made', () async {
+      final profile = await aProfile();
+
+      session.arriveAtKeypad();
+
+      expect(await session.restLeftFor(profile.id), Duration.zero);
     });
   });
 

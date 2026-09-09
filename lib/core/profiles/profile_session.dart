@@ -6,6 +6,7 @@ import '../db/database_session.dart';
 import 'data_key_store.dart';
 import 'profile.dart';
 import 'profile_list.dart';
+import 'rest.dart';
 
 /// What came of an attempt to unlock a Profile.
 sealed class UnlockOutcome extends Equatable {
@@ -30,6 +31,16 @@ class WrongPin extends UnlockOutcome {
   List<Object?> get props => [failedAttempts];
 }
 
+/// The keypad is resting after wrong PINs. [remaining] is what is left of it.
+class Resting extends UnlockOutcome {
+  const Resting(this.remaining);
+
+  final Duration remaining;
+
+  @override
+  List<Object?> get props => [remaining];
+}
+
 /// The Profile cannot be opened, and the User made no mistake.
 class Failed extends UnlockOutcome {
   const Failed(this.reason);
@@ -52,7 +63,7 @@ enum UnlockFailure { dataKeyMissing, fileWillNotOpen, migrationFailed }
 /// data key from the phone, and the connection from `core/db/`. It publishes
 /// no state of its own, because `core/db/` already publishes that one fact.
 class ProfileSession {
-  const ProfileSession({
+  ProfileSession({
     required this.profiles,
     required this.databases,
     required this.dataKeys,
@@ -64,12 +75,30 @@ class ProfileSession {
 
   final DataKeyStore dataKeys;
 
+  final Stopwatch _sinceArrival = Stopwatch();
+
+  /// Marks the moment the keypad appeared, which the rest is measured from.
+  ///
+  /// It measures with a timer that only counts forward while the app runs, so
+  /// that moving the phone's clock buys nothing and closing the app costs the
+  /// whole rest again.
+  void arriveAtKeypad() => _sinceArrival
+    ..reset()
+    ..start();
+
+  /// What is left of the rest for this Profile, as it now stands.
+  Future<Duration> restLeftFor(String profileId) async =>
+      restLeft((await _rowOf(profileId)).failedAttempts, _sinceArrival.elapsed);
+
   /// Checks the PIN, and opens the Profile when it is right.
   ///
   /// A wrong PIN is counted before the caller is told, so that killing the
   /// app between the two costs the attempt anyway.
   Future<UnlockOutcome> unlock(String profileId, String pin) async {
     final profile = await _rowOf(profileId);
+
+    final resting = restLeft(profile.failedAttempts, _sinceArrival.elapsed);
+    if (resting > Duration.zero) return Resting(resting);
 
     final digest = await hashPinApart(pin, profile.kdfParams);
     if (!samePinHash(digest, profile.pinHash)) {
