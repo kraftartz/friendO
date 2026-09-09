@@ -23,13 +23,16 @@ dependencies:
   equatable: ^2.1.0
   cupertino_icons: ^1.0.8
 
+  # Argon2id, for the PIN hash. Pure Dart, so it adds no second native library
+  # beside libsqlite3mc.so and it runs the same code in a host test as on the
+  # phone. ADR-0006 allowed a PBKDF2 fallback; docs/spec/first-run.md measured
+  # this package against the RFC 9106 vector and settled on Argon2id.
+  hashlib: ^2.4.2
+
   # Declared, and not used yet. These are the runtime packages the accepted
   # decision records commit the app to. They are listed early on purpose: a
   # version conflict between them is far cheaper to find now, against an empty
   # app, than later against a half-built feature.
-  #
-  # Absent on purpose: an Argon2id implementation, because ADR-0006 still marks
-  # the candidate package unverified, and declaring it would be a guess.
   crypto: ^3.0.7
   diacritic: ^0.1.6
   drift: ^2.34.4
