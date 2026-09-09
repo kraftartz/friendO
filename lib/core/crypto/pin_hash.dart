@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:isolate';
 import 'dart:typed_data';
 
 import 'package:equatable/equatable.dart';
@@ -95,4 +96,26 @@ Uint8List hashPin(String pin, KdfParams params) {
     hashLength: pinHashLength,
     security: Argon2Security('stored', m: params.m, t: params.t, p: params.p),
   ).bytes;
+}
+
+/// Hashes the PIN away from the isolate that draws the screen.
+///
+/// The work is hundreds of milliseconds on a mid-range phone, which is a
+/// dropped frame for every one of them if it runs beside the keypad.
+Future<Uint8List> hashPinApart(String pin, KdfParams params) =>
+    Isolate.run(() => hashPin(pin, params));
+
+/// Answers whether two PIN digests are the same, in constant time.
+///
+/// It reads every byte of both, so that the time it takes says nothing about
+/// how many bytes matched.
+bool samePinHash(Uint8List a, Uint8List b) {
+  if (a.length != b.length) return false;
+
+  var difference = 0;
+  for (var i = 0; i < a.length; i++) {
+    difference |= a[i] ^ b[i];
+  }
+
+  return difference == 0;
 }

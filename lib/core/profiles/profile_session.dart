@@ -1,0 +1,134 @@
+import 'package:equatable/equatable.dart';
+
+import '../crypto/pin_hash.dart';
+import '../db/app_database.dart';
+import '../db/database_session.dart';
+import 'data_key_store.dart';
+import 'profile.dart';
+import 'profile_list.dart';
+
+/// What came of an attempt to unlock a Profile.
+sealed class UnlockOutcome extends Equatable {
+  const UnlockOutcome();
+
+  @override
+  List<Object?> get props => const [];
+}
+
+/// The PIN was right and the Profile is open.
+class Unlocked extends UnlockOutcome {
+  const Unlocked();
+}
+
+/// The PIN was wrong. [failedAttempts] is the count as it now stands.
+class WrongPin extends UnlockOutcome {
+  const WrongPin(this.failedAttempts);
+
+  final int failedAttempts;
+
+  @override
+  List<Object?> get props => [failedAttempts];
+}
+
+/// The Profile cannot be opened, and the User made no mistake.
+class Failed extends UnlockOutcome {
+  const Failed(this.reason);
+
+  final UnlockFailure reason;
+
+  @override
+  List<Object?> get props => [reason];
+}
+
+/// Why a Profile with the right PIN did not open.
+///
+/// The three are told apart because they need different words. A broken
+/// install that reads as "try again" cannot be put right by trying again.
+enum UnlockFailure { dataKeyMissing, fileWillNotOpen, migrationFailed }
+
+/// The walk from six digits to an open connection, and back again.
+///
+/// It coordinates and owns nothing: the hash comes from `core/crypto/`, the
+/// data key from the phone, and the connection from `core/db/`. It publishes
+/// no state of its own, because `core/db/` already publishes that one fact.
+class ProfileSession {
+  const ProfileSession({
+    required this.profiles,
+    required this.databases,
+    required this.dataKeys,
+  });
+
+  final ProfileList profiles;
+
+  final DatabaseSession databases;
+
+  final DataKeyStore dataKeys;
+
+  /// Checks the PIN, and opens the Profile when it is right.
+  ///
+  /// A wrong PIN is counted before the caller is told, so that killing the
+  /// app between the two costs the attempt anyway.
+  Future<UnlockOutcome> unlock(String profileId, String pin) async {
+    final profile = await _rowOf(profileId);
+
+    final digest = await hashPinApart(pin, profile.kdfParams);
+    if (!samePinHash(digest, profile.pinHash)) {
+      final attempts = profile.failedAttempts + 1;
+      await _writeAttempts(profileId, attempts);
+
+      return WrongPin(attempts);
+    }
+
+    final failure = await _openProfile(profileId);
+    if (failure != null) return Failed(failure);
+
+    await _writeAttempts(profileId, 0);
+
+    return const Unlocked();
+  }
+
+  /// Closes the Profile, and drops the key with the connection that held it.
+  Future<void> lock() => databases.close();
+
+  /// Unwraps the data key and opens the file. It takes no PIN.
+  ///
+  /// A second gate, such as a fingerprint, reaches the same step rather than
+  /// copying the walk that follows a PIN.
+  Future<UnlockFailure?> _openProfile(String profileId) async {
+    final dataKey = await dataKeys.read(profileId);
+    if (dataKey == null) return UnlockFailure.dataKeyMissing;
+
+    try {
+      await databases.open(profileId, dataKey);
+    } on MigrationFailed {
+      return UnlockFailure.migrationFailed;
+    } on Object {
+      return UnlockFailure.fileWillNotOpen;
+    }
+
+    return null;
+  }
+
+  Future<Profile> _rowOf(String profileId) async {
+    final rows = await profiles.read();
+    final row = rows.where((row) => row.id == profileId).firstOrNull;
+    if (row == null) {
+      throw ArgumentError.value(
+        profileId,
+        'profileId',
+        'is in no Profile list',
+      );
+    }
+
+    return row;
+  }
+
+  Future<void> _writeAttempts(String profileId, int count) async {
+    final rows = await profiles.read();
+
+    await profiles.write([
+      for (final row in rows)
+        if (row.id == profileId) row.withFailedAttempts(count) else row,
+    ]);
+  }
+}

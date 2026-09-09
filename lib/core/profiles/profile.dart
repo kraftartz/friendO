@@ -35,6 +35,14 @@ class Profile extends Equatable {
   /// The count of wrong PINs since the last correct one.
   final int failedAttempts;
 
+  Profile withFailedAttempts(int count) => Profile(
+    id: id,
+    displayName: displayName,
+    pinHash: pinHash,
+    kdfParams: kdfParams,
+    failedAttempts: count,
+  );
+
   @override
   List<Object?> get props => [
     id,
