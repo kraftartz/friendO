@@ -1,7 +1,10 @@
 # ADR-0018: Put design tokens and dumb widgets in their own package
 
 **Status:** Accepted
-**Date:** 2026-09-08
+**Date:** 2026-09-08. The Widgetbook tree changed from generated to hand written on 2026-09-08,
+and the rejected choice moved into Alternatives. The edit came before
+[ADR-0019](0019-correcting-and-partly-superseding-a-record.md) set the rule. Today it would need
+its own record.
 
 ## Context
 

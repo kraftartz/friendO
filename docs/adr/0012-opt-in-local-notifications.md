@@ -1,6 +1,7 @@
 # ADR-0012: Offer local reminders, off by default
 
-**Status:** Accepted
+**Status:** Accepted. [ADR-0032](0032-a-cadence-change-moves-the-due-date.md) adds one rule.
+A Cadence change that puts the Due Date in the past schedules no reminder.
 **Date:** 2026-09-07
 
 ## Context

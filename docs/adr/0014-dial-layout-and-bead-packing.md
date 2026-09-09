@@ -1,7 +1,8 @@
 # ADR-0014: Pack beads per orbit, not across the whole dial
 
 **Status:** Accepted
-**Date:** 2026-09-07
+**Date:** 2026-09-07. Radii and capacities corrected from the designs 2026-09-08, and one bead
+size on every orbit added at the same time. Stop condition for the packer added 2026-09-09.
 
 ## Context
 
@@ -38,12 +39,28 @@ order. Then pack each orbit on its own:
 for each orbit r:
     members = orderedFriends where orbit == r
     cursor  = 1.0                              # 12:00, in phase units
+    first   = none
     for f in members:
-        placed(f) = min(phase(f), cursor)
-        cursor    = placed(f) - minGap(r)      # gap for THIS orbit
+        placed = min(phase(f), cursor)
+        if first is not none and placed < minGap(r) + first - 1:
+            f does not fit                     # the lap has closed
+            continue
+        if first is none:
+            first = placed
+        place f at placed
+        cursor = placed - minGap(r)            # gap for THIS orbit
 ```
 
 `minGap(r) = (beadDiameter + padding) / circumference(r)`.
+
+**A bead does not fit when the lap has closed.** The cursor walks down from 1.0 toward 0.0, and
+phase 1.0 and phase 0.0 are **the same place on the lap**. So the test is not `cursor >= 0`. The
+last bead must keep a full `minGap` from the first bead, measured the short way round, which is the
+line above.
+
+Stopping at zero instead admits one bead too many. On the inner orbit it would land 5.8 degrees
+from the first bead, which is 6px apart for beads that are 28px wide. The rule above returns the
+capacities in the table.
 
 The packer returns two things: the placed beads, and the beads that did not fit. See
 [ADR-0015](0015-dial-overflow-treatment.md).

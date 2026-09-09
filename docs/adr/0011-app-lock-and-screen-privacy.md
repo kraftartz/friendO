@@ -1,7 +1,9 @@
 # ADR-0011: Lock the app and hide the screen preview
 
 **Status:** Accepted
-**Date:** 2026-09-07
+**Date:** 2026-09-07. Biometric unlock added 2026-09-08, as a decision.
+It was written before [ADR-0019](0019-correcting-and-partly-superseding-a-record.md) set the rule,
+so it went in here. Today it would need its own record.
 
 ## Context
 

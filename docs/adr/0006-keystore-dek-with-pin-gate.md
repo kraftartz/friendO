@@ -1,9 +1,9 @@
-# ADR-0006: Keep the data key in the Keystore, gate it with a PIN
+# ADR-0006: Wrap the data key with a Keystore key, and gate it with a PIN
 
-**Status:** Accepted. The decision stands.
-[ADR-0024](0024-keystore-holds-a-wrapping-key.md) describes it accurately: the Keystore holds a
-non-exportable **wrapping key**, and the data key is stored wrapped.
-**Date:** 2026-09-07
+**Status:** Accepted. The reset flow in Consequences is superseded by
+[ADR-0031](0031-a-forgotten-pin-loses-the-profile.md): a forgotten PIN has no way back.
+**Date:** 2026-09-07. Key mechanism corrected 2026-09-09, and biometric binding marked out of
+scope. [ADR-0024](0024-keystore-holds-a-wrapping-key.md) found both gaps and holds the reasoning.
 
 ## Context
 
@@ -26,27 +26,50 @@ hardware, or both.
 
 ## Decision
 
-Generate a random 256-bit **data key** on first launch. Store it in the Android Keystore or the
-iOS Keychain. Both are hardware-backed and mark the key as non-exportable.
+Use **two keys**, not one.
+
+Generate a random **wrapping key** for each Profile. Keep it in the Android Keystore or the iOS
+Keychain, which mark it non-exportable. It never leaves the hardware.
+
+Generate a random 256-bit **data key**. Ask the hardware to wrap it, and store only the wrapped
+value. SQLCipher needs the data key in plain text, so the app asks the hardware to unwrap it at
+unlock. The plain data key then lives in the Dart heap until the Profile locks.
+
+```
+Keystore / Keychain           Shared preferences / Keychain item     File
+-------------------           ----------------------------------     ----
+wrapping key (non-            wrapped data key (ciphertext)          friendo_A.db
+exportable, per Profile)  ->  unwrapped in process memory  ------->  (SQLCipher)
+```
+
+Two keys are necessary, not extra. A non-exportable key never leaves the hardware, and SQLCipher
+must receive a key in Dart. One key cannot do both jobs.
+
+A thief gets the file and the wrapped value. The thief gets neither key, because the wrapping key
+cannot leave the hardware. That answers the threat this record chose.
 
 Use the **PIN as a gate, not as a key**. Store an Argon2id hash of the PIN for checking only. The
-PIN never derives the data key.
+PIN never derives either key.
 
 The unlock flow:
 
 ```
-PIN typed  ->  Argon2id hash matches?  ->  read data key from Keystore  ->  open SQLCipher file
+PIN typed  ->  Argon2id hash matches?  ->  unwrap the data key  ->  open SQLCipher file
 ```
 
-Prefer the platform's biometric or device-credential binding on the Keystore entry where it is
-available.
+**Biometric binding on the Keystore entry is out of scope for v1.** `flutter_secure_storage`
+exposes no `setUserAuthenticationRequired`, so the flag needs platform channel code that nobody has
+written. [ADR-0011](0011-app-lock-and-screen-privacy.md) keeps biometric unlock as a gate in front
+of the app. That is a different check, in a different place.
 
 ## Consequences
 
 ### Positive
 
 - A stolen phone gives a thief an encrypted file and no key. That is the threat we chose to stop.
-- A forgotten PIN does not destroy the data. A reset flow can rebuild the gate and keep the file.
+- A forgotten PIN does not destroy the data, and a reset flow can rebuild the gate.
+  **No longer true.** [ADR-0031](0031-a-forgotten-pin-loses-the-profile.md) removes the reset
+  flow, because it needed no secret and made the PIN a courtesy screen.
 - Changing the PIN is instant. It rewrites one hash. It does not re-encrypt the database.
 - The key is random, so it has full 256-bit strength. A 4-digit PIN never limits it.
 

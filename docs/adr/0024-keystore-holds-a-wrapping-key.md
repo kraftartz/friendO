@@ -1,14 +1,20 @@
 # ADR-0024: The Keystore holds a wrapping key, and the Profile list has a home
 
-**Status:** Accepted
+**Status:** Accepted. The `profiles.json` shape is partly superseded by
+[ADR-0030](0030-first-run-creates-one-profile.md), which drops `avatarId`, and by
+[ADR-0031](0031-a-forgotten-pin-loses-the-profile.md), which adds `failedAttempts`.
 **Date:** 2026-09-08
 
 Corrects the description in [ADR-0006](0006-keystore-dek-with-pin-gate.md). The decision in
 ADR-0006 stands. This record says accurately what it does, and answers two questions it left open.
 
+The correction was applied to ADR-0006 itself on 2026-09-09, so that record now describes the two
+keys. This record keeps the reasoning, and holds two decisions of its own.
+
 ## Context
 
-[ADR-0006](0006-keystore-dek-with-pin-gate.md) describes the data key like this:
+[ADR-0006](0006-keystore-dek-with-pin-gate.md) described the data key like this, until this
+record was applied to it:
 
 > Store it in the Android Keystore or the iOS Keychain. Both are hardware-backed and mark the key
 > as **non-exportable**.
@@ -17,9 +23,9 @@ Two sentences cannot both be true. A non-exportable key never leaves the secure 
 key must reach Dart, because Dart passes it to `pragma key` to open the SQLCipher file. So the data
 key is not the non-exportable key.
 
-What `flutter_secure_storage` actually does on Android is right, and it is not what the record says.
+What `flutter_secure_storage` actually does on Android is right, and it was not what the record said.
 It uses a non-exportable Keystore key to **wrap** a value, and it keeps the wrapped value in shared
-preferences. The design is correct. The wording is not, and the gap matters twice:
+preferences. The design is correct. The wording was not, and the gap mattered twice:
 
 - It is why the leak in [ADR-0020](0020-no-os-level-backup.md) existed. The wrapped blob sits in
   shared preferences, and Android Auto Backup copies shared preferences.

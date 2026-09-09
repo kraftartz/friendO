@@ -161,9 +161,10 @@ graph LR
 The PIN never becomes the encryption key. The PIN only opens the gate. The real key is a random
 number, and the phone hardware holds a second, non-exportable key that wraps it. The data key is
 stored wrapped and is unwrapped into memory to open the file. A stolen phone gives no access,
-because the wrapping key cannot leave the hardware. A lost PIN does not destroy the data. See
-[ADR-0006](adr/0006-keystore-dek-with-pin-gate.md) and
-[ADR-0024](adr/0024-keystore-holds-a-wrapping-key.md).
+because the wrapping key cannot leave the hardware. A lost PIN loses the Profile, and v1 has no way
+back. See [ADR-0006](adr/0006-keystore-dek-with-pin-gate.md),
+[ADR-0024](adr/0024-keystore-holds-a-wrapping-key.md) and
+[ADR-0031](adr/0031-a-forgotten-pin-loses-the-profile.md).
 
 The profile list lives in one plaintext `profiles.json` beside the databases. It has to be readable
 before any profile is unlocked, so no key can cover it. That is why
