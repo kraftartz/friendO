@@ -14,6 +14,11 @@ import 'package:friendo/features/first_run/view/first_run_page.dart';
 import 'package:friendo_ui/friendo_ui.dart';
 import 'package:hashlib/hashlib.dart';
 
+/// What the screens must show, and nothing that the cubit tests already hold.
+///
+/// ADR-0013 refuses full widget coverage on a form. The three checks here are
+/// the ones no other test can make: the order of the two screens, the sentence
+/// ADR-0020 asked for, and the one-way door ADR-0030 asked for.
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
@@ -48,70 +53,14 @@ void main() {
     ),
   );
 
-  Future<void> typeName(WidgetTester tester, String name) async {
-    await tester.enterText(find.byType(TextField), name);
-    await tester.tap(find.text('Continue'));
-    await tester.pump();
-  }
-
-  Future<void> typePin(WidgetTester tester, String digits) async {
-    for (final digit in digits.split('')) {
-      await tester.tap(find.widgetWithText(TextButton, digit));
-      await tester.pump();
-    }
-  }
-
-  testWidgets('asks for a name before anything else', (tester) async {
-    await pump(tester);
-
-    expect(find.byType(TextField), findsOneWidget);
-    expect(find.byType(PinKeypad), findsNothing);
-  });
-
-  testWidgets('shows the keypad once the name is given', (tester) async {
-    await pump(tester);
-
-    await typeName(tester, 'Michal');
-
-    expect(find.byType(PinKeypad), findsOneWidget);
-  });
-
-  testWidgets('says so when the name holds nothing but spaces', (tester) async {
-    await pump(tester);
-
-    await typeName(tester, '   ');
-
-    expect(find.byType(PinKeypad), findsNothing);
-    expect(find.text('A Profile needs a name.'), findsOneWidget);
-  });
-
-  testWidgets('fills one dot for every digit typed', (tester) async {
-    await pump(tester);
-    await typeName(tester, 'Michal');
-
-    await typePin(tester, '123');
-
-    final dots = tester.widgetList<PinDot>(find.byType(PinDot));
-    expect(dots.where((dot) => dot.filled), hasLength(3));
-  });
-
-  testWidgets('asks for the PIN a second time', (tester) async {
-    await pump(tester);
-    await typeName(tester, 'Michal');
-
-    await typePin(tester, '123456');
-
-    expect(find.text('Type the PIN again'), findsOneWidget);
-  });
-
   /// Makes the Profile for real, which needs the event loop a widget test
-  /// holds still. Driving the cubit rather than the keypad keeps the real I/O
+  /// holds still. Driving the cubit rather than the keypad keeps the real work
   /// inside [WidgetTester.runAsync], where it can finish.
   Future<void> reachCostScreen(WidgetTester tester) async {
     await tester.runAsync(() async {
       cubit.submitName('Michal');
-      for (final digits in ['123456', '123456']) {
-        for (final digit in digits.split('')) {
+      for (final pin in ['123456', '123456']) {
+        for (final digit in pin.split('')) {
           cubit.pressDigit(int.parse(digit));
         }
       }
@@ -121,6 +70,13 @@ void main() {
     });
     await tester.pump();
   }
+
+  testWidgets('asks for a name before it asks for a PIN', (tester) async {
+    await pump(tester);
+
+    expect(find.byType(TextField), findsOneWidget);
+    expect(find.byType(PinKeypad), findsNothing);
+  });
 
   testWidgets('states the cost once the Profile is made', (tester) async {
     await pump(tester);

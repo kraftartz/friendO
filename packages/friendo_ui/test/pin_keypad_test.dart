@@ -45,9 +45,7 @@ void main() {
   });
 
   group('PinDots', () {
-    testWidgets('draws one dot for every digit the entry takes', (
-      tester,
-    ) async {
+    testWidgets('draws one dot for every digit the PIN takes', (tester) async {
       await tester.pumpWidget(
         const MaterialApp(home: PinDots(length: 6, filled: 2)),
       );

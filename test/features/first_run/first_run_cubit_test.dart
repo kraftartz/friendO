@@ -11,6 +11,8 @@ import 'package:friendo/features/first_run/bloc/first_run_cubit.dart';
 import 'package:friendo/features/first_run/bloc/first_run_state.dart';
 import 'package:hashlib/hashlib.dart';
 
+import '../../support/uncreatable_database.dart';
+
 void _type(FirstRunCubit cubit, String digits) {
   for (final digit in digits.split('')) {
     cubit.pressDigit(int.parse(digit));
@@ -72,7 +74,7 @@ void main() {
     });
   });
 
-  group('the first entry', () {
+  group('the PIN typed first', () {
     test('waits at five digits', () {
       final cubit = named();
 
@@ -82,7 +84,7 @@ void main() {
       expect(cubit.state.pin, '12345');
     });
 
-    test('asks for the second entry on the sixth digit', () {
+    test('asks for the PIN again on the sixth digit', () {
       final cubit = named();
 
       _type(cubit, '123456');
@@ -116,8 +118,8 @@ void main() {
     });
   });
 
-  group('the second entry', () {
-    test('returns to the first entry when the two differ', () async {
+  group('the PIN typed again', () {
+    test('starts over when the two differ', () async {
       final cubit = named();
 
       _type(cubit, '123456');
@@ -168,7 +170,7 @@ void main() {
       cubit = FirstRunCubit(
         ProfileCreator(
           profiles: profiles,
-          databases: _UncreatableDatabase(directory),
+          databases: UncreatableDatabase(directory),
           dataKeys: const DataKeyStore(),
           security: Argon2Security.test,
         ),
@@ -195,13 +197,4 @@ void main() {
       expect: () => [const FirstRunState(step: FirstRunStep.done)],
     );
   });
-}
-
-/// A session that cannot make a file, so the sequence fails at step 4.
-class _UncreatableDatabase extends DatabaseSession {
-  _UncreatableDatabase(super.directory);
-
-  @override
-  Future<Never> open(String profileId, dataKey) =>
-      Future.error(const FileSystemException('no room on the disk'));
 }

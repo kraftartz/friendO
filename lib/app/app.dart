@@ -10,37 +10,37 @@ import 'navigation/navigation_cubit.dart';
 import 'theme.dart';
 
 class FriendoApp extends StatefulWidget {
-  const FriendoApp({this.firstRun, super.key});
+  const FriendoApp({this.firstRunCreator, super.key});
 
   /// The way to make the first Profile, for a phone that holds none.
   ///
   /// It is null when a Profile already exists, and the app opens on the Dial.
-  final ProfileCreator? firstRun;
+  final ProfileCreator? firstRunCreator;
 
   @override
   State<FriendoApp> createState() => _FriendoAppState();
 }
 
 class _FriendoAppState extends State<FriendoApp> {
-  late ProfileCreator? _firstRun = widget.firstRun;
+  late ProfileCreator? _creator = widget.firstRunCreator;
 
   @override
   Widget build(BuildContext context) {
-    final firstRun = _firstRun;
+    final creator = _creator;
 
     return MaterialApp(
       title: 'friendO',
       theme: friendoTheme(),
-      home: firstRun == null
+      home: creator == null
           ? BlocProvider(
               create: (_) => NavigationCubit(),
               child: const HomeShell(),
             )
           : BlocProvider(
-              create: (_) => FirstRunCubit(firstRun),
+              create: (_) => FirstRunCubit(creator),
               child: BlocListener<FirstRunCubit, FirstRunState>(
                 listenWhen: (_, state) => state.step == FirstRunStep.done,
-                listener: (_, _) => setState(() => _firstRun = null),
+                listener: (_, _) => setState(() => _creator = null),
                 child: const FirstRunPage(),
               ),
             ),

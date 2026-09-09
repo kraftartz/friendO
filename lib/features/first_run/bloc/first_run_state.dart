@@ -5,10 +5,10 @@ enum FirstRunStep {
   /// The Profile has no name yet.
   name,
 
-  /// The first PIN entry.
+  /// The PIN, as it is typed the first time.
   pin,
 
-  /// The second PIN entry, which catches a typo.
+  /// The PIN, as it is typed the second time. It catches a typo.
   confirm,
 
   /// The keys, the file and the row are being made.
@@ -39,10 +39,11 @@ class FirstRunState extends Equatable {
   /// The name as it was typed. It is trimmed when the Profile is made.
   final String name;
 
-  /// The first PIN entry. It is empty from the moment the Profile is made.
+  /// The PIN as it was typed the first time. It is empty from the moment the
+  /// Profile is made.
   final String pin;
 
-  /// The second PIN entry.
+  /// The PIN as it was typed the second time.
   final String confirmation;
 
   /// What went wrong, for the User to read. It is null while nothing has.

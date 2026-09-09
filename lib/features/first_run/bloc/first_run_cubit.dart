@@ -5,13 +5,13 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../core/profiles/profile_creator.dart';
 import 'first_run_state.dart';
 
-/// The number of digits in a PIN. The last one submits the entry, so no
-/// confirm button is needed here or at any later unlock.
+/// The number of digits in a PIN. The last one submits it, so no confirm
+/// button is needed here or at any later unlock.
 const pinLength = 6;
 
 /// Walks First Run from an empty phone to a Profile that opens.
 ///
-/// The Profile is made the moment the two PIN entries match, and before the
+/// The Profile is made the moment the two PINs match, and before the
 /// cost screen appears. The PIN then leaves this state at the earliest moment
 /// it can, and the cost screen has no way to fail.
 class FirstRunCubit extends Cubit<FirstRunState> {
@@ -19,10 +19,10 @@ class FirstRunCubit extends Cubit<FirstRunState> {
 
   final ProfileCreator _creator;
 
-  /// Takes the name and asks for the first PIN entry.
+  /// Takes the name and asks for the PIN.
   ///
-  /// A name of spaces alone is refused, because a blank row on the picker
-  /// names no Profile.
+  /// A name of spaces alone is refused, because a Profile with no name tells
+  /// two Profiles apart from each other not at all.
   void submitName(String name) {
     if (name.trim().isEmpty) {
       emit(state.copyWith(name: name, message: 'A Profile needs a name.'));
@@ -33,17 +33,17 @@ class FirstRunCubit extends Cubit<FirstRunState> {
     emit(FirstRunState(step: FirstRunStep.pin, name: name));
   }
 
-  /// Adds one digit to the entry that is open.
+  /// Adds one digit to the PIN that is open.
   ///
-  /// The entry takes no more than [pinLength] digits. The last one submits it:
-  /// the first entry asks for the second, and the second either makes the
+  /// A PIN takes no more than [pinLength] digits, and the last one submits it.
+  /// The first PIN asks for the second, and the second either makes the
   /// Profile or reports that the two differ.
   void pressDigit(int digit) {
-    final entry = _entry();
-    if (entry == null || entry.length >= pinLength) return;
+    final open = _open();
+    if (open == null || open.length >= pinLength) return;
 
-    final typed = '$entry$digit';
-    emit(_withEntry(typed));
+    final typed = '$open$digit';
+    emit(_withTyped(typed));
 
     if (typed.length < pinLength) return;
 
@@ -60,18 +60,18 @@ class FirstRunCubit extends Cubit<FirstRunState> {
         FirstRunState(
           step: FirstRunStep.pin,
           name: state.name,
-          message: 'The two entries differ. Type the PIN again.',
+          message: 'The two PINs differ. Type the PIN again.',
         ),
       );
     }
   }
 
-  /// Drops the last digit of the entry that is open.
+  /// Drops the last digit of the PIN that is open.
   void deleteDigit() {
-    final entry = _entry();
-    if (entry == null || entry.isEmpty) return;
+    final open = _open();
+    if (open == null || open.isEmpty) return;
 
-    emit(_withEntry(entry.substring(0, entry.length - 1)));
+    emit(_withTyped(open.substring(0, open.length - 1)));
   }
 
   /// Leaves the cost screen for the app.
@@ -85,24 +85,25 @@ class FirstRunCubit extends Cubit<FirstRunState> {
     try {
       await _creator.createProfile(name, pin);
       emit(FirstRunState(step: FirstRunStep.cost, name: name));
-    } on Object catch (error) {
+    } on Object {
       emit(
         FirstRunState(
           step: FirstRunStep.pin,
           name: name,
-          message: 'The Profile was not made: $error',
+          message: 'The Profile was not made. Try again.',
         ),
       );
     }
   }
 
-  String? _entry() => switch (state.step) {
+  /// The PIN the next digit belongs to, or null while none takes a digit.
+  String? _open() => switch (state.step) {
     FirstRunStep.pin => state.pin,
     FirstRunStep.confirm => state.confirmation,
     _ => null,
   };
 
-  FirstRunState _withEntry(String entry) => state.step == FirstRunStep.pin
-      ? state.copyWith(pin: entry)
-      : state.copyWith(confirmation: entry);
+  FirstRunState _withTyped(String typed) => state.step == FirstRunStep.pin
+      ? state.copyWith(pin: typed)
+      : state.copyWith(confirmation: typed);
 }

@@ -5,12 +5,16 @@ import 'package:drift/native.dart';
 import 'package:path/path.dart' as p;
 import 'package:sqlite3/sqlite3.dart' as sqlite;
 
+import '../crypto/hex.dart';
 import 'app_database.dart';
 
 /// The one owner of the open connection.
 ///
 /// Nothing else opens or closes a database file. A second owner would keep a
 /// dead handle after a close, and the key would stay in it.
+///
+/// It opens, it closes, and it hands out the database while one is open. It
+/// publishes no state stream yet, so nothing can watch it across a lock.
 class DatabaseSession {
   DatabaseSession(this.directory);
 
@@ -78,7 +82,12 @@ class DatabaseSession {
   /// The key comes first. A statement before it reads a file the engine cannot
   /// decrypt yet.
   void _unlock(sqlite.Database raw, Uint8List dataKey) {
-    raw.execute("pragma key = \"x'${_hex(dataKey)}'\"");
+    // The cipher is named rather than left to the default, so a later build
+    // with a different default cannot quietly change what the file is
+    // encrypted with. It must be chosen before the key is given.
+    raw.execute('pragma cipher = chacha20');
+
+    raw.execute("pragma key = \"x'${hex(dataKey)}'\"");
 
     // A sort that spills to a file writes private text in the clear, because
     // sqlite3mc encrypts the database, the journal and the write-ahead log,
@@ -90,7 +99,4 @@ class DatabaseSession {
     raw.execute('pragma plaintext_header_size = 0');
     raw.execute('pragma mc_legacy_wal = 0');
   }
-
-  String _hex(Uint8List bytes) =>
-      bytes.map((b) => b.toRadixString(16).padLeft(2, '0')).join();
 }

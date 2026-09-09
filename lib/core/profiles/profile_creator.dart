@@ -3,6 +3,7 @@ import 'dart:typed_data';
 
 import 'package:hashlib/hashlib.dart';
 
+import '../crypto/hex.dart';
 import '../crypto/pin_hash.dart';
 import '../db/database_session.dart';
 import 'data_key_store.dart';
@@ -69,7 +70,12 @@ class ProfileCreator {
       throw ArgumentError.value(displayName, 'displayName', 'is empty');
     }
 
-    final id = _hex(_bytes(_profileIdBytes));
+    // The list is read before anything is minted. A list that cannot be read
+    // stops the work here, rather than after a key and a file exist that no
+    // row will ever name.
+    final existing = await profiles.read();
+
+    final id = hex(_bytes(_profileIdBytes));
     final kdfParams = KdfParams.forNewPin(
       salt: _bytes(_saltBytes),
       security: security,
@@ -89,14 +95,11 @@ class ProfileCreator {
     await databases.open(id, dataKey);
     await databases.close();
 
-    await profiles.write([...await profiles.read(), profile]);
+    await profiles.write([...existing, profile]);
 
     return profile;
   }
 
   Uint8List _bytes(int count) =>
       Uint8List.fromList(List.generate(count, (_) => _random.nextInt(256)));
-
-  String _hex(Uint8List bytes) =>
-      bytes.map((b) => b.toRadixString(16).padLeft(2, '0')).join();
 }

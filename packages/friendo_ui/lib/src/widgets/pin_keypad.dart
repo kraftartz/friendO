@@ -5,7 +5,7 @@ import '../tokens/soft.dart';
 /// The ten digits and a way to drop the last one.
 ///
 /// It shows no confirm key. A caller that submits on the last digit needs
-/// none, and one less key is one less thing to reach for one-handed.
+/// none, and one key less is one thing less to reach one-handed.
 class PinKeypad extends StatelessWidget {
   const PinKeypad({required this.onDigit, required this.onDelete, super.key});
 
@@ -72,7 +72,7 @@ class _Key extends StatelessWidget {
   );
 }
 
-/// One place in an entry, filled or empty.
+/// One place in a PIN, filled or empty.
 class PinDot extends StatelessWidget {
   const PinDot({required this.filled, super.key});
 
@@ -96,13 +96,13 @@ class PinDot extends StatelessWidget {
   }
 }
 
-/// How far an entry has got, without showing what was typed.
+/// How much of a PIN is typed, without showing what was typed.
 ///
-/// A person beside the User learns the length of the entry and nothing else.
+/// A person beside the User learns how many digits are in and nothing else.
 class PinDots extends StatelessWidget {
   const PinDots({required this.length, required this.filled, super.key});
 
-  /// The number of places the entry holds.
+  /// The number of places the PIN holds.
   final int length;
 
   /// The number of places that hold a digit.

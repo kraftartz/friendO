@@ -10,16 +10,9 @@ import 'package:friendo/core/profiles/data_key_store.dart';
 import 'package:friendo/core/profiles/profile_creator.dart';
 import 'package:friendo/core/profiles/profile_list.dart';
 import 'package:hashlib/hashlib.dart';
+
+import '../../support/uncreatable_database.dart';
 import 'package:path/path.dart' as p;
-
-/// A session that cannot make a file, so the sequence stops at step 4.
-class _UncreatableDatabase extends DatabaseSession {
-  _UncreatableDatabase(super.directory);
-
-  @override
-  Future<Never> open(String profileId, Uint8List dataKey) =>
-      Future.error(const FileSystemException('no room on the disk'));
-}
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -135,6 +128,8 @@ void main() {
       final one = await creator.createProfile('Michal', '123456');
       final two = await creator.createProfile('Ada', '123456');
 
+      expect(await dataKeys.read(one.id), hasLength(32));
+      expect(await dataKeys.read(two.id), hasLength(32));
       expect(await dataKeys.read(one.id), isNot(await dataKeys.read(two.id)));
     });
 
@@ -195,7 +190,7 @@ void main() {
     test('leaves no row in the list', () async {
       final failing = ProfileCreator(
         profiles: profiles,
-        databases: _UncreatableDatabase(directory),
+        databases: UncreatableDatabase(directory),
         dataKeys: dataKeys,
         security: Argon2Security.test,
       );
@@ -211,7 +206,7 @@ void main() {
       final made = await creator.createProfile('Michal', '123456');
       final failing = ProfileCreator(
         profiles: profiles,
-        databases: _UncreatableDatabase(directory),
+        databases: UncreatableDatabase(directory),
         dataKeys: dataKeys,
         security: Argon2Security.test,
       );

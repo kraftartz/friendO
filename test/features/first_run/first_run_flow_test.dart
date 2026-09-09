@@ -40,7 +40,7 @@ void main() {
   testWidgets('a phone with no Profile starts on the creation screen', (
     tester,
   ) async {
-    await tester.pumpWidget(FriendoApp(firstRun: creator));
+    await tester.pumpWidget(FriendoApp(firstRunCreator: creator));
 
     expect(find.byType(FirstRunPage), findsOneWidget);
   });
@@ -53,7 +53,7 @@ void main() {
   });
 
   testWidgets('the cost screen leads to the Dial', (tester) async {
-    await tester.pumpWidget(FriendoApp(firstRun: creator));
+    await tester.pumpWidget(FriendoApp(firstRunCreator: creator));
 
     final cubit = BlocProvider.of<FirstRunCubit>(
       tester.element(find.byType(FirstRunPage)),

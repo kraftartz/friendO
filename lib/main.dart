@@ -25,7 +25,7 @@ Future<void> main() async {
 
   runApp(
     FriendoApp(
-      firstRun: (await profiles.read()).isEmpty
+      firstRunCreator: (await profiles.read()).isEmpty
           ? ProfileCreator(
               profiles: profiles,
               databases: DatabaseSession(directory),
