@@ -28,8 +28,12 @@ A new label becomes a suggestion for every other Friend.
 Seen on: Add Friend (`Family, Close Friend, College Buddy, Creative Colleague, Mentor`),
 Friend Detail (`Close Friends · Monthly Orbit`), Directory filters.
 
-    affinities(id, label, is_seed)
+    affinities(id, label, label_folded, is_seed)
     friend_affinities(friend_id, affinity_id)
+
+`label_folded` holds the Folded Text that search matches. Every searched column carries one, so
+the Friend name and the Topic body do too. See
+[ADR-0033](adr/0033-fold-the-text-that-search-matches.md).
 
 **An Affinity does need its own table.** You filter the Directory by it, so two
 spellings of one label are a defect. A Fact label has no such risk.
@@ -139,9 +143,9 @@ a restart.
 |---|---|---|---|
 | Bead motion | `animate-orbit-*` spins the beads | Angle means phase | Drop the animation |
 | Last seen date | No field on Add Friend | ADR-0016 needs one | Add the field |
-| Overdue | No mock shows it | ADR-0015 open | Resolve ADR-0015 |
-| Meeting time | `October 14 ... at Blue Bottle`, no hour | ADR-0021 allows an optional one | Show the hour only when the owner set it |
-| Dial capacity | 57 slots | Cap is ~100 Friends | Resolve ADR-0015 |
+| Overdue | No mock shows it | ADR-0015 | Draw the Beads Queue at 12:00 |
+| Meeting time | `October 14 ... at Blue Bottle`, no hour | ADR-0021 allows an optional one | Show the hour only when the User set it |
+| Dial capacity | 57 slots | 59, then an Overflow Badge | Draw the Badge, ADR-0015 |
 | Bead size | 32px outer, 28px inner | — | Use 28px everywhere |
 | Orbit radii | 62 / 102 / 142 | 62 / 102 / 142 | Settled. ADR-0014 already agrees. |
 | Cadence presets | 7/30/90 and 7/14/30/60 | Free duration | Pick one preset list |

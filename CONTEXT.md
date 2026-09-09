@@ -22,15 +22,31 @@ The picture that stands for a Friend.
 _Avoid_: photo, image, icon, profile picture
 
 **Profile**:
-One private space on a shared phone, belonging to one of its owners. Two Profiles never see each
-other's Friends.
-_Avoid_: user, account, login, identity
+One private space on a shared phone, belonging to one of its Users. Two Profiles never see each
+other's Friends. A Profile is the space, not the person.
+_Avoid_: account, login, identity
+
+**User**:
+A person who holds a Profile on this phone. One phone may have two.
+_Avoid_: owner, account holder, member
+The banned `owner` is the word for a person. A component that owns a resource keeps the word.
+
+### The App
+
+**First Run**:
+The one time a phone has no Profile at all. It ends when the first Profile exists.
+_Avoid_: onboarding, setup, welcome flow, install
+
+**Folded Text**:
+A copy of a piece of text, reduced so that a search can match it. It is lower case, and it holds no
+accent and no stroke. The app keeps one beside each thing it searches, and never shows one.
+_Avoid_: normalised text, slug, search key, ascii text, search index
 
 ### Timing
 
 **Civil Date**:
 One day on a calendar, with no time and no zone. A Meeting happens on one. It stays the same day
-when the owner flies to another zone.
+when the User flies to another zone.
 _Avoid_: date, day, timestamp, datetime
 
 **Cadence**:
@@ -121,6 +137,13 @@ _Avoid_: queue, stack, pile, cluster, waiting list
 The Beads that an Orbit has no room to draw.
 _Avoid_: excess, remainder, hidden beads, spillover
 
+**Overflow Badge**:
+The last place on a crowded Orbit. It holds a count and stands for the Overflow, so it is not a
+Bead and it names no Friend.
+Always both words. The banned `marker` is the bare word, and this is a different thing with its
+own entry, in the same way as the Beads Queue.
+_Avoid_: marker, cluster, pill, chip, more-bead, overflow bead
+
 **dial-minute**:
 The unit of arc on the Dial. One lap is 720 of them, because the Dial reads like a 12-hour face and
 each hour holds 60. It measures spacing between Beads and nothing else. It is not a length of time
@@ -129,7 +152,7 @@ _Avoid_: minute, degree, tick, slot
 
 ### What You Remember
 
-None of these three is ever cleared by the app. The owner deletes what has gone stale.
+None of these three is ever cleared by the app. The User deletes what has gone stale.
 
 **Topic**:
 Something you want to raise the next time you see a Friend. It looks forward.
@@ -145,16 +168,16 @@ _Avoid_: comment, memo, remark, description
 
 ### About a Friend
 
-These three describe a Friend rather than a Meeting. The app never invents one; the owner writes
+These three describe a Friend rather than a Meeting. The app never invents one; the User writes
 them.
 
 **Fact**:
 A small piece of standing information about a Friend, held as a label and a value. Where they live,
-what they drink, the name of their dog. The owner writes both halves and chooses the label.
+what they drink, the name of their dog. The User writes both halves and chooses the label.
 _Avoid_: field, attribute, property, detail, trait
 
 **Affinity**:
-Something a Friend is into, taken from a shared set that the owner can add to. Two Friends who
+Something a Friend is into, taken from a shared set that the User can add to. Two Friends who
 share one can be found together.
 _Avoid_: tag, category, interest, hobby
 
