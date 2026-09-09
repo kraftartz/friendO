@@ -182,7 +182,7 @@ void main() {
     test('is closed when the Profile is made', () async {
       await creator.createProfile('Michal', '123456');
 
-      expect(() => databases.database, throwsA(isA<StateError>()));
+      expect(() => databases.database, throwsA(isA<DatabaseLockedError>()));
     });
   });
 

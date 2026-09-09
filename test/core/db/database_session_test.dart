@@ -63,33 +63,126 @@ void main() {
   });
 
   group('the pragmas that keep the whole file private', () {
-    late DatabaseSession open;
-
-    setUp(() async {
-      await session.open('9f2c', _key(1));
-      open = session;
-    });
-
     Future<String> pragma(String name) async {
-      final row = await open.database.customSelect('pragma $name').getSingle();
+      final row = await session.database
+          .customSelect('pragma $name')
+          .getSingle();
 
       return row.data.values.single.toString();
     }
 
-    test('encrypts with chacha20', () async {
-      expect(await pragma('cipher'), 'chacha20');
+    void theyHold() {
+      test('encrypts with chacha20', () async {
+        expect(await pragma('cipher'), 'chacha20');
+      });
+
+      test('never spills a sort to a file', () async {
+        expect(await pragma('temp_store'), isNot('1'));
+      });
+
+      test('leaves no readable header', () async {
+        expect(await pragma('plaintext_header_size'), '0');
+      });
+
+      test('encrypts the write-ahead log', () async {
+        expect(await pragma('mc_legacy_wal'), '0');
+      });
+    }
+
+    group('on a file it has just created', () {
+      setUp(() => session.open('9f2c', _key(1)));
+
+      theyHold();
     });
 
-    test('never spills a sort to a file', () async {
-      expect(await pragma('temp_store'), isNot('1'));
+    group('on a file it opens again', () {
+      setUp(() async {
+        await session.open('9f2c', _key(1));
+        await session.close();
+        await session.open('9f2c', _key(1));
+      });
+
+      theyHold();
+    });
+  });
+
+  group('the state it publishes', () {
+    test('starts locked', () async {
+      expect(await session.state.first, DatabaseState.locked);
     });
 
-    test('leaves no readable header', () async {
-      expect(await pragma('plaintext_header_size'), '0');
+    test('passes through opening on the way to open', () async {
+      final seen = expectLater(
+        session.state,
+        emitsInOrder([
+          DatabaseState.locked,
+          DatabaseState.opening,
+          DatabaseState.open,
+        ]),
+      );
+
+      await session.open('9f2c', _key(1));
+
+      await seen;
     });
 
-    test('encrypts the write-ahead log', () async {
-      expect(await pragma('mc_legacy_wal'), '0');
+    test('replays where it stands to a listener that arrives later', () async {
+      await session.open('9f2c', _key(1));
+
+      expect(await session.state.first, DatabaseState.open);
+    });
+
+    test('becomes locked again when the Profile closes', () async {
+      await session.open('9f2c', _key(1));
+      await session.close();
+
+      expect(await session.state.first, DatabaseState.locked);
+    });
+
+    test('stays locked when the file will not open', () async {
+      await session.open('9f2c', _key(1));
+      await session.close();
+
+      await expectLater(session.open('9f2c', _key(2)), throwsA(isA<Object>()));
+
+      expect(await session.state.first, DatabaseState.locked);
+    });
+  });
+
+  group('what it refuses', () {
+    test('gives no database while the Profile is locked', () {
+      expect(() => session.database, throwsA(isA<DatabaseLockedError>()));
+    });
+
+    test('gives no database after the Profile closes', () async {
+      await session.open('9f2c', _key(1));
+      await session.close();
+
+      expect(() => session.database, throwsA(isA<DatabaseLockedError>()));
+    });
+
+    test('refuses to open a second Profile over an open one', () async {
+      await session.open('9f2c', _key(1));
+
+      await expectLater(
+        session.open('4b71', _key(2)),
+        throwsA(isA<StateError>()),
+      );
+    });
+
+    test('closes twice without complaint', () async {
+      await session.open('9f2c', _key(1));
+
+      await session.close();
+      await session.close();
+
+      expect(await session.state.first, DatabaseState.locked);
+    });
+
+    test('closes while locked without complaint', () async {
+      await session.close();
+
+      expect(await session.state.first, DatabaseState.locked);
     });
   });
 }
