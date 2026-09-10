@@ -212,8 +212,9 @@ friendO/
 |   |   |                        tables/.
 |   |   +-- friends/             FriendRepository. The whole aggregate, and the
 |   |   |                        only place that reads or writes these tables.
-|   |   +-- reminders/           Watches the repository. Reschedules. No feature
-|   |   |                        owns it.
+|   |   +-- reminders/           Watches the repository and the reminder settings.
+|   |   |                        Cancels and schedules so the two agree. The only
+|   |   |                        caller of flutter_local_notifications.
 |   |   +-- ids/                 One fresh id for a row this app writes
 |   |   +-- media/               Avatar images and audio recaps, as BLOB columns
 |   |   +-- profiles/            profiles.json, the PIN hash, and the wrapped
@@ -221,13 +222,18 @@ friendO/
 |   |   |                        Profile is unlocked, so it belongs to no
 |   |   |                        feature.
 |   |   +-- security/            App lock, screen privacy, auto-lock
+|   |   +-- settings/            The Profile's own options. The auto-lock seconds,
+|   |   |                        the reminder switch and hour, and the screenshot
+|   |   |                        allowance. core/security/ and core/reminders/
+|   |   |                        read them, and neither may import a feature.
 |   |   +-- text/                The fold that search matches, and nothing else
 |   |   +-- time/                Clock. Every "now" comes from here.
 |   |
 |   +-- features/                One folder per user-facing area
 |   |   +-- dial/                The dial. The main screen.
-|   |   +-- friends/             Add, edit, delete people
-|   |   +-- journal/             Meetings, notes, topics, what is new
+|   |   +-- friends/             Add, edit and delete people, and the Friend
+|   |   |                        Notepad: Meetings, Topics, Updates, Notes,
+|   |   |                        Facts and Milestones
 |   |   +-- auth/                Profiles, PIN, session
 |   |   +-- backup/              Export and import
 |   |   +-- settings/            Reminder switch and app options
@@ -240,7 +246,14 @@ friendO/
 Each feature folder holds its own `bloc/` and `view/`. A feature may use `core/`, `friendo_domain`
 and `friendo_ui`. **A feature must not import another feature.**
 
-**Repositories are not in features.** Look in `core/friends/`, not in `features/journal/`. Three
+**One feature holds both Friend screens, and there is no `features/journal/`.** Add a Friend and
+the Friend Notepad share one Cadence picker, and that widget reads `Cadence`, `Orbit`, `dueDateOf`
+and `Standing`. ADR-0018 forbids `friendo_ui` from importing the domain, and a feature may not
+import another feature, so two feature folders would leave the picker no legal home. Merging them
+leaves the rule stronger, because the import that would have broken it cannot be written. See
+[docs/spec/add-notepad-and-settings.md](spec/add-notepad-and-settings.md).
+
+**Repositories are not in features.** Look in `core/friends/`, not in `features/friends/`. Three
 features read meetings and two write them, so a repository per feature would mean three row
 mappings and no owner for the rule that a friend always has at least one meeting. One aggregate,
 one repository, whole loads and whole saves. A read that only draws takes a read model instead. See
