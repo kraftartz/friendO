@@ -2,8 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:widgetbook/widgetbook.dart';
 
 import 'use_cases/avatar_halo_use_case.dart';
+import 'use_cases/pill_use_case.dart';
 import 'use_cases/pin_keypad_use_case.dart';
+import 'use_cases/soft_button_use_case.dart';
 import 'use_cases/soft_card_use_case.dart';
+import 'use_cases/soft_well_use_case.dart';
 
 void main() => runApp(const FriendoBook());
 
@@ -34,15 +37,33 @@ class FriendoBook extends StatelessWidget {
             ],
           ),
           WidgetbookComponent(
+            name: 'Pill',
+            useCases: [
+              WidgetbookUseCase(name: 'Default', builder: pillUseCase),
+            ],
+          ),
+          WidgetbookComponent(
             name: 'PinKeypad',
             useCases: [
               WidgetbookUseCase(name: 'Default', builder: pinKeypadUseCase),
             ],
           ),
           WidgetbookComponent(
+            name: 'SoftButton',
+            useCases: [
+              WidgetbookUseCase(name: 'Default', builder: softButtonUseCase),
+            ],
+          ),
+          WidgetbookComponent(
             name: 'SoftCard',
             useCases: [
               WidgetbookUseCase(name: 'Default', builder: softCardUseCase),
+            ],
+          ),
+          WidgetbookComponent(
+            name: 'SoftWell',
+            useCases: [
+              WidgetbookUseCase(name: 'Default', builder: softWellUseCase),
             ],
           ),
         ],
