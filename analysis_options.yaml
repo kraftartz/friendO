@@ -9,3 +9,9 @@ linter:
   rules:
     - prefer_single_quotes
     - require_trailing_commas
+
+analyzer:
+  exclude:
+    # Generated code. Nobody writes it, so nobody can fix a lint in it, and a
+    # warning here would have to be lived with rather than acted on.
+    - "**/*.g.dart"

@@ -177,6 +177,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.1.2"
+  convertlib:
+    dependency: transitive
+    description:
+      name: convertlib
+      sha256: "5874961a2c30a76b65363550897f58d6980deec67320bbfa8021b45cb2797c9c"
+      url: "https://pub.dev"
+    source: hosted
+    version: "3.6.1"
   coverage:
     dependency: transitive
     description:
@@ -454,6 +462,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.3.2"
+  hashlib:
+    dependency: "direct main"
+    description:
+      name: hashlib
+      sha256: b998d270c41c782d4e75e8fd19c8f43b64070f65bfeb528bbf886bb253cbb35b
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.4.2"
   hooks:
     dependency: transitive
     description:
@@ -647,7 +663,7 @@ packages:
     source: hosted
     version: "2.2.0"
   path:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: path
       sha256: "75cca69d1490965be98c73ceaea117e8a04dd21217b37b292c9ddbec0d955bc5"

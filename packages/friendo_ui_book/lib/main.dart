@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:widgetbook/widgetbook.dart';
 
+import 'use_cases/pin_keypad_use_case.dart';
 import 'use_cases/soft_card_use_case.dart';
 
 void main() => runApp(const FriendoBook());
@@ -25,6 +26,12 @@ class FriendoBook extends StatelessWidget {
       WidgetbookFolder(
         name: 'widgets',
         children: [
+          WidgetbookComponent(
+            name: 'PinKeypad',
+            useCases: [
+              WidgetbookUseCase(name: 'Default', builder: pinKeypadUseCase),
+            ],
+          ),
           WidgetbookComponent(
             name: 'SoftCard',
             useCases: [

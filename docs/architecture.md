@@ -213,6 +213,10 @@ friendO/
 |   |   +-- reminders/           Watches the repository. Reschedules. No feature
 |   |   |                        owns it.
 |   |   +-- media/               Avatar images and audio recaps, as BLOB columns
+|   |   +-- profiles/            profiles.json, the PIN hash, and the wrapped
+|   |   |                        data key by name. The list is read before any
+|   |   |                        Profile is unlocked, so it belongs to no
+|   |   |                        feature.
 |   |   +-- security/            App lock, screen privacy, auto-lock
 |   |   +-- time/                Clock. Every "now" comes from here.
 |   |
