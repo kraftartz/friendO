@@ -19,6 +19,7 @@ import '../features/auth/view/unlock_page.dart';
 import '../features/first_run/bloc/first_run_cubit.dart';
 import '../features/first_run/bloc/first_run_state.dart';
 import '../features/dial/bloc/dial_cubit.dart';
+import '../features/friends/bloc/friends_cubit.dart';
 import '../features/first_run/view/first_run_page.dart';
 import 'boot.dart';
 import 'navigation/home_shell.dart';
@@ -157,6 +158,13 @@ class _FriendoAppState extends State<FriendoApp> {
   Widget _theApp() => MultiBlocProvider(
     providers: [
       BlocProvider(create: (_) => NavigationCubit()),
+      BlocProvider(
+        create: (_) => FriendsCubit(
+          friends: _friends,
+          databases: widget.session.databases,
+          dayChange: _dayChange,
+        ),
+      ),
       BlocProvider(
         create: (_) => DialCubit(
           friends: _friends,

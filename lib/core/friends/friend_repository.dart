@@ -16,6 +16,8 @@ import '../db/database_session.dart';
 import '../text/folded_text.dart';
 import '../time/clock.dart';
 import 'dial_friend.dart';
+import 'friend_search.dart';
+import 'listed_friend.dart';
 
 /// One row per Friend: the id, the name, the Cadence, and the Civil Date of
 /// the newest Meeting.
@@ -28,6 +30,31 @@ const dialFriendsStatement =
     'select f.id, f.name, f.cadence_days, max(m.happened_on) as last_met '
     'from friends f join meetings m on m.friend_id = f.id '
     'group by f.id, f.name, f.cadence_days order by f.name';
+
+/// One row per Friend: the name as the User wrote it, the Cadence, the newest
+/// Meeting with its optional time and its place, the newest waiting Topic and
+/// how many wait.
+///
+/// The newest Meeting arrives as one row of the meetings table, so that its
+/// place and its optional time belong to the same Meeting as the Civil Date.
+/// Two Meetings on one Civil Date are told apart by the instant the store
+/// wrote them, which ADR-0021 keeps for this.
+///
+/// While no Topic can be marked done, every Topic is waiting. When the done
+/// mark lands, both sub-queries gain the same one condition.
+const listedFriendsStatement =
+    'select f.id, f.name, f.cadence_days, '
+    'm.happened_on as last_met, m.happened_at_minute, m.place, '
+    '(select n.body from notes n '
+    ' where n.friend_id = f.id and n.label = ? '
+    ' order by n.written_on desc, n.id desc limit 1) as newest_topic, '
+    '(select count(*) from notes n '
+    ' where n.friend_id = f.id and n.label = ?) as topics_waiting '
+    'from friends f join meetings m on m.id = '
+    '(select newest.id from meetings newest where newest.friend_id = f.id '
+    ' order by newest.happened_on desc, newest.created_at desc, '
+    ' newest.id desc limit 1) '
+    'order by f.name';
 
 /// The one door to a Friend.
 ///
@@ -225,6 +252,67 @@ class FriendRepository {
               .toList(),
         ),
   );
+
+  /// Every Friend the Friends List draws, watched.
+  ///
+  /// No reading is worked out here, and no clock is read. One `now` from the
+  /// caller then builds the whole screen, so two cards never fall on either
+  /// side of midnight.
+  Stream<List<ListedFriend>> watchListedFriends() => databases.watch(
+    (database) => database
+        .customSelect(
+          listedFriendsStatement,
+          variables: [
+            Variable<String>(NoteLabel.topic.name),
+            Variable<String>(NoteLabel.topic.name),
+          ],
+          readsFrom: {database.friends, database.meetings, database.notes},
+        )
+        .watch()
+        .map(
+          (rows) => rows
+              .map(
+                (row) => ListedFriend(
+                  id: row.read<String>('id'),
+                  name: row.read<String>('name'),
+                  cadence: Cadence.ofDays(row.read<int>('cadence_days')),
+                  lastMet: CivilDate.fromEpochDay(row.read<int>('last_met')),
+                  lastMetAtMinute: row.read<int?>('happened_at_minute'),
+                  lastMetPlace: row.read<String?>('place'),
+                  newestTopic: row.read<String?>('newest_topic'),
+                  topicsWaiting: row.read<int>('topics_waiting'),
+                ),
+              )
+              .toList(),
+        ),
+  );
+
+  /// Name every Friend the term matches, or null when the term narrows
+  /// nothing.
+  ///
+  /// The term is folded through the same function that folded the stored
+  /// copy, so a plain spelling finds a name with a stroke and the name with
+  /// the stroke finds it too.
+  Future<Set<String>?> friendIdsMatching(String term) async {
+    final search = FriendSearch.forTerm(term);
+    if (search == null) return null;
+
+    final database = databases.database;
+    final rows = await database
+        .customSelect(
+          search.statement,
+          variables: search.variables,
+          readsFrom: {
+            database.friends,
+            database.notes,
+            database.affinities,
+            database.friendAffinities,
+          },
+        )
+        .get();
+
+    return {for (final row in rows) row.read<String>('id')};
+  }
 
   /// When the store first wrote each Meeting this Friend holds.
   ///
