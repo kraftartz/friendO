@@ -5,12 +5,12 @@ import 'package:friendo_domain/friendo_domain.dart'
     show Orbit, Placing, PriorityOrder;
 
 import 'package:friendo/features/dial/packing/dial_geometry.dart'
-    show DialGeometry;
+    show DialGeometry, lapFractionOf;
 
 /// One Friend, and the Phase their Bead is drawn at.
 ///
 /// [phase] is not always the Friend's own Phase. A Bead that catches the back
-/// of the Beads Queue is drawn where the queue leaves room, which is why the
+/// of the Beads Queue is drawn where that line leaves room, which is why the
 /// packing is a reading of its own rather than a Phase read twice.
 final class PlacedBead extends Equatable {
   const PlacedBead({required this.placing, required this.phase});
@@ -22,7 +22,7 @@ final class PlacedBead extends Equatable {
   final double phase;
 
   /// Where the Bead is drawn, in laps clockwise from 12:00, inside one lap.
-  double get lapFraction => phase % 1.0;
+  double get lapFraction => lapFractionOf(phase);
 
   @override
   List<Object?> get props => [placing, phase];
@@ -91,9 +91,9 @@ PackedOrbit _packOrbit(Orbit orbit, List<Placing> members, double minGap) {
   double? first;
 
   for (final placing in members) {
-    // A Phase above one clamps to one, and a Bead that catches the queue
-    // slows into the back of it. One expression covers both, so being Overdue
-    // asks for no branch of its own.
+    // A Phase above one clamps to one, and a Bead that catches the Beads
+    // Queue slows into the back of it. One expression covers both, so being
+    // Overdue asks for no branch of its own.
     final placed = min(placing.phase.value, cursor);
 
     // Phase 1.0 and Phase 0.0 are the same place, so the last Bead has to keep

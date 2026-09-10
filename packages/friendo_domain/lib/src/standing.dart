@@ -7,11 +7,9 @@ const inOrbitFrom = 0.25;
 
 /// The Phase a Friend starts Nearing their Due Date at.
 ///
-/// It is one number and not two. The last quarter of a lap is also the last
-/// quarter of the Dial, from 9:00 round to 12:00, so a drawing that warms that
-/// arc reads this rather than an angle of its own. A second copy would let the
-/// picture contradict the count printed beside it, which is the failure a
-/// boundary in Phase was chosen to avoid.
+/// It is the last quarter of a lap, and it is one number. Anything that counts
+/// that quarter or draws it reads this. A second copy of the value, in a
+/// count or in an angle, would let two readings of one lap disagree.
 const nearingFrom = 0.75;
 
 /// How far through their Cadence a Friend has reached, said as a name.

@@ -50,3 +50,6 @@ app.*.map.json
 .dolt/
 *.db
 .beads-credential-key
+
+# Golden test scratch. The runner writes it on a mismatch.
+**/failures/

@@ -3,6 +3,14 @@ import 'dart:ui' show Offset;
 
 import 'package:friendo_domain/friendo_domain.dart' show Orbit;
 
+/// Where [phase] falls inside one lap, clockwise from 12:00.
+///
+/// A placed Phase runs to one and below zero, because a Beads Queue that
+/// reaches the top carries on past it. Every reading of a place on the lap
+/// comes through here, so a drawing cannot forget the wrap and put a Bead off
+/// the top of the Dial.
+double lapFractionOf(double phase) => phase % 1.0;
+
 /// The measurements of the Dial, in design units.
 ///
 /// Nothing here is a device pixel. The instrument is laid out at [size] and

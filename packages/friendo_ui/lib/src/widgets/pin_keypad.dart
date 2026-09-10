@@ -81,7 +81,7 @@ class PinDot extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final soft = Theme.of(context).extension<Soft>() ?? const Soft.dark();
+    final soft = Soft.of(context);
 
     return Container(
       width: 16,

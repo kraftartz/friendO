@@ -47,7 +47,7 @@ class DialBody extends StatelessWidget {
     child: Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        if (!reading.isLocked && !reading.isEmpty) _CountsRow(reading.counts),
+        if (!reading.isLocked) _CountsRow(reading.counts),
         const SizedBox(height: 16),
         Flexible(
           child: DialView(
@@ -156,7 +156,7 @@ class _Count extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final soft = Theme.of(context).extension<Soft>() ?? const Soft.dark();
+    final soft = Soft.of(context);
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),

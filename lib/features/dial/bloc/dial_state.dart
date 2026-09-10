@@ -1,5 +1,7 @@
 import 'package:equatable/equatable.dart';
 import 'package:friendo/core/friends/dial_friend.dart' show DialFriend;
+import 'package:friendo/features/dial/packing/dial_geometry.dart'
+    show lapFractionOf;
 import 'package:friendo_domain/friendo_domain.dart'
     show DialCounts, Orbit, Standing;
 
@@ -48,8 +50,11 @@ final class DialBead extends Equatable {
 
   String get name => friend.name;
 
+  /// The Orbit this Friend's Cadence puts them on.
+  Orbit get orbit => friend.cadence.orbit;
+
   /// Where the Bead is drawn, in laps clockwise from 12:00, inside one lap.
-  double get lapFraction => phase % 1.0;
+  double get lapFraction => lapFractionOf(phase);
 
   @override
   List<Object?> get props => [friend, phase, standing];
@@ -67,7 +72,7 @@ final class OverflowBadge extends Equatable {
 
   final double phase;
 
-  double get lapFraction => phase % 1.0;
+  double get lapFraction => lapFractionOf(phase);
 
   @override
   List<Object?> get props => [count, phase];

@@ -23,14 +23,24 @@ class HomeShell extends StatelessWidget {
   ///
   /// This list is indexed by [AppSection.index], so its order must match the
   /// order of the enum values.
-  static const _pages = [DialPage(), FriendsPage(), SettingsPage()];
-
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<NavigationCubit, AppSection>(
       builder: (context, section) => Scaffold(
         body: SafeArea(
-          child: IndexedStack(index: section.index, children: _pages),
+          child: IndexedStack(
+            index: section.index,
+            children: [
+              // Wiring one feature to another is this layer's job. The Dial
+              // raises the request and routes none of it itself.
+              DialPage(
+                onAddFriend: () =>
+                    context.read<NavigationCubit>().select(AppSection.friends),
+              ),
+              const FriendsPage(),
+              const SettingsPage(),
+            ],
+          ),
         ),
         bottomNavigationBar: NavigationBar(
           selectedIndex: section.index,

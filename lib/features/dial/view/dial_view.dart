@@ -82,7 +82,6 @@ class _DialViewState extends State<DialView>
     super.didUpdateWidget(old);
     if (widget.reading == old.reading) return;
 
-    _colours = _coloursIn(widget.reading);
     _setOff(from: old.reading, to: widget.reading);
   }
 
@@ -95,7 +94,7 @@ class _DialViewState extends State<DialView>
 
   @override
   Widget build(BuildContext context) {
-    final soft = Theme.of(context).extension<Soft>() ?? const Soft.dark();
+    final soft = Soft.of(context);
     final geometry = widget.geometry;
 
     return FittedBox(
@@ -159,14 +158,17 @@ class _DialViewState extends State<DialView>
     setState(() {
       _journeys = journeys;
       _leaving = leaving?.bead;
+      _colours = _coloursIn(to, leaving: leaving?.bead);
     });
 
     _travel.forward(from: 0);
 
     _resting?.cancel();
+    // The rest begins where the travel ends. Counting both from here would
+    // spend the arrival inside the rest and leave half of it.
     _resting = leaving == null
         ? null
-        : Timer(restAtTop, () {
+        : Timer(moveDuration + restAtTop, () {
             if (mounted) setState(() => _leaving = null);
           });
   }
@@ -214,10 +216,15 @@ class _DialViewState extends State<DialView>
     return null;
   }
 
-  Map<String, Color> _coloursIn(DialState reading) => coloursFor([
-    for (final orbit in reading.orbits)
-      for (final bead in orbit.beads) bead.friend.avatarSeed,
-  ]);
+  /// A colour for every Friend the Dial draws, the one resting on its way into
+  /// the Overflow included. A Bead left out of the assignment would fall back
+  /// to the colour it asked for, which another Bead may already hold.
+  Map<String, Color> _coloursIn(DialState reading, {DialBead? leaving}) =>
+      coloursFor([
+        for (final orbit in reading.orbits)
+          for (final bead in orbit.beads) bead.friend.avatarSeed,
+        if (leaving != null) leaving.friend.avatarSeed,
+      ]);
 
   Map<String, ({Orbit orbit, double lapFraction})> _placesIn(
     DialState reading,
@@ -270,8 +277,7 @@ class _DialViewState extends State<DialView>
     if (badge == null) return 0;
 
     final leaving = _leaving;
-    final waiting =
-        leaving != null && leaving.friend.cadence.orbit == orbit.orbit;
+    final waiting = leaving != null && leaving.orbit == orbit.orbit;
 
     return waiting ? badge.count - 1 : badge.count;
   }
@@ -283,13 +289,14 @@ class _DialViewState extends State<DialView>
 
   Widget _leavingBead(DialBead bead) => _at(
     bead.id,
-    bead.friend.cadence.orbit,
+    bead.orbit,
     0,
     BeadView(
       key: Key('bead-${bead.id}'),
       bead: bead,
       colour: _colourOf(bead),
       width: widget.geometry.beadWidth,
+      isEmphasised: bead.id == widget.reading.emphasisedId,
       onTap: () => widget.onTapBead?.call(bead),
     ),
   );

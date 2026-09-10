@@ -24,9 +24,9 @@ class BeadView extends StatelessWidget {
 
   final DialBead bead;
 
-  /// The Avatar's colour. It arrives as an argument because no two Friends on
-  /// one Dial may share one, and that is an assignment made against the whole
-  /// roster rather than a reading of this one Friend.
+  /// The Avatar's colour. This widget draws the colour it is given and works
+  /// none out: telling two Beads apart is a fact about a roster, and a Bead
+  /// holds only itself.
   final Color colour;
 
   final double width;

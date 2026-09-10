@@ -17,7 +17,8 @@ import '../text/folded_text.dart';
 import '../time/clock.dart';
 import 'dial_friend.dart';
 
-/// The statement behind [FriendRepository.watchDialFriends].
+/// One row per Friend: the id, the name, the Cadence, and the Civil Date of
+/// the newest Meeting.
 ///
 /// It names its four columns rather than taking a whole Friend, so a column
 /// added to the table never joins this read. The Avatar picture and the audio
@@ -225,6 +226,12 @@ class FriendRepository {
         ),
   );
 
+  /// When the store first wrote each Meeting this Friend holds.
+  ///
+  /// A whole save takes every child row away and puts it back. Without this
+  /// the instant would be the time of the last write, and ADR-0021 asks it to
+  /// break a tie between two Meetings on one Civil Date, which a moving
+  /// instant cannot do.
   Future<Map<String, int>> _bornAtOf(
     AppDatabase database,
     String friendId,

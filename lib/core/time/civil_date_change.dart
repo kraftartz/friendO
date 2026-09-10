@@ -32,8 +32,8 @@ const _leastWait = Duration(milliseconds: 20);
 /// waits again.
 ///
 /// The timer runs only while somebody listens, and stops with the last
-/// listener. A screen that clears behind a lock cancels its subscription, so
-/// no timer is left running behind the PIN screen.
+/// listener. Nothing keeps it alive on its own, so letting go of the stream is
+/// enough to stop it.
 class CivilDateChange {
   CivilDateChange({this.clock = const Clock()});
 

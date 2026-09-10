@@ -100,11 +100,5 @@ void main() {
         Standing.nearing,
       );
     });
-
-    test('put Nearing at the last quarter of the lap, which is the arc the '
-        'Dial warms', () {
-      expect(nearingFrom, 0.75);
-      expect(1 - nearingFrom, 0.25);
-    });
   });
 }

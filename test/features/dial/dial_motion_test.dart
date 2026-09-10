@@ -178,7 +178,15 @@ void main() {
     expect(offsetOf(tester, 'ola').dy, lessThan(0));
     expect(find.text('+1'), findsOneWidget);
 
-    await tester.pump(restAtTop);
+    // The rest begins where the travel ended, so nearly all of it is still to
+    // come. Counting the rest from the tap would have spent half of it
+    // getting here.
+    await tester.pump(restAtTop - const Duration(milliseconds: 50));
+
+    expect(find.byKey(const Key('bead-ola')), findsOneWidget);
+    expect(find.text('+1'), findsOneWidget);
+
+    await tester.pump(const Duration(milliseconds: 100));
 
     expect(find.byKey(const Key('bead-ola')), findsNothing);
     expect(find.text('+2'), findsOneWidget);

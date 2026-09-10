@@ -10,6 +10,8 @@ import 'package:flutter/material.dart';
 ///
 /// Read these values, never copy them. A colour written straight into a widget
 /// stops following the theme the moment the theme changes.
+const _wellDark = Color(0xFF090711);
+
 @immutable
 class Soft extends ThemeExtension<Soft> {
   /// Create a token set from explicit values.
@@ -17,7 +19,7 @@ class Soft extends ThemeExtension<Soft> {
     required this.surface,
     required this.glow,
     required this.radius,
-    this.well = const Color(0xFF090711),
+    this.well = _wellDark,
   });
 
   /// Create the dark token set.
@@ -28,7 +30,7 @@ class Soft extends ThemeExtension<Soft> {
     : surface = const Color(0xFF211C33),
       glow = const Color(0xFFD0BCFF),
       radius = 20,
-      well = const Color(0xFF090711);
+      well = _wellDark;
 
   /// The colour of a raised surface.
   final Color surface;
@@ -42,6 +44,13 @@ class Soft extends ThemeExtension<Soft> {
   /// The fill of a surface that sinks into the one behind it: an input, a
   /// Phase track, an empty Orbit.
   final Color well;
+
+  /// The tokens installed in [context], or the dark ones when none are.
+  ///
+  /// A widget reads its treatment through this rather than reaching for the
+  /// theme itself, so a screen with no tokens installed still draws.
+  static Soft of(BuildContext context) =>
+      Theme.of(context).extension<Soft>() ?? const Soft.dark();
 
   @override
   Soft copyWith({Color? surface, Color? glow, double? radius, Color? well}) =>

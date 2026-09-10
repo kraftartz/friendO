@@ -58,8 +58,8 @@ class _FriendoAppState extends State<FriendoApp> {
     widget.session.databases,
   );
 
-  /// One announcement for every screen that reads a Civil Date, so that no
-  /// screen leaves a timer of its own running behind the PIN screen.
+  /// The one announcement of the Civil Date change in the app. It is built
+  /// here because it belongs to no single feature.
   late final CivilDateChange _dayChange = CivilDateChange();
 
   StreamSubscription<DatabaseState>? _whileOpen;
