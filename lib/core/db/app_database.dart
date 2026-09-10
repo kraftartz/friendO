@@ -7,6 +7,7 @@ import 'tables/friends.dart';
 import 'tables/meetings.dart';
 import 'tables/milestones.dart';
 import 'tables/notes.dart';
+import 'tables/settings.dart';
 
 part 'app_database.g.dart';
 
@@ -32,13 +33,14 @@ class MigrationFailed implements Exception {
     FriendAffinities,
     Facts,
     Milestones,
+    Settings,
   ],
 )
 class AppDatabase extends _$AppDatabase {
   AppDatabase(super.e);
 
   @override
-  int get schemaVersion => 2;
+  int get schemaVersion => 3;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -62,6 +64,7 @@ class AppDatabase extends _$AppDatabase {
   /// a file is deleted with the app rather than migrated.
   Future<void> _forward(Migrator migrator, int from) async {
     if (from < 2) await migrator.createAll();
+    if (from == 2) await migrator.createTable(settings);
   }
 
   Future<void> _report(Future<void> work) async {

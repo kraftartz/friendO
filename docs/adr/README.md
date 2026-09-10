@@ -64,6 +64,7 @@ inside a group are not continuous. Read the group you are working in.
 | [0024](0024-keystore-holds-a-wrapping-key.md) | The Keystore holds a wrapping key, and the Profile list has a home | Accepted, partly superseded by [0030](0030-first-run-creates-one-profile.md) and [0031](0031-a-forgotten-pin-loses-the-profile.md) |
 | [0030](0030-first-run-creates-one-profile.md) | First Run creates one Profile, and says what is not kept | Accepted |
 | [0031](0031-a-forgotten-pin-loses-the-profile.md) | A forgotten PIN loses the Profile | Accepted |
+| [0036](0036-where-a-setting-lives.md) | Where a setting lives | Accepted |
 
 ### Time, Phase and the Priority Order
 

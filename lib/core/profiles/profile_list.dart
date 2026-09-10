@@ -88,6 +88,30 @@ class ProfileList {
     await temporary.rename(file.path);
   }
 
+  /// Change one Profile in the file, and leave every other field of it and
+  /// every other Profile alone.
+  ///
+  /// The whole file is rewritten, because it is one JSON document. The write
+  /// is the atomic one [write] makes.
+  Future<void> changeOne(
+    String profileId,
+    Profile Function(Profile profile) change,
+  ) async {
+    final rows = await read();
+    if (!rows.any((row) => row.id == profileId)) {
+      throw ArgumentError.value(
+        profileId,
+        'profileId',
+        'is in no Profile list',
+      );
+    }
+
+    await write([
+      for (final row in rows)
+        if (row.id == profileId) change(row) else row,
+    ]);
+  }
+
   List<Profile> _parse(String text) {
     final json = jsonDecode(text);
     if (json is! Map<String, dynamic>) {
@@ -124,6 +148,7 @@ class ProfileList {
       'salt': base64Encode(profile.kdfParams.salt),
     },
     'failedAttempts': profile.failedAttempts,
+    'usesBiometricUnlock': profile.usesBiometricUnlock,
   };
 
   Profile _profileOf(Map<String, dynamic> row) {
@@ -142,6 +167,9 @@ class ProfileList {
         salt: _bytesOf(kdf['salt'] as String),
       ),
       failedAttempts: row['failedAttempts'] as int,
+      // A file written before this setting existed holds no key for it, and
+      // a Profile that has never asked for a fingerprint does not offer one.
+      usesBiometricUnlock: row['usesBiometricUnlock'] as bool? ?? false,
     );
   }
 

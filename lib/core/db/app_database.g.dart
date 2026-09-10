@@ -2646,6 +2646,403 @@ class MilestonesCompanion extends UpdateCompanion<MilestoneRow> {
   }
 }
 
+class $SettingsTable extends Settings
+    with TableInfo<$SettingsTable, SettingsRow> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $SettingsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _remindersOnMeta = const VerificationMeta(
+    'remindersOn',
+  );
+  @override
+  late final GeneratedColumn<bool> remindersOn = GeneratedColumn<bool>(
+    'reminders_on',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("reminders_on" IN (0, 1))',
+    ),
+    defaultValue: const Constant(false),
+  );
+  static const VerificationMeta _reminderHourMeta = const VerificationMeta(
+    'reminderHour',
+  );
+  @override
+  late final GeneratedColumn<int> reminderHour = GeneratedColumn<int>(
+    'reminder_hour',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(9),
+  );
+  static const VerificationMeta _autoLockSecondsMeta = const VerificationMeta(
+    'autoLockSeconds',
+  );
+  @override
+  late final GeneratedColumn<int> autoLockSeconds = GeneratedColumn<int>(
+    'auto_lock_seconds',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(60),
+  );
+  static const VerificationMeta _screenshotsAllowedMeta =
+      const VerificationMeta('screenshotsAllowed');
+  @override
+  late final GeneratedColumn<bool> screenshotsAllowed = GeneratedColumn<bool>(
+    'screenshots_allowed',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("screenshots_allowed" IN (0, 1))',
+    ),
+    defaultValue: const Constant(false),
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    remindersOn,
+    reminderHour,
+    autoLockSeconds,
+    screenshotsAllowed,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'settings';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<SettingsRow> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('reminders_on')) {
+      context.handle(
+        _remindersOnMeta,
+        remindersOn.isAcceptableOrUnknown(
+          data['reminders_on']!,
+          _remindersOnMeta,
+        ),
+      );
+    }
+    if (data.containsKey('reminder_hour')) {
+      context.handle(
+        _reminderHourMeta,
+        reminderHour.isAcceptableOrUnknown(
+          data['reminder_hour']!,
+          _reminderHourMeta,
+        ),
+      );
+    }
+    if (data.containsKey('auto_lock_seconds')) {
+      context.handle(
+        _autoLockSecondsMeta,
+        autoLockSeconds.isAcceptableOrUnknown(
+          data['auto_lock_seconds']!,
+          _autoLockSecondsMeta,
+        ),
+      );
+    }
+    if (data.containsKey('screenshots_allowed')) {
+      context.handle(
+        _screenshotsAllowedMeta,
+        screenshotsAllowed.isAcceptableOrUnknown(
+          data['screenshots_allowed']!,
+          _screenshotsAllowedMeta,
+        ),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  SettingsRow map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return SettingsRow(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      remindersOn: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}reminders_on'],
+      )!,
+      reminderHour: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}reminder_hour'],
+      )!,
+      autoLockSeconds: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}auto_lock_seconds'],
+      )!,
+      screenshotsAllowed: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}screenshots_allowed'],
+      )!,
+    );
+  }
+
+  @override
+  $SettingsTable createAlias(String alias) {
+    return $SettingsTable(attachedDatabase, alias);
+  }
+}
+
+class SettingsRow extends DataClass implements Insertable<SettingsRow> {
+  /// The one row's key. It holds [settingsRowId] and nothing else.
+  final String id;
+
+  /// Whether the User has turned reminders on. Off in a new Profile, per
+  /// ADR-0012.
+  final bool remindersOn;
+
+  /// The hour of the Due Date a reminder fires at, from 0 to 23.
+  final int reminderHour;
+
+  /// How long the app waits before it locks itself, in seconds. ADR-0011 set
+  /// the default.
+  final int autoLockSeconds;
+
+  /// Whether the User has allowed their own screenshots. It defaults to
+  /// secure.
+  final bool screenshotsAllowed;
+  const SettingsRow({
+    required this.id,
+    required this.remindersOn,
+    required this.reminderHour,
+    required this.autoLockSeconds,
+    required this.screenshotsAllowed,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['reminders_on'] = Variable<bool>(remindersOn);
+    map['reminder_hour'] = Variable<int>(reminderHour);
+    map['auto_lock_seconds'] = Variable<int>(autoLockSeconds);
+    map['screenshots_allowed'] = Variable<bool>(screenshotsAllowed);
+    return map;
+  }
+
+  SettingsCompanion toCompanion(bool nullToAbsent) {
+    return SettingsCompanion(
+      id: Value(id),
+      remindersOn: Value(remindersOn),
+      reminderHour: Value(reminderHour),
+      autoLockSeconds: Value(autoLockSeconds),
+      screenshotsAllowed: Value(screenshotsAllowed),
+    );
+  }
+
+  factory SettingsRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return SettingsRow(
+      id: serializer.fromJson<String>(json['id']),
+      remindersOn: serializer.fromJson<bool>(json['remindersOn']),
+      reminderHour: serializer.fromJson<int>(json['reminderHour']),
+      autoLockSeconds: serializer.fromJson<int>(json['autoLockSeconds']),
+      screenshotsAllowed: serializer.fromJson<bool>(json['screenshotsAllowed']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'remindersOn': serializer.toJson<bool>(remindersOn),
+      'reminderHour': serializer.toJson<int>(reminderHour),
+      'autoLockSeconds': serializer.toJson<int>(autoLockSeconds),
+      'screenshotsAllowed': serializer.toJson<bool>(screenshotsAllowed),
+    };
+  }
+
+  SettingsRow copyWith({
+    String? id,
+    bool? remindersOn,
+    int? reminderHour,
+    int? autoLockSeconds,
+    bool? screenshotsAllowed,
+  }) => SettingsRow(
+    id: id ?? this.id,
+    remindersOn: remindersOn ?? this.remindersOn,
+    reminderHour: reminderHour ?? this.reminderHour,
+    autoLockSeconds: autoLockSeconds ?? this.autoLockSeconds,
+    screenshotsAllowed: screenshotsAllowed ?? this.screenshotsAllowed,
+  );
+  SettingsRow copyWithCompanion(SettingsCompanion data) {
+    return SettingsRow(
+      id: data.id.present ? data.id.value : this.id,
+      remindersOn: data.remindersOn.present
+          ? data.remindersOn.value
+          : this.remindersOn,
+      reminderHour: data.reminderHour.present
+          ? data.reminderHour.value
+          : this.reminderHour,
+      autoLockSeconds: data.autoLockSeconds.present
+          ? data.autoLockSeconds.value
+          : this.autoLockSeconds,
+      screenshotsAllowed: data.screenshotsAllowed.present
+          ? data.screenshotsAllowed.value
+          : this.screenshotsAllowed,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('SettingsRow(')
+          ..write('id: $id, ')
+          ..write('remindersOn: $remindersOn, ')
+          ..write('reminderHour: $reminderHour, ')
+          ..write('autoLockSeconds: $autoLockSeconds, ')
+          ..write('screenshotsAllowed: $screenshotsAllowed')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    remindersOn,
+    reminderHour,
+    autoLockSeconds,
+    screenshotsAllowed,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is SettingsRow &&
+          other.id == this.id &&
+          other.remindersOn == this.remindersOn &&
+          other.reminderHour == this.reminderHour &&
+          other.autoLockSeconds == this.autoLockSeconds &&
+          other.screenshotsAllowed == this.screenshotsAllowed);
+}
+
+class SettingsCompanion extends UpdateCompanion<SettingsRow> {
+  final Value<String> id;
+  final Value<bool> remindersOn;
+  final Value<int> reminderHour;
+  final Value<int> autoLockSeconds;
+  final Value<bool> screenshotsAllowed;
+  final Value<int> rowid;
+  const SettingsCompanion({
+    this.id = const Value.absent(),
+    this.remindersOn = const Value.absent(),
+    this.reminderHour = const Value.absent(),
+    this.autoLockSeconds = const Value.absent(),
+    this.screenshotsAllowed = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  SettingsCompanion.insert({
+    required String id,
+    this.remindersOn = const Value.absent(),
+    this.reminderHour = const Value.absent(),
+    this.autoLockSeconds = const Value.absent(),
+    this.screenshotsAllowed = const Value.absent(),
+    this.rowid = const Value.absent(),
+  }) : id = Value(id);
+  static Insertable<SettingsRow> custom({
+    Expression<String>? id,
+    Expression<bool>? remindersOn,
+    Expression<int>? reminderHour,
+    Expression<int>? autoLockSeconds,
+    Expression<bool>? screenshotsAllowed,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (remindersOn != null) 'reminders_on': remindersOn,
+      if (reminderHour != null) 'reminder_hour': reminderHour,
+      if (autoLockSeconds != null) 'auto_lock_seconds': autoLockSeconds,
+      if (screenshotsAllowed != null) 'screenshots_allowed': screenshotsAllowed,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  SettingsCompanion copyWith({
+    Value<String>? id,
+    Value<bool>? remindersOn,
+    Value<int>? reminderHour,
+    Value<int>? autoLockSeconds,
+    Value<bool>? screenshotsAllowed,
+    Value<int>? rowid,
+  }) {
+    return SettingsCompanion(
+      id: id ?? this.id,
+      remindersOn: remindersOn ?? this.remindersOn,
+      reminderHour: reminderHour ?? this.reminderHour,
+      autoLockSeconds: autoLockSeconds ?? this.autoLockSeconds,
+      screenshotsAllowed: screenshotsAllowed ?? this.screenshotsAllowed,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (remindersOn.present) {
+      map['reminders_on'] = Variable<bool>(remindersOn.value);
+    }
+    if (reminderHour.present) {
+      map['reminder_hour'] = Variable<int>(reminderHour.value);
+    }
+    if (autoLockSeconds.present) {
+      map['auto_lock_seconds'] = Variable<int>(autoLockSeconds.value);
+    }
+    if (screenshotsAllowed.present) {
+      map['screenshots_allowed'] = Variable<bool>(screenshotsAllowed.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('SettingsCompanion(')
+          ..write('id: $id, ')
+          ..write('remindersOn: $remindersOn, ')
+          ..write('reminderHour: $reminderHour, ')
+          ..write('autoLockSeconds: $autoLockSeconds, ')
+          ..write('screenshotsAllowed: $screenshotsAllowed, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
@@ -2658,6 +3055,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   );
   late final $FactsTable facts = $FactsTable(this);
   late final $MilestonesTable milestones = $MilestonesTable(this);
+  late final $SettingsTable settings = $SettingsTable(this);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -2670,6 +3068,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     friendAffinities,
     facts,
     milestones,
+    settings,
   ];
 }
 
@@ -5375,6 +5774,211 @@ typedef $$MilestonesTableProcessedTableManager =
       MilestoneRow,
       PrefetchHooks Function({bool friendId})
     >;
+typedef $$SettingsTableCreateCompanionBuilder =
+    SettingsCompanion Function({
+      required String id,
+      Value<bool> remindersOn,
+      Value<int> reminderHour,
+      Value<int> autoLockSeconds,
+      Value<bool> screenshotsAllowed,
+      Value<int> rowid,
+    });
+typedef $$SettingsTableUpdateCompanionBuilder =
+    SettingsCompanion Function({
+      Value<String> id,
+      Value<bool> remindersOn,
+      Value<int> reminderHour,
+      Value<int> autoLockSeconds,
+      Value<bool> screenshotsAllowed,
+      Value<int> rowid,
+    });
+
+class $$SettingsTableFilterComposer
+    extends Composer<_$AppDatabase, $SettingsTable> {
+  $$SettingsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get remindersOn => $composableBuilder(
+    column: $table.remindersOn,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get reminderHour => $composableBuilder(
+    column: $table.reminderHour,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get autoLockSeconds => $composableBuilder(
+    column: $table.autoLockSeconds,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get screenshotsAllowed => $composableBuilder(
+    column: $table.screenshotsAllowed,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$SettingsTableOrderingComposer
+    extends Composer<_$AppDatabase, $SettingsTable> {
+  $$SettingsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get remindersOn => $composableBuilder(
+    column: $table.remindersOn,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get reminderHour => $composableBuilder(
+    column: $table.reminderHour,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get autoLockSeconds => $composableBuilder(
+    column: $table.autoLockSeconds,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get screenshotsAllowed => $composableBuilder(
+    column: $table.screenshotsAllowed,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$SettingsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $SettingsTable> {
+  $$SettingsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<bool> get remindersOn => $composableBuilder(
+    column: $table.remindersOn,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get reminderHour => $composableBuilder(
+    column: $table.reminderHour,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get autoLockSeconds => $composableBuilder(
+    column: $table.autoLockSeconds,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<bool> get screenshotsAllowed => $composableBuilder(
+    column: $table.screenshotsAllowed,
+    builder: (column) => column,
+  );
+}
+
+class $$SettingsTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $SettingsTable,
+          SettingsRow,
+          $$SettingsTableFilterComposer,
+          $$SettingsTableOrderingComposer,
+          $$SettingsTableAnnotationComposer,
+          $$SettingsTableCreateCompanionBuilder,
+          $$SettingsTableUpdateCompanionBuilder,
+          (
+            SettingsRow,
+            BaseReferences<_$AppDatabase, $SettingsTable, SettingsRow>,
+          ),
+          SettingsRow,
+          PrefetchHooks Function()
+        > {
+  $$SettingsTableTableManager(_$AppDatabase db, $SettingsTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$SettingsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$SettingsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$SettingsTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<String> id = const Value.absent(),
+                Value<bool> remindersOn = const Value.absent(),
+                Value<int> reminderHour = const Value.absent(),
+                Value<int> autoLockSeconds = const Value.absent(),
+                Value<bool> screenshotsAllowed = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => SettingsCompanion(
+                id: id,
+                remindersOn: remindersOn,
+                reminderHour: reminderHour,
+                autoLockSeconds: autoLockSeconds,
+                screenshotsAllowed: screenshotsAllowed,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String id,
+                Value<bool> remindersOn = const Value.absent(),
+                Value<int> reminderHour = const Value.absent(),
+                Value<int> autoLockSeconds = const Value.absent(),
+                Value<bool> screenshotsAllowed = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => SettingsCompanion.insert(
+                id: id,
+                remindersOn: remindersOn,
+                reminderHour: reminderHour,
+                autoLockSeconds: autoLockSeconds,
+                screenshotsAllowed: screenshotsAllowed,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$SettingsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $SettingsTable,
+      SettingsRow,
+      $$SettingsTableFilterComposer,
+      $$SettingsTableOrderingComposer,
+      $$SettingsTableAnnotationComposer,
+      $$SettingsTableCreateCompanionBuilder,
+      $$SettingsTableUpdateCompanionBuilder,
+      (SettingsRow, BaseReferences<_$AppDatabase, $SettingsTable, SettingsRow>),
+      SettingsRow,
+      PrefetchHooks Function()
+    >;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -5393,4 +5997,6 @@ class $AppDatabaseManager {
       $$FactsTableTableManager(_db, _db.facts);
   $$MilestonesTableTableManager get milestones =>
       $$MilestonesTableTableManager(_db, _db.milestones);
+  $$SettingsTableTableManager get settings =>
+      $$SettingsTableTableManager(_db, _db.settings);
 }
