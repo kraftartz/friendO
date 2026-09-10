@@ -197,7 +197,7 @@ void main() {
 
       await session.unlock(mine.id, '123456');
       await databases.database.customStatement(
-        'create table friends (name text)',
+        'create table scratch (name text)',
       );
       await session.lock();
 
@@ -205,7 +205,7 @@ void main() {
       final tables = await databases.database
           .customSelect(
             'select count(*) as found from sqlite_master '
-            "where name = 'friends'",
+            "where name = 'scratch'",
           )
           .getSingle();
 

@@ -17,17 +17,19 @@ void main() {
   late ProfileSession session;
   late String profileId;
 
-  /// The table stands in for the schema friendO-fff.8 brings. The contract
-  /// under test is the lock, and the lock needs a table and not the schema.
+  /// A table of its own, made inside the open file.
+  ///
+  /// The contract under test is the lock, which needs a table and not the
+  /// schema. A table the app never declares keeps the two apart.
   Stream<List<String>> namesInOrder() => databases.watch(
     (database) => database
-        .customSelect('select name from friends order by name')
+        .customSelect('select name from scratch order by name')
         .watch()
         .map((rows) => rows.map((row) => row.read<String>('name')).toList()),
   );
 
   Future<void> add(String name) => databases.database.customStatement(
-    'insert into friends (name) values (?)',
+    'insert into scratch (name) values (?)',
     [name],
   );
 
@@ -49,7 +51,7 @@ void main() {
     ).createProfile('Michal', '123456')).id;
     await session.unlock(profileId, '123456');
     await databases.database.customStatement(
-      'create table friends (name text)',
+      'create table scratch (name text)',
     );
   });
 
@@ -105,7 +107,7 @@ void main() {
     final other = DatabaseSession(directory);
     await other.open(profileId, (await const DataKeyStore().read(profileId))!);
     await other.database.customStatement(
-      "insert into friends (name) values ('Ola')",
+      "insert into scratch (name) values ('Ola')",
     );
     await other.close();
 
