@@ -42,6 +42,12 @@ class DatabaseSession {
 
   AppDatabase? _database;
 
+  /// Where the connection stands at this moment.
+  ///
+  /// A caller that must decide now reads this. A caller that must follow the
+  /// changes listens to [state]. Both read the one field.
+  DatabaseState get stateNow => _state;
+
   /// Where the connection stands, from now on.
   ///
   /// A listener that arrives late reads where it stands first, so that it

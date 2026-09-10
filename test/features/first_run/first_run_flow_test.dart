@@ -5,38 +5,26 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:friendo/app/app.dart';
 import 'package:friendo/app/boot.dart';
-import 'package:friendo/core/db/database_session.dart';
-import 'package:friendo/core/profiles/data_key_store.dart';
-import 'package:friendo/core/profiles/profile_creator.dart';
-import 'package:friendo/core/profiles/profile_list.dart';
 import 'package:friendo/features/first_run/bloc/first_run_cubit.dart';
 import 'package:friendo/features/first_run/bloc/first_run_state.dart';
 import 'package:friendo/features/first_run/view/first_run_page.dart';
-import 'package:hashlib/hashlib.dart';
 
-import '../../support/creator_in.dart';
+import '../../support/wiring.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
   late Directory directory;
-  late DatabaseSession databases;
-  late ProfileCreator creator;
+  late Wiring wiring;
 
   setUp(() {
     FlutterSecureStorage.setMockInitialValues({});
     directory = Directory.systemTemp.createTempSync('friendo_flow');
-    databases = DatabaseSession(directory);
-    creator = ProfileCreator(
-      profiles: ProfileList(directory),
-      databases: databases,
-      dataKeys: const DataKeyStore(),
-      security: Argon2Security.test,
-    );
+    wiring = Wiring(directory);
   });
 
   tearDown(() async {
-    await databases.close();
+    await wiring.databases.close();
     directory.deleteSync(recursive: true);
   });
 
@@ -45,8 +33,8 @@ void main() {
   ) async {
     await tester.pumpWidget(
       FriendoApp(
-        creator: creator,
-        session: sessionIn(directory),
+        creator: wiring.creator,
+        session: wiring.session,
         firstScreen: const StartFirstRun(),
       ),
     );
@@ -56,7 +44,7 @@ void main() {
 
   testWidgets('a phone with a Profile starts on the Dial', (tester) async {
     await tester.pumpWidget(
-      FriendoApp(creator: creator, session: sessionIn(directory)),
+      FriendoApp(creator: wiring.creator, session: wiring.session),
     );
 
     expect(find.byType(FirstRunPage), findsNothing);
@@ -66,8 +54,8 @@ void main() {
   testWidgets('the cost screen leads to the Dial', (tester) async {
     await tester.pumpWidget(
       FriendoApp(
-        creator: creator,
-        session: sessionIn(directory),
+        creator: wiring.creator,
+        session: wiring.session,
         firstScreen: const StartFirstRun(),
       ),
     );
@@ -87,7 +75,6 @@ void main() {
           .timeout(const Duration(seconds: 30));
     });
     await tester.pump();
-
     await tester.tap(find.text('Continue'));
     await tester.pumpAndSettle();
 

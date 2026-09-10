@@ -8,6 +8,7 @@ import 'package:friendo/core/db/database_session.dart';
 import 'package:friendo/core/profiles/data_key_store.dart';
 import 'package:friendo/core/profiles/profile_creator.dart';
 import 'package:friendo/core/profiles/profile_list.dart';
+import 'package:friendo/core/profiles/profile_session.dart';
 import 'package:friendo/features/first_run/bloc/first_run_cubit.dart';
 import 'package:friendo/features/first_run/bloc/first_run_state.dart';
 import 'package:friendo/features/first_run/view/first_run_page.dart';
@@ -36,6 +37,11 @@ void main() {
         databases: databases,
         dataKeys: const DataKeyStore(),
         security: Argon2Security.test,
+      ),
+      ProfileSession(
+        profiles: ProfileList(directory),
+        databases: databases,
+        dataKeys: const DataKeyStore(),
       ),
     );
   });

@@ -108,7 +108,7 @@ class ProfileSession {
       return WrongPin(attempts);
     }
 
-    final failure = await _openProfile(profileId);
+    final failure = await openProfile(profileId);
     if (failure != null) return Failed(failure);
 
     await _writeAttempts(profileId, 0);
@@ -121,9 +121,12 @@ class ProfileSession {
 
   /// Unwraps the data key and opens the file. It takes no PIN.
   ///
-  /// A second gate, such as a fingerprint, reaches the same step rather than
-  /// copying the walk that follows a PIN.
-  Future<UnlockFailure?> _openProfile(String profileId) async {
+  /// A second gate, such as a fingerprint, reaches this step rather than
+  /// copying the walk that follows a PIN. So does First Run, which has just
+  /// watched the User choose the PIN twice.
+  ///
+  /// It answers null when the Profile is open, and why not when it is not.
+  Future<UnlockFailure?> openProfile(String profileId) async {
     final dataKey = await dataKeys.read(profileId);
     if (dataKey == null) return UnlockFailure.dataKeyMissing;
 
