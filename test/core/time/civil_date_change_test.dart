@@ -4,10 +4,26 @@ import 'package:friendo/core/time/civil_date_change.dart'
 
 import '../../support/running_clock.dart';
 
-/// Long enough for a timer set a tenth of a second ahead to have fired even on
-/// a machine running the whole suite at once, and short enough that a second
-/// midnight cannot arrive inside it.
+/// How long to wait when the thing under test is an absence.
+///
+/// There is no answer to poll for, so a length of time is the only way to ask.
+/// It is short because a late timer cannot make an absence look present, and
+/// short enough that a second midnight cannot arrive inside it.
 const settle = Duration(milliseconds: 500);
+
+/// Wait for [answer].
+///
+/// A timer fires when it fires. A machine running the whole suite at once can
+/// leave a timer set a tenth of a second ahead waiting for seconds, so a test
+/// waits for the answer rather than for a length of time it can miss. The
+/// budget is long because it costs nothing on a machine that is not loaded:
+/// the wait ends on the answer and not on the clock.
+Future<void> until(bool Function() answer) async {
+  for (var tries = 0; tries < 1000 && !answer(); tries++) {
+    await Future<void>.delayed(const Duration(milliseconds: 20));
+    await pumpEventQueue();
+  }
+}
 
 /// A tenth of a second before the local Civil Date changes.
 DateTime justBeforeMidnight() => DateTime(2026, 9, 10, 23, 59, 59, 900);
@@ -63,6 +79,9 @@ void main() {
       final listening = change.changes.listen(announcements.add);
       addTearDown(listening.cancel);
 
+      await until(() => announcements.isNotEmpty);
+      // Long enough after the first announcement for a second to have shown
+      // up, had the timer been a tick rather than a wait for one midnight.
       await Future<void>.delayed(settle);
 
       expect(announcements, hasLength(1));
@@ -72,10 +91,11 @@ void main() {
       final change = CivilDateChange(clock: RunningClock(justBeforeMidnight()));
       addTearDown(change.dispose);
 
-      final listening = change.changes.listen((_) {});
+      final announcements = <void>[];
+      final listening = change.changes.listen(announcements.add);
       addTearDown(listening.cancel);
 
-      await Future<void>.delayed(settle);
+      await until(() => announcements.isNotEmpty);
 
       expect(change.isWaiting, isTrue);
     });
@@ -91,7 +111,7 @@ void main() {
       addTearDown(onDial.cancel);
       addTearDown(onList.cancel);
 
-      await Future<void>.delayed(settle);
+      await until(() => dial.isNotEmpty && list.isNotEmpty);
 
       expect(dial, hasLength(1));
       expect(list, hasLength(1));
@@ -120,7 +140,7 @@ void main() {
       addTearDown(onList.cancel);
       await onDial.cancel();
 
-      await Future<void>.delayed(settle);
+      await until(() => staying.isNotEmpty);
 
       expect(staying, hasLength(1));
     });
@@ -137,7 +157,7 @@ void main() {
       addTearDown(listening.cancel);
 
       expect(change.isWaiting, isTrue);
-      await Future<void>.delayed(settle);
+      await until(() => announcements.isNotEmpty);
       expect(announcements, hasLength(1));
     });
 
