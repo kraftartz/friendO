@@ -1,20 +1,17 @@
-import 'package:diacritic/diacritic.dart';
+import 'package:diacritic/diacritic.dart' show removeDiacritics;
 
-/// The Folded Text that search matches, for [written].
+/// Fold [written] to the copy a search matches.
 ///
-/// It runs three steps in this order, which ADR-0033 fixes:
+/// The fold has three steps, in this order: spell the sharp s out, lower the
+/// case over all of Unicode, then take the diacritics off an explicit table.
 ///
-/// 1. Replace the sharp s with `ss`, so that `Straße` answers `strasse`. The
-///    table in step 3 would otherwise give `strase`.
-/// 2. Lower case it. This covers the whole of Unicode.
-/// 3. Take the diacritics off, from an explicit table. Decomposition alone
-///    reaches none of `Ł`, `Đ`, `Ø`, `Æ` or `Þ`, which are single characters.
+/// Step one comes first because the table maps the sharp s to one letter. The
+/// other order folds Straße to `strase`, and a User who types `strasse` finds
+/// nobody.
 ///
-/// The upper case sharp s is replaced beside the lower case one, because step
-/// 2 has not run yet when step 1 reads the text.
-///
-/// Nothing shows Folded Text. It sits beside the text it folds and it is read
-/// by a query alone.
+/// One function serves both sides. The store folds what it writes, and the
+/// search folds what the User types. A second fold on one side would match in
+/// one direction only. See ADR-0033, which holds the table this returns.
 String foldedText(String written) => removeDiacritics(
   written.replaceAll('ß', 'ss').replaceAll('ẞ', 'ss').toLowerCase(),
 );
