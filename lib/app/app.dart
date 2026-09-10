@@ -4,11 +4,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../core/db/database_session.dart';
+import '../core/friends/friend_repository.dart';
 import '../core/profiles/profile.dart';
 import '../core/profiles/profile_creator.dart';
 import '../core/profiles/profile_session.dart';
 import '../core/security/auto_lock.dart';
 import '../core/security/screen_cover.dart';
+import '../core/time/civil_date_change.dart';
 import '../features/auth/bloc/unlock_cubit.dart';
 import '../features/auth/bloc/unlock_state.dart';
 import '../features/auth/view/damaged_list_page.dart';
@@ -16,6 +18,7 @@ import '../features/auth/view/profile_picker_page.dart';
 import '../features/auth/view/unlock_page.dart';
 import '../features/first_run/bloc/first_run_cubit.dart';
 import '../features/first_run/bloc/first_run_state.dart';
+import '../features/dial/bloc/dial_cubit.dart';
 import '../features/first_run/view/first_run_page.dart';
 import 'boot.dart';
 import 'navigation/home_shell.dart';
@@ -51,6 +54,14 @@ class _FriendoAppState extends State<FriendoApp> {
 
   late final AutoLock _autoLock = AutoLock(lock: widget.session.lock);
 
+  late final FriendRepository _friends = FriendRepository(
+    widget.session.databases,
+  );
+
+  /// One announcement for every screen that reads a Civil Date, so that no
+  /// screen leaves a timer of its own running behind the PIN screen.
+  late final CivilDateChange _dayChange = CivilDateChange();
+
   StreamSubscription<DatabaseState>? _whileOpen;
 
   DatabaseState _wasState = DatabaseState.locked;
@@ -65,6 +76,7 @@ class _FriendoAppState extends State<FriendoApp> {
   @override
   void dispose() {
     unawaited(_whileOpen?.cancel());
+    unawaited(_dayChange.dispose());
     WidgetsBinding.instance.removeObserver(_autoLock);
     super.dispose();
   }
@@ -142,6 +154,17 @@ class _FriendoAppState extends State<FriendoApp> {
     unawaited(_askAgain());
   }
 
-  Widget _theApp() =>
-      BlocProvider(create: (_) => NavigationCubit(), child: const HomeShell());
+  Widget _theApp() => MultiBlocProvider(
+    providers: [
+      BlocProvider(create: (_) => NavigationCubit()),
+      BlocProvider(
+        create: (_) => DialCubit(
+          friends: _friends,
+          databases: widget.session.databases,
+          dayChange: _dayChange,
+        ),
+      ),
+    ],
+    child: const HomeShell(),
+  );
 }

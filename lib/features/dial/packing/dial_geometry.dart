@@ -1,4 +1,5 @@
-import 'dart:math' show pi;
+import 'dart:math' show cos, pi, sin;
+import 'dart:ui' show Offset;
 
 import 'package:friendo_domain/friendo_domain.dart' show Orbit;
 
@@ -40,6 +41,25 @@ class DialGeometry {
   };
 
   double circumferenceOf(Orbit orbit) => 2 * pi * radiusOf(orbit);
+
+  /// The width of a trough, which is a Bead and the clear space beside it.
+  double get troughWidth => beadWidth + beadPadding;
+
+  /// The middle of the instrument.
+  Offset get centre => Offset(size / 2, size / 2);
+
+  /// Where a lap fraction points, in radians, for a canvas whose zero is at
+  /// 3:00. The lap runs clockwise from 12:00, so nothing on the Dial needs a
+  /// second convention.
+  double angleOf(double lapFraction) => -pi / 2 + lapFraction * 2 * pi;
+
+  /// The middle of a Bead resting at [lapFraction] on [orbit].
+  Offset placeOn(Orbit orbit, double lapFraction) {
+    final angle = angleOf(lapFraction);
+    final radius = radiusOf(orbit);
+
+    return centre + Offset(cos(angle) * radius, sin(angle) * radius);
+  }
 
   /// The smallest space two Beads on [orbit] may keep, as a fraction of one
   /// lap. It falls as the radius grows, which is what gives each Orbit its own

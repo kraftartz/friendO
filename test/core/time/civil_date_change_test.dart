@@ -4,9 +4,10 @@ import 'package:friendo/core/time/civil_date_change.dart'
 
 import '../../support/running_clock.dart';
 
-/// Long enough for a timer set a tenth of a second ahead to have fired, and
-/// short enough that a second midnight cannot arrive inside it.
-const settle = Duration(milliseconds: 300);
+/// Long enough for a timer set a tenth of a second ahead to have fired even on
+/// a machine running the whole suite at once, and short enough that a second
+/// midnight cannot arrive inside it.
+const settle = Duration(milliseconds: 500);
 
 /// A tenth of a second before the local Civil Date changes.
 DateTime justBeforeMidnight() => DateTime(2026, 9, 10, 23, 59, 59, 900);

@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:friendo/app/app.dart';
 import 'package:friendo/app/navigation/app_section.dart';
+import 'package:friendo/features/dial/view/dial_view.dart' show DialView;
 
 import 'support/wiring.dart';
 
@@ -14,13 +15,21 @@ FriendoApp aFriendoApp() {
 
 void main() {
   group('the app shell', () {
-    testWidgets('opens on the Dial and shows a phase from the domain', (
+    testWidgets('opens on the Dial', (tester) async {
+      await tester.pumpWidget(aFriendoApp());
+
+      expect(find.byType(DialView), findsOneWidget);
+    });
+
+    testWidgets('draws the Dial quiet while no Profile is open', (
       tester,
     ) async {
       await tester.pumpWidget(aFriendoApp());
 
-      // 12 days into a 30 day Cadence.
-      expect(find.text('0.40'), findsOneWidget);
+      // No Friend, no name and no count belongs on screen until a Profile is
+      // open. An empty roster is a different reading, and it says so.
+      expect(find.textContaining('Add your first Friend'), findsNothing);
+      expect(find.textContaining('Log a Meeting'), findsNothing);
     });
 
     testWidgets('shows one destination per section', (tester) async {
@@ -40,7 +49,7 @@ void main() {
 
       expect(find.text('Friends page'), findsOneWidget);
       // The Dial is still built, but the IndexedStack now keeps it offstage.
-      expect(find.text('Phase'), findsNothing);
+      expect(find.byType(DialView), findsNothing);
     });
 
     testWidgets('returns to the Dial with its state intact', (tester) async {
@@ -52,7 +61,7 @@ void main() {
 
       await tester.tap(find.text('Dial'));
       await tester.pumpAndSettle();
-      expect(find.text('0.40'), findsOneWidget);
+      expect(find.byType(DialView), findsOneWidget);
     });
   });
 }

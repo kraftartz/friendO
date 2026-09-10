@@ -2,6 +2,18 @@ import 'package:equatable/equatable.dart';
 
 import 'phase.dart';
 
+/// The Phase a Friend stops being Freshly Reset at.
+const inOrbitFrom = 0.25;
+
+/// The Phase a Friend starts Nearing their Due Date at.
+///
+/// It is one number and not two. The last quarter of a lap is also the last
+/// quarter of the Dial, from 9:00 round to 12:00, so a drawing that warms that
+/// arc reads this rather than an angle of its own. A second copy would let the
+/// picture contradict the count printed beside it, which is the failure a
+/// boundary in Phase was chosen to avoid.
+const nearingFrom = 0.75;
+
 /// How far through their Cadence a Friend has reached, said as a name.
 ///
 /// Phase gives the number and Standing gives the name. The Dial counts Friends
@@ -33,8 +45,8 @@ enum Standing {
   /// a Phase cannot do.
   static Standing of({required Phase phase, required bool isOverdue}) {
     if (isOverdue) return Standing.overdue;
-    if (phase.value < 0.25) return Standing.freshlyReset;
-    if (phase.value < 0.75) return Standing.inOrbit;
+    if (phase.value < inOrbitFrom) return Standing.freshlyReset;
+    if (phase.value < nearingFrom) return Standing.inOrbit;
     return Standing.nearing;
   }
 }

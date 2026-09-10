@@ -80,4 +80,31 @@ void main() {
       );
     });
   });
+
+  group('the boundaries', () {
+    test('are the numbers the Standings turn on, and not a second copy', () {
+      expect(
+        Standing.of(phase: Phase(inOrbitFrom - 0.001), isOverdue: false),
+        Standing.freshlyReset,
+      );
+      expect(
+        Standing.of(phase: Phase(inOrbitFrom), isOverdue: false),
+        Standing.inOrbit,
+      );
+      expect(
+        Standing.of(phase: Phase(nearingFrom - 0.001), isOverdue: false),
+        Standing.inOrbit,
+      );
+      expect(
+        Standing.of(phase: Phase(nearingFrom), isOverdue: false),
+        Standing.nearing,
+      );
+    });
+
+    test('put Nearing at the last quarter of the lap, which is the arc the '
+        'Dial warms', () {
+      expect(nearingFrom, 0.75);
+      expect(1 - nearingFrom, 0.25);
+    });
+  });
 }

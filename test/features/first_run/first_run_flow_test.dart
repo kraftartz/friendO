@@ -80,5 +80,12 @@ void main() {
 
     expect(find.byType(FirstRunPage), findsNothing);
     expect(find.text('Dial'), findsOneWidget);
+
+    // The Dial watches the store from the moment it is drawn, and that watch
+    // was made inside this test's own async zone. Lock here rather than in the
+    // teardown, so that the query is let go while the zone that owns it still
+    // runs.
+    await tester.runAsync(wiring.session.lock);
+    await tester.pump();
   });
 }
