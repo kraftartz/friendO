@@ -29,4 +29,37 @@ void main() {
       expect(Cadence.ofDays(365).orbit, Orbit.outer);
     });
   });
+
+  group('Orbit', () {
+    test('holds the range of Cadence days that belongs to it', () {
+      expect(Orbit.inner.cadenceDays.holds(1), isTrue);
+      expect(Orbit.inner.cadenceDays.holds(14), isTrue);
+      expect(Orbit.inner.cadenceDays.holds(15), isFalse);
+
+      expect(Orbit.middle.cadenceDays.holds(15), isTrue);
+      expect(Orbit.middle.cadenceDays.holds(60), isTrue);
+      expect(Orbit.middle.cadenceDays.holds(61), isFalse);
+
+      expect(Orbit.outer.cadenceDays.holds(61), isTrue);
+      expect(Orbit.outer.cadenceDays.holds(3650), isTrue);
+    });
+
+    test('the outer range runs on with no end', () {
+      expect(Orbit.outer.cadenceDays.last, isNull);
+      expect(Orbit.inner.cadenceDays.last, 14);
+      expect(Orbit.middle.cadenceDays.last, 60);
+    });
+
+    test('the three ranges meet with no gap and no overlap', () {
+      expect(Orbit.middle.cadenceDays.first, Orbit.inner.cadenceDays.last! + 1);
+      expect(Orbit.outer.cadenceDays.first, Orbit.middle.cadenceDays.last! + 1);
+    });
+
+    test('names the Orbit that holds a number of days', () {
+      expect(Orbit.of(14), Orbit.inner);
+      expect(Orbit.of(15), Orbit.middle);
+      expect(Orbit.of(60), Orbit.middle);
+      expect(Orbit.of(61), Orbit.outer);
+    });
+  });
 }
