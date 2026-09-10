@@ -54,9 +54,15 @@ class DialGeometry {
   double angleOf(double lapFraction) => -pi / 2 + lapFraction * 2 * pi;
 
   /// The middle of a Bead resting at [lapFraction] on [orbit].
-  Offset placeOn(Orbit orbit, double lapFraction) {
+  Offset placeOn(Orbit orbit, double lapFraction) =>
+      placeAt(radiusOf(orbit), lapFraction);
+
+  /// The middle of a Bead at [lapFraction], [radius] out from the centre.
+  ///
+  /// The radius is free of the three Orbits, because a Bead stepping across
+  /// from one to another passes through the space between them.
+  Offset placeAt(double radius, double lapFraction) {
     final angle = angleOf(lapFraction);
-    final radius = radiusOf(orbit);
 
     return centre + Offset(cos(angle) * radius, sin(angle) * radius);
   }
