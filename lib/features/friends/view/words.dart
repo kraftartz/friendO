@@ -1,6 +1,7 @@
 import 'package:friendo/features/friends/cadence/cadence_choice.dart'
     show CadencePreview;
-import 'package:friendo_domain/friendo_domain.dart' show Orbit, Standing;
+import 'package:friendo_domain/friendo_domain.dart'
+    show NoteLabel, Orbit, Standing;
 
 /// The glossary's word for each Standing.
 ///
@@ -47,3 +48,20 @@ String dueWords(CadencePreview preview) => switch (preview.daysUntilDue) {
 /// Standing it gives.
 String previewWords(CadencePreview preview) =>
     '${dueWords(preview)} · ${standingWord(preview.standing)}';
+
+/// The glossary's word for each Note label.
+///
+/// The three are labels on one record (ADR-0017), so these are the words that
+/// group a Friend's writing and nothing more.
+String noteLabelWord(NoteLabel label) => switch (label) {
+  NoteLabel.topic => 'Topic',
+  NoteLabel.update => 'Update',
+  NoteLabel.note => 'Note',
+};
+
+/// The heading over a group of writing, in the plural.
+String noteGroupWord(NoteLabel label) => switch (label) {
+  NoteLabel.topic => 'Topics',
+  NoteLabel.update => 'Updates',
+  NoteLabel.note => 'Notes',
+};

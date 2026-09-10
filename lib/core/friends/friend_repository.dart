@@ -293,6 +293,39 @@ class FriendRepository {
   /// The term is folded through the same function that folded the stored
   /// copy, so a plain spelling finds a name with a stroke and the name with
   /// the stroke finds it too.
+  /// Every Affinity the Profile holds, by label.
+  ///
+  /// The set belongs to the Profile and not to one Friend, so a label written
+  /// for one Friend is offered for the next. Sorted by label, because a
+  /// picker draws them in that order and no caller wants another.
+  Future<List<Affinity>> affinities() async {
+    final database = databases.database;
+
+    final rows = await (database.select(
+      database.affinities,
+    )..orderBy([(row) => OrderingTerm(expression: row.label)])).get();
+
+    return [for (final row in rows) Affinity(id: row.id, label: row.label)];
+  }
+
+  /// The Fact labels this Profile has already used, each once.
+  ///
+  /// A Fact has no table of fixed labels. The User writes both halves, and
+  /// the labels already stored are the only suggestion the app can honestly
+  /// make.
+  Future<List<String>> factLabels() async {
+    final database = databases.database;
+
+    final rows = await database
+        .customSelect(
+          'select distinct label from facts order by label',
+          readsFrom: {database.facts},
+        )
+        .get();
+
+    return [for (final row in rows) row.read<String>('label')];
+  }
+
   Future<Set<String>?> friendIdsMatching(String term) async {
     final search = FriendSearch.forTerm(term);
     if (search == null) return null;
