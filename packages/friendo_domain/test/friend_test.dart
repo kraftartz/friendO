@@ -111,15 +111,18 @@ void main() {
       expect(friend.newestMeeting.id, 'm3');
     });
 
-    test('takes no now, because a stored Friend states no rule about today', () {
-      final ahead = Friend.hydrate(
-        id: 'anna',
-        name: 'Anna',
-        cadence: monthly,
-        meetings: [meeting('m1', CivilDate(2026, 5, 20))],
-      );
-      expect(ahead.lastMet, CivilDate(2026, 5, 20));
-    });
+    test(
+      'takes no now, because a stored Friend states no rule about today',
+      () {
+        final ahead = Friend.hydrate(
+          id: 'anna',
+          name: 'Anna',
+          cadence: monthly,
+          meetings: [meeting('m1', CivilDate(2026, 5, 20))],
+        );
+        expect(ahead.lastMet, CivilDate(2026, 5, 20));
+      },
+    );
   });
 
   group('lastMet', () {
@@ -149,12 +152,18 @@ void main() {
     });
 
     test('accepts a Meeting on today', () {
-      expect(started().logMeeting(meeting('m2', today), now: now).lastMet, today);
+      expect(
+        started().logMeeting(meeting('m2', today), now: now).lastMet,
+        today,
+      );
     });
 
     test('refuses a Meeting after today, because a plan is not a Meeting', () {
       expect(
-        () => started().logMeeting(meeting('m2', CivilDate(2026, 6, 2)), now: now),
+        () => started().logMeeting(
+          meeting('m2', CivilDate(2026, 6, 2)),
+          now: now,
+        ),
         throwsArgumentError,
       );
     });
@@ -170,7 +179,11 @@ void main() {
   group('amendMeeting', () {
     test('replaces the Meeting that holds the same id', () {
       final friend = started().amendMeeting(
-        Meeting(id: 'm1', happenedOn: CivilDate(2026, 5, 21), place: 'Kawiarnia'),
+        Meeting(
+          id: 'm1',
+          happenedOn: CivilDate(2026, 5, 21),
+          place: 'Kawiarnia',
+        ),
         now: now,
       );
       expect(friend.meetings.single.place, 'Kawiarnia');
@@ -186,7 +199,10 @@ void main() {
 
     test('refuses a Civil Date after today', () {
       expect(
-        () => started().amendMeeting(meeting('m1', CivilDate(2026, 6, 2)), now: now),
+        () => started().amendMeeting(
+          meeting('m1', CivilDate(2026, 6, 2)),
+          now: now,
+        ),
         throwsArgumentError,
       );
     });
@@ -255,12 +271,8 @@ void main() {
 
     test('refuses an empty body', () {
       expect(
-        () => Note(
-          id: 'n4',
-          label: NoteLabel.note,
-          body: ' ',
-          writtenOn: today,
-        ),
+        () =>
+            Note(id: 'n4', label: NoteLabel.note, body: ' ', writtenOn: today),
         throwsArgumentError,
       );
     });
@@ -303,7 +315,11 @@ void main() {
         facts: [Fact(id: 'f1', label: 'City', value: 'Kraków')],
         affinities: [Affinity(id: 'a1', label: 'Family')],
         milestones: [
-          Milestone(id: 'ms1', label: 'Birthday', onDate: CivilDate(1991, 10, 14)),
+          Milestone(
+            id: 'ms1',
+            label: 'Birthday',
+            onDate: CivilDate(1991, 10, 14),
+          ),
         ],
       );
       expect(friend.facts.single.value, 'Kraków');
