@@ -1,42 +1,37 @@
 import 'package:flutter/material.dart';
-import 'package:friendo_domain/friendo_domain.dart';
-import 'package:friendo_ui/friendo_ui.dart' show SoftCard;
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:friendo/features/dial/bloc/dial_cubit.dart' show DialCubit;
+import 'package:friendo/features/dial/bloc/dial_state.dart' show DialState;
+import 'package:friendo/features/dial/view/dial_body.dart' show DialBody;
+import 'package:friendo_domain/friendo_domain.dart' show Orbit;
 
-/// A placeholder for the Dial.
+/// The main screen: who should I see next, and one tap to say I did.
 ///
-/// It draws no Dial and no Bead yet. It exists to hold one wire open: a screen
-/// in the app calls the pure-Dart domain and renders the answer with a
-/// friendo_ui widget. Replace the body when the real Dial arrives; keep the two
-/// imports.
+/// The two requests it raises go out as arguments. Opening a Friend and
+/// opening the Friends List filtered to an Orbit are both somebody else's
+/// screens, and what routes them is still an open question.
 class DialPage extends StatelessWidget {
-  /// Create the page.
-  const DialPage({super.key});
+  const DialPage({
+    this.onAddFriend,
+    this.onOpenFriend,
+    this.onShowOrbit,
+    super.key,
+  });
+
+  final VoidCallback? onAddFriend;
+
+  final void Function(String friendId)? onOpenFriend;
+
+  final void Function(Orbit orbit)? onShowOrbit;
 
   @override
-  Widget build(BuildContext context) {
-    // Fixed dates rather than DateTime.now(). The domain takes `now` as an
-    // argument, so this screen reads the same on every run and in every test.
-    final lastMet = CivilDate(2026, 1, 1);
-    final phase = phaseOf(
-      lastMet: lastMet,
-      cadence: Cadence.ofDays(30),
-      now: lastMet.startOfDayLocal().add(const Duration(days: 12)),
-    );
-
-    return Center(
-      child: SoftCard(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Text('Phase'),
-            Text(
-              phase.value.toStringAsFixed(2),
-              key: const Key('dial-phase'),
-              style: const TextStyle(fontSize: 32),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
+  Widget build(BuildContext context) => BlocBuilder<DialCubit, DialState>(
+    builder: (context, reading) => DialBody(
+      reading: reading,
+      onLogMeeting: context.read<DialCubit>().logMeeting,
+      onAddFriend: onAddFriend,
+      onOpenFriend: onOpenFriend,
+      onShowOrbit: onShowOrbit,
+    ),
+  );
 }

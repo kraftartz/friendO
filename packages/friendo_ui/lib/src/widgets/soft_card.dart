@@ -18,7 +18,7 @@ class SoftCard extends StatelessWidget {
     // Fall back to the dark tokens when no Soft is installed. A card then still
     // renders inside a bare MaterialApp, which keeps previews and widget tests
     // from needing a full theme.
-    final soft = Theme.of(context).extension<Soft>() ?? const Soft.dark();
+    final soft = Soft.of(context);
 
     return DecoratedBox(
       decoration: BoxDecoration(

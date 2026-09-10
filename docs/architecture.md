@@ -214,6 +214,7 @@ friendO/
 |   |   |                        only place that reads or writes these tables.
 |   |   +-- reminders/           Watches the repository. Reschedules. No feature
 |   |   |                        owns it.
+|   |   +-- ids/                 One fresh id for a row this app writes
 |   |   +-- media/               Avatar images and audio recaps, as BLOB columns
 |   |   +-- profiles/            profiles.json, the PIN hash, and the wrapped
 |   |   |                        data key by name. The list is read before any

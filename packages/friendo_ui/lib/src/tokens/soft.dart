@@ -10,10 +10,17 @@ import 'package:flutter/material.dart';
 ///
 /// Read these values, never copy them. A colour written straight into a widget
 /// stops following the theme the moment the theme changes.
+const _wellDark = Color(0xFF090711);
+
 @immutable
 class Soft extends ThemeExtension<Soft> {
   /// Create a token set from explicit values.
-  const Soft({required this.surface, required this.glow, required this.radius});
+  const Soft({
+    required this.surface,
+    required this.glow,
+    required this.radius,
+    this.well = _wellDark,
+  });
 
   /// Create the dark token set.
   ///
@@ -22,7 +29,8 @@ class Soft extends ThemeExtension<Soft> {
   const Soft.dark()
     : surface = const Color(0xFF211C33),
       glow = const Color(0xFFD0BCFF),
-      radius = 20;
+      radius = 20,
+      well = _wellDark;
 
   /// The colour of a raised surface.
   final Color surface;
@@ -33,12 +41,25 @@ class Soft extends ThemeExtension<Soft> {
   /// The corner radius of a surface, in logical pixels.
   final double radius;
 
+  /// The fill of a surface that sinks into the one behind it: an input, a
+  /// Phase track, an empty Orbit.
+  final Color well;
+
+  /// The tokens installed in [context], or the dark ones when none are.
+  ///
+  /// A widget reads its treatment through this rather than reaching for the
+  /// theme itself, so a screen with no tokens installed still draws.
+  static Soft of(BuildContext context) =>
+      Theme.of(context).extension<Soft>() ?? const Soft.dark();
+
   @override
-  Soft copyWith({Color? surface, Color? glow, double? radius}) => Soft(
-    surface: surface ?? this.surface,
-    glow: glow ?? this.glow,
-    radius: radius ?? this.radius,
-  );
+  Soft copyWith({Color? surface, Color? glow, double? radius, Color? well}) =>
+      Soft(
+        surface: surface ?? this.surface,
+        glow: glow ?? this.glow,
+        radius: radius ?? this.radius,
+        well: well ?? this.well,
+      );
 
   @override
   Soft lerp(covariant ThemeExtension<Soft>? other, double t) {
@@ -47,6 +68,7 @@ class Soft extends ThemeExtension<Soft> {
       surface: Color.lerp(surface, other.surface, t)!,
       glow: Color.lerp(glow, other.glow, t)!,
       radius: lerpDouble(radius, other.radius, t)!,
+      well: Color.lerp(well, other.well, t)!,
     );
   }
 }

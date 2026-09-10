@@ -1,26 +1,33 @@
 import 'package:drift/drift.dart';
-import 'package:equatable/equatable.dart';
-import 'package:friendo_domain/friendo_domain.dart';
+import 'package:friendo_domain/friendo_domain.dart'
+    show
+        Affinity,
+        Cadence,
+        CivilDate,
+        Fact,
+        Friend,
+        Meeting,
+        Milestone,
+        Note,
+        NoteLabel;
 
 import '../db/app_database.dart';
 import '../db/database_session.dart';
 import '../text/folded_text.dart';
 import '../time/clock.dart';
+import 'dial_friend.dart';
 
-/// A Friend reduced to a name beside a Placing.
+/// One row per Friend: the id, the name, the Cadence, and the Civil Date of
+/// the newest Meeting.
 ///
-/// It holds no Meeting, no Note and no Fact, so a caller that only draws
-/// never loads the whole aggregate to reach a name.
-class FriendPlacing extends Equatable {
-  const FriendPlacing({required this.name, required this.placing});
-
-  final String name;
-
-  final Placing placing;
-
-  @override
-  List<Object?> get props => [name, placing];
-}
+/// It names its four columns rather than taking a whole Friend, so a column
+/// added to the table never joins this read. The Avatar picture and the audio
+/// recap are BLOB columns, and a Dial query that pulled one would read
+/// megabytes to draw a circle 28 units wide. See ADR-0026.
+const dialFriendsStatement =
+    'select f.id, f.name, f.cadence_days, max(m.happened_on) as last_met '
+    'from friends f join meetings m on m.friend_id = f.id '
+    'group by f.id, f.name, f.cadence_days order by f.name';
 
 /// The one door to a Friend.
 ///
@@ -188,44 +195,36 @@ class FriendRepository {
     });
   }
 
-  /// Follows every Friend, reduced to what a list needs.
+  /// Every Friend the Dial draws, watched.
   ///
-  /// The last Meeting is the largest Civil Date the Meetings hold, worked out
-  /// in the query. Nothing stores it. See ADR-0016.
+  /// One Friend gives one row, whatever the number of their Meetings, and the
+  /// newest Meeting arrives as one Civil Date rather than as the Meetings it
+  /// was worked out from. The largest Civil Date is taken in the query, and
+  /// nothing stores it. See ADR-0016.
   ///
-  /// [now] is read once and holds for the life of the stream. A Standing that
-  /// turns at midnight therefore needs a caller that reads again when the
-  /// Civil Date changes, which is what `core/time` announces. A stream that
-  /// re-read the clock on every row would move a Bead nobody touched.
-  Stream<List<FriendPlacing>> watchPlacings({required DateTime now}) =>
-      databases.watch(
-        (database) => database
-            .customSelect(
-              'select f.id, f.name, f.cadence_days, '
-              'max(m.happened_on) as last_met '
-              'from friends f join meetings m on m.friend_id = f.id '
-              'group by f.id, f.name, f.cadence_days order by f.name',
-              readsFrom: {database.friends, database.meetings},
-            )
-            .watch()
-            .map(
-              (rows) => rows
-                  .map(
-                    (row) => FriendPlacing(
-                      name: row.read<String>('name'),
-                      placing: Placing(
-                        friendId: row.read<String>('id'),
-                        lastMet: CivilDate.fromEpochDay(
-                          row.read<int>('last_met'),
-                        ),
-                        cadence: Cadence.ofDays(row.read<int>('cadence_days')),
-                        now: now,
-                      ),
-                    ),
-                  )
-                  .toList(),
-            ),
-      );
+  /// No reading is worked out here, and no clock is read. A caller gives one
+  /// `now` to the whole packing it builds, so a Standing that turns at
+  /// midnight is a re-read of these same rows rather than a new stream.
+  Stream<List<DialFriend>> watchDialFriends() => databases.watch(
+    (database) => database
+        .customSelect(
+          dialFriendsStatement,
+          readsFrom: {database.friends, database.meetings},
+        )
+        .watch()
+        .map(
+          (rows) => rows
+              .map(
+                (row) => DialFriend(
+                  id: row.read<String>('id'),
+                  name: row.read<String>('name'),
+                  cadence: Cadence.ofDays(row.read<int>('cadence_days')),
+                  lastMet: CivilDate.fromEpochDay(row.read<int>('last_met')),
+                ),
+              )
+              .toList(),
+        ),
+  );
 
   /// When the store first wrote each Meeting this Friend holds.
   ///

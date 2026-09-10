@@ -148,4 +148,5 @@ a restart.
 | Dial capacity | 57 slots | 59, then an Overflow Badge | Draw the Badge, ADR-0015 |
 | Bead size | 32px outer, 28px inner | — | Use 28px everywhere |
 | Orbit radii | 62 / 102 / 142 | 62 / 102 / 142 | Settled. ADR-0014 already agrees. |
+| Bead name label | A name under every Bead | ADR-0014 spaces Beads 4 units apart | Drop the label. Name the Friend on a tap |
 | Cadence presets | 7/30/90 and 7/14/30/60 | Free duration | Pick one preset list |

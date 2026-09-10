@@ -80,4 +80,25 @@ void main() {
       );
     });
   });
+
+  group('the boundaries', () {
+    test('are the numbers the Standings turn on, and not a second copy', () {
+      expect(
+        Standing.of(phase: Phase(inOrbitFrom - 0.001), isOverdue: false),
+        Standing.freshlyReset,
+      );
+      expect(
+        Standing.of(phase: Phase(inOrbitFrom), isOverdue: false),
+        Standing.inOrbit,
+      );
+      expect(
+        Standing.of(phase: Phase(nearingFrom - 0.001), isOverdue: false),
+        Standing.inOrbit,
+      );
+      expect(
+        Standing.of(phase: Phase(nearingFrom), isOverdue: false),
+        Standing.nearing,
+      );
+    });
+  });
 }
