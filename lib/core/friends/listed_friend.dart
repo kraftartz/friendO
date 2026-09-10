@@ -12,8 +12,8 @@ import 'package:friendo_domain/friendo_domain.dart'
 /// It holds no Folded Text either. ADR-0033 says a Folded Text is never
 /// shown, and a field that never leaves the query cannot be drawn by mistake.
 ///
-/// A card is two halves that meet in the view: this writing, and the ranking
-/// from [Placing].
+/// A card is two halves that meet in the view: this writing, and the reading
+/// the domain works out, which is a [Placing].
 final class ListedFriend extends Equatable {
   const ListedFriend({
     required this.id,
@@ -29,7 +29,7 @@ final class ListedFriend extends Equatable {
   final String id;
 
   /// The name as the User wrote it. A rule about matching never changes how a
-  /// person's name appears.
+  /// Friend's name appears.
   final String name;
 
   final Cadence cadence;

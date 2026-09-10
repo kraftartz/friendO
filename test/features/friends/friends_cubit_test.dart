@@ -21,9 +21,9 @@ import '../../support/wiring.dart';
 
 /// The Friends List's state, over a real repository, over a real database.
 ///
-/// The term, the chip, the ranking, the banner, the counts, the empty states
-/// and the lock all meet here, so one test can read what the screen would
-/// show without drawing it.
+/// The term, the chip, the Priority Order, the banner, the counts, the empty
+/// states and the lock all meet here, so one test can read what the screen
+/// would show without drawing it.
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
@@ -209,7 +209,8 @@ void main() {
       final reading = await readingOf(list);
 
       expect(reading.orbit, Orbit.inner);
-      // Ben is further through his Cadence, so the ranking puts him first.
+      // Ben is further through his Cadence, so the Priority Order puts him
+      // first.
       expect(namesOn(reading), ['ben inner', 'anna inner']);
     });
 
@@ -282,21 +283,24 @@ void main() {
   });
 
   group('the banner', () {
-    test('names the Overdue Friends in the order the ranking gives', () async {
-      await writeFriend('slipped-first', cadenceDays: 10, daysAgo: 30);
-      await writeFriend('on-track', cadenceDays: 30, daysAgo: 2);
-      await writeFriend('slipped-later', cadenceDays: 10, daysAgo: 15);
-      final list = aList();
-      addTearDown(list.close);
+    test(
+      'names the Overdue Friends in the order the Priority Order gives',
+      () async {
+        await writeFriend('slipped-first', cadenceDays: 10, daysAgo: 30);
+        await writeFriend('on-track', cadenceDays: 30, daysAgo: 2);
+        await writeFriend('slipped-later', cadenceDays: 10, daysAgo: 15);
+        final list = aList();
+        addTearDown(list.close);
 
-      final reading = await readingOf(list);
+        final reading = await readingOf(list);
 
-      expect(reading.overdue.map((card) => card.name).toList(), [
-        'slipped-first',
-        'slipped-later',
-      ]);
-      expect(reading.overdueCount, 2);
-    });
+        expect(reading.overdue.map((card) => card.name).toList(), [
+          'slipped-first',
+          'slipped-later',
+        ]);
+        expect(reading.overdueCount, 2);
+      },
+    );
 
     test('is not there while nobody is Overdue', () async {
       await writeFriend('fine', cadenceDays: 30, daysAgo: 2);
@@ -545,8 +549,8 @@ void main() {
       expect((await readingOf(list)).overdue, isEmpty);
 
       clock.advance(const Duration(milliseconds: 200));
-      // The timer fires on its own schedule, so wait for the answer rather
-      // than for a length of time a loaded machine could miss.
+      // The timer fires when it fires, so wait for the answer rather than for
+      // a length of time a loaded machine could miss.
       for (var tries = 0; tries < 40 && list.state.overdue.isEmpty; tries++) {
         await Future<void>.delayed(const Duration(milliseconds: 50));
         await pumpEventQueue();

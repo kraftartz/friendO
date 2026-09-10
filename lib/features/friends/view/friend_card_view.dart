@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:friendo/features/friends/bloc/friends_state.dart'
     show FriendCard;
 import 'package:friendo/features/friends/view/phase_bar.dart' show PhaseBar;
-import 'package:friendo_domain/friendo_domain.dart'
-    show CivilDate, Orbit, Standing;
+import 'package:friendo/features/friends/view/words.dart'
+    show orbitWord, standingWord;
+import 'package:friendo_domain/friendo_domain.dart' show CivilDate, Standing;
 import 'package:friendo_ui/friendo_ui.dart'
     show AvatarHalo, Soft, SoftButton, SoftCard, colourOf, initialOf;
 
@@ -59,7 +60,7 @@ class FriendCardView extends StatelessWidget {
                         style: Theme.of(context).textTheme.titleMedium,
                       ),
                       Text(
-                        '${_orbitWord(card.orbit)} · '
+                        '${orbitWord(card.orbit)} · '
                         'every ${card.cadenceDays} days',
                         style: TextStyle(
                           fontSize: 12,
@@ -70,7 +71,7 @@ class FriendCardView extends StatelessWidget {
                   ),
                 ),
                 Text(
-                  _standingWord(card.standing),
+                  standingWord(card.standing),
                   style: TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.w600,
@@ -157,20 +158,3 @@ class FriendCardView extends StatelessWidget {
     };
   }
 }
-
-/// The glossary's word for each Standing.
-///
-/// The card and the Dial's counts must agree, so these are the four words
-/// CONTEXT.md defines and no others. Drifting is a banned word for Overdue.
-String _standingWord(Standing standing) => switch (standing) {
-  Standing.freshlyReset => 'Freshly Reset',
-  Standing.inOrbit => 'In Orbit',
-  Standing.nearing => 'Nearing',
-  Standing.overdue => 'Overdue',
-};
-
-String _orbitWord(Orbit orbit) => switch (orbit) {
-  Orbit.inner => 'Inner',
-  Orbit.middle => 'Middle',
-  Orbit.outer => 'Outer',
-};

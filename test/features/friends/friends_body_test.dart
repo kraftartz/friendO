@@ -196,6 +196,43 @@ void main() {
       expect(find.text('ann'), findsOneWidget);
     });
 
+    testWidgets('clears the whole term with one tap', (tester) async {
+      final typed = <String>[];
+
+      await draw(
+        tester,
+        aReading(cards: [aCard('anna')], term: 'ann'),
+        onSearch: typed.add,
+      );
+      await tester.tap(find.byKey(const Key('friends-clear-search')));
+
+      expect(typed, ['']);
+    });
+
+    testWidgets('offers nothing to clear while the term holds nothing', (
+      tester,
+    ) async {
+      await draw(tester, aReading(cards: [aCard('anna')]));
+
+      expect(find.byKey(const Key('friends-clear-search')), findsNothing);
+    });
+
+    testWidgets('keeps what the User typed while an older answer arrives', (
+      tester,
+    ) async {
+      final anna = aCard('anna');
+
+      await draw(tester, aReading(cards: [anna], term: 'an'));
+      await tester.enterText(find.byType(TextField), 'ann');
+      // The state for the earlier keystroke lands after the later one.
+      await draw(tester, aReading(cards: [anna], term: 'an'));
+
+      expect(
+        tester.widget<TextField>(find.byType(TextField)).controller!.text,
+        'ann',
+      );
+    });
+
     testWidgets('empties when the state clears the term', (tester) async {
       await draw(tester, aReading(cards: [aCard('anna')], term: 'ann'));
 

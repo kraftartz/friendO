@@ -146,6 +146,11 @@ The last place on a crowded Orbit. It holds a count and stands for the Overflow,
 Bead and it names no Friend.
 Always both words. The banned `marker` is the bare word, and this is a different thing with its
 own entry, in the same way as the Beads Queue.
+The banned `pill` and `chip` are the words for this Badge. Two other things keep them, because
+both were named before this entry was written. `Pill` is one of the six treatments
+[ADR-0018](docs/adr/0018-ui-package-and-widgetbook.md) puts in `friendo_ui`, and it carries no
+meaning of its own. An Orbit chip is the control on the Friends List that narrows the view to one
+Orbit, which [docs/spec/friends-list.md](docs/spec/friends-list.md) names throughout.
 _Avoid_: marker, cluster, pill, chip, more-bead, overflow bead
 
 **dial-minute**:

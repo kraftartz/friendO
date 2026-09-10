@@ -31,7 +31,9 @@ const dialFriendsStatement =
     'from friends f join meetings m on m.friend_id = f.id '
     'group by f.id, f.name, f.cadence_days order by f.name';
 
-/// One row per Friend, holding everything a card on the Friends List draws.
+/// One row per Friend: the name as the User wrote it, the Cadence, the newest
+/// Meeting with its optional time and its place, the newest waiting Topic and
+/// how many wait.
 ///
 /// The newest Meeting arrives as one row of the meetings table, so that its
 /// place and its optional time belong to the same Meeting as the Civil Date.

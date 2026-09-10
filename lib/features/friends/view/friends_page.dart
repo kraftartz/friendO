@@ -17,15 +17,15 @@ class FriendsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final list = context.read<FriendsCubit>();
+    final friends = context.read<FriendsCubit>();
 
     return BlocBuilder<FriendsCubit, FriendsListState>(
       builder: (context, reading) => FriendsBody(
         reading: reading,
-        onSearch: list.search,
-        onShowOrbit: list.showOrbit,
-        onReview: list.review,
-        onLogMeeting: list.logMeeting,
+        onSearch: friends.search,
+        onShowOrbit: friends.showOrbit,
+        onReview: friends.review,
+        onLogMeeting: friends.logMeeting,
         onAddFriend: onAddFriend,
         onOpenFriend: onOpenFriend,
       ),

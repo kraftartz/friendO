@@ -20,8 +20,8 @@ import 'package:friendo_domain/friendo_domain.dart'
 ///
 /// It holds two narrowings of one ranked list. The term and the chip are
 /// independent, they compose in either order, and neither ever sorts what it
-/// leaves. There is no relevance ranking, so the first card is the Friend to
-/// see next whatever is typed above it.
+/// leaves. Nothing is ordered by how well it matched, so the first card is
+/// the Friend to see next whatever is typed above it.
 ///
 /// It reads again on four triggers and polls on none: the watch stream emits,
 /// the Profile unlocks, the app resumes, and the local Civil Date changes.
@@ -67,14 +67,15 @@ class FriendsCubit extends Cubit<FriendsListState> with WidgetsBindingObserver {
     _rebuild();
   }
 
-  /// Show one Orbit, or the whole ranking for null. The term stays as it is.
+  /// Show one Orbit, or the whole Priority Order for null. The term stays as
+  /// it is.
   void showOrbit(Orbit? orbit) {
     _orbit = orbit;
     _rebuild();
   }
 
-  /// Return the view to the top of the ranking, where the Overdue Friends
-  /// are.
+  /// Return the view to the top of the Priority Order, where the Overdue
+  /// Friends are.
   ///
   /// It clears the term and the chip. No Overdue filter exists, and none is
   /// needed: the list is in Priority Order, so those Friends are already the

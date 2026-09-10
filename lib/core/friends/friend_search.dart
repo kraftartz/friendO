@@ -2,15 +2,18 @@ import 'package:drift/drift.dart' show Variable;
 import 'package:friendo/core/text/folded_text.dart' show foldedText;
 import 'package:friendo_domain/friendo_domain.dart' show NoteLabel, Orbit;
 
-/// The escape character the four arms give to LIKE.
+/// The escape character each matching arm gives to LIKE.
 const _escape = r'\';
 
 /// The statement that names every Friend a term matches, and what it binds.
 ///
-/// Four arms produce Friend ids, and UNION folds them into one set. A Friend
-/// whose name and three of whose Topics match is one Friend, and the set
-/// operation says so. One LEFT JOIN with an OR was measured ten times slower
-/// and would need the same duplicates taken out afterwards.
+/// Four kinds of arm produce Friend ids, and UNION folds them into one set:
+/// the folded name, the folded body of a Topic, the folded label of an
+/// Affinity, and one arm for each Orbit the term names.
+///
+/// A Friend whose name and three of whose Topics match is one Friend, and the
+/// set operation says so. One LEFT JOIN with an OR was measured ten times
+/// slower and would need the same duplicates taken out afterwards.
 ///
 /// The statement holds no Orbit threshold. Each Orbit knows its own range of
 /// Cadence days, and a matched Orbit binds that range as two numbers. The

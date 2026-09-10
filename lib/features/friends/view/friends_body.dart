@@ -3,6 +3,7 @@ import 'package:friendo/features/friends/bloc/friends_state.dart'
     show Emptiness, FriendCard, FriendsListState;
 import 'package:friendo/features/friends/view/friend_card_view.dart'
     show FriendCardView;
+import 'package:friendo/features/friends/view/words.dart' show orbitWord;
 import 'package:friendo_domain/friendo_domain.dart' show Orbit;
 import 'package:friendo_ui/friendo_ui.dart' show Pill, Soft, SoftWell;
 
@@ -34,7 +35,7 @@ class FriendsBody extends StatefulWidget {
 
   final void Function(String term) onSearch;
 
-  /// Asks for one Orbit, or for the whole ranking with null.
+  /// Asks for one Orbit, or for the whole Priority Order with null.
   final void Function(Orbit? orbit) onShowOrbit;
 
   final VoidCallback onReview;
@@ -57,9 +58,11 @@ class _FriendsBodyState extends State<FriendsBody> {
   @override
   void didUpdateWidget(FriendsBody old) {
     super.didUpdateWidget(old);
-    // The state owns the term. A lock and a Review both clear it, and the
-    // field must follow rather than keep what the User typed.
-    if (_typed.text != widget.reading.term) _typed.text = widget.reading.term;
+    // A lock and a Review clear the term, and the field follows them. It
+    // follows nothing else. A state carries the term it was built from, and
+    // that term is one keystroke behind a fast typist, so following every
+    // state would take back letters the User has already typed.
+    if (widget.reading.term.isEmpty && _typed.text.isNotEmpty) _typed.clear();
   }
 
   @override
@@ -98,10 +101,21 @@ class _FriendsBodyState extends State<FriendsBody> {
       key: const Key('friends-search'),
       controller: _typed,
       onChanged: widget.onSearch,
-      decoration: const InputDecoration(
+      decoration: InputDecoration(
         border: InputBorder.none,
         hintText: 'Search a Friend, a Topic, an Affinity or an Orbit',
         isDense: true,
+        suffixIcon: widget.reading.term.isEmpty
+            ? null
+            : IconButton(
+                key: const Key('friends-clear-search'),
+                icon: const Icon(Icons.close),
+                tooltip: 'Clear the search',
+                onPressed: () {
+                  _typed.clear();
+                  widget.onSearch('');
+                },
+              ),
       ),
     ),
   );
@@ -120,7 +134,7 @@ class _FriendsBodyState extends State<FriendsBody> {
         ),
         for (final orbit in Orbit.values)
           Pill(
-            label: _orbitWord(orbit),
+            label: orbitWord(orbit),
             count: reading.counts.of(orbit),
             isChosen: reading.orbit == orbit,
             onTap: () => widget.onShowOrbit(orbit),
@@ -161,10 +175,10 @@ class _FriendsBodyState extends State<FriendsBody> {
   };
 }
 
-/// The band that names the Friends whose Due Date has passed.
+/// The banner that names the Friends whose Due Date has passed.
 ///
-/// It draws the ranking in the order it arrives and sorts nothing. It names
-/// as many Friends as fit and always carries the true count, so the number is
+/// It draws the Overdue Friends in the order they arrive and sorts nothing.
+/// It names the first few and always carries the true count, so the number is
 /// right even when the names run out.
 class _Banner extends StatelessWidget {
   const _Banner({required this.overdue, required this.onReview});
@@ -243,9 +257,3 @@ class _Empty extends StatelessWidget {
     ),
   );
 }
-
-String _orbitWord(Orbit orbit) => switch (orbit) {
-  Orbit.inner => 'Inner',
-  Orbit.middle => 'Middle',
-  Orbit.outer => 'Outer',
-};

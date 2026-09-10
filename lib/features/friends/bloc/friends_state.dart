@@ -25,7 +25,7 @@ enum Emptiness {
   noneInOrbit,
 }
 
-/// One card: the writing from the store, and the ranking from the domain.
+/// One card: the writing from the store, and the Placing from the domain.
 final class FriendCard extends Equatable {
   const FriendCard({required this.friend, required this.placing});
 
@@ -120,7 +120,8 @@ final class FriendsListState extends Equatable {
   /// force. Neither narrowing ever sorts them.
   final List<FriendCard> cards;
 
-  /// Every Overdue Friend on the roster, in the order the ranking gives.
+  /// Every Overdue Friend on the roster, in the order the Priority Order
+  /// gives.
   ///
   /// It describes the whole roster and never the narrowed view, because a
   /// filter is a way of looking and must not be a way of silencing. It is
