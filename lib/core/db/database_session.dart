@@ -104,6 +104,35 @@ class DatabaseSession {
     _publish(DatabaseState.locked);
   }
 
+  /// Follows [query] while the Profile is open, and goes quiet while it is not.
+  ///
+  /// The returned stream stays alive across a lock, so one subscription lasts
+  /// the life of a screen. It runs [query] again on every unlock, which is
+  /// what makes the rows after a lock fresh rather than stale.
+  Stream<T> watch<T>(Stream<T> Function(AppDatabase database) query) {
+    StreamSubscription<DatabaseState>? whileOpen;
+    StreamSubscription<T>? rows;
+    late StreamController<T> found;
+
+    Future<void> follow(DatabaseState state) async {
+      await rows?.cancel();
+      rows = null;
+      if (state != DatabaseState.open) return;
+
+      rows = query(database).listen(found.add, onError: found.addError);
+    }
+
+    found = StreamController<T>(
+      onListen: () => whileOpen = state.listen(follow),
+      onCancel: () async {
+        await whileOpen?.cancel();
+        await rows?.cancel();
+      },
+    );
+
+    return found.stream;
+  }
+
   void _publish(DatabaseState state) {
     _state = state;
     _changes.add(state);
