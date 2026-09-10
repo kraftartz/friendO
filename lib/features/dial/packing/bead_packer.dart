@@ -4,7 +4,8 @@ import 'package:equatable/equatable.dart';
 import 'package:friendo_domain/friendo_domain.dart'
     show Orbit, Placing, PriorityOrder;
 
-import 'dial_geometry.dart' show DialGeometry;
+import 'package:friendo/features/dial/packing/dial_geometry.dart'
+    show DialGeometry;
 
 /// One Friend, and the Phase their Bead is drawn at.
 ///

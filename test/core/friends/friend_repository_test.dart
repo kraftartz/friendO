@@ -3,8 +3,20 @@ import 'dart:io';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:friendo/core/db/database_session.dart';
-import 'package:friendo/core/friends/friend_repository.dart';
-import 'package:friendo_domain/friendo_domain.dart';
+import 'package:friendo/core/friends/dial_friend.dart' show DialFriend;
+import 'package:friendo/core/friends/friend_repository.dart'
+    show FriendRepository, dialFriendsStatement;
+import 'package:friendo_domain/friendo_domain.dart'
+    show
+        Affinity,
+        Cadence,
+        CivilDate,
+        Fact,
+        Friend,
+        Meeting,
+        Milestone,
+        Note,
+        NoteLabel;
 
 import '../../support/fixed_clock.dart';
 import '../../support/wiring.dart';
@@ -106,16 +118,86 @@ void main() {
     },
   );
 
-  test('works the last Meeting out from the Meetings it holds', () async {
-    await friends.save(
-      aFriend()
-          .logMeeting(aMeeting('m2', 8), now: today)
-          .logMeeting(aMeeting('m3', 4), now: today),
-    );
+  group('what the Dial reads', () {
+    test('gives one Friend one row, holding the newest Meeting', () async {
+      await friends.save(
+        aFriend()
+            .logMeeting(aMeeting('m2', 8), now: today)
+            .logMeeting(aMeeting('m3', 4), now: today),
+      );
 
-    final placings = await friends.watchPlacings(now: today).first;
+      expect(await friends.watchDialFriends().first, [
+        DialFriend(
+          id: 'f1',
+          name: 'Michał',
+          cadence: Cadence.ofDays(7),
+          lastMet: CivilDate(2026, 9, 8),
+        ),
+      ]);
+    });
 
-    expect(placings.single.placing.dueAt, CivilDate(2026, 9, 15));
+    test('seeds the Avatar from the id, which needs no column', () async {
+      await friends.save(aFriend());
+
+      final drawn = (await friends.watchDialFriends().first).single;
+
+      expect(drawn.avatarSeed, 'f1');
+    });
+
+    test('works a Placing out from a now the caller gives it', () async {
+      await friends.save(aFriend());
+
+      final drawn = (await friends.watchDialFriends().first).single;
+      final placing = drawn.placingAt(DateTime(2026, 9, 8));
+
+      expect(placing.friendId, 'f1');
+      expect(placing.dueAt, CivilDate(2026, 9, 8));
+      expect(placing.phase.value, closeTo(1, 1e-9));
+    });
+
+    test('names four columns, and no BLOB among them', () async {
+      await friends.save(aFriend());
+
+      final row = await wiring.databases.database
+          .customSelect(dialFriendsStatement)
+          .getSingle();
+
+      expect(row.data.keys.toSet(), {'id', 'name', 'cadence_days', 'last_met'});
+      expect(row.data.values.every((held) => held is! List<int>), isTrue);
+    });
+
+    test('reads no Note, Fact, Affinity, Milestone or Meeting', () async {
+      await friends.save(
+        aFriend().copyWith(
+          notes: [
+            Note(
+              id: 'n1',
+              label: NoteLabel.topic,
+              body: 'Ask about Zoë',
+              writtenOn: CivilDate(2026, 9, 2),
+            ),
+          ],
+          facts: [Fact(id: 'x1', label: 'City', value: 'Kraków')],
+          affinities: [Affinity(id: 'a1', label: 'Family')],
+          milestones: [
+            Milestone(
+              id: 's1',
+              label: 'Birthday',
+              onDate: CivilDate(1988, 10, 14),
+              repeatsYearly: true,
+            ),
+          ],
+        ),
+      );
+
+      final statement = dialFriendsStatement.toLowerCase();
+
+      expect(statement, isNot(contains('notes')));
+      expect(statement, isNot(contains('facts')));
+      expect(statement, isNot(contains('affinities')));
+      expect(statement, isNot(contains('milestones')));
+      expect(await friends.watchDialFriends().first, hasLength(1));
+    });
   });
 
   test('stores the last Meeting nowhere', () async {
@@ -206,13 +288,13 @@ void main() {
     });
 
     test('a watch goes quiet, stays alive, and reads fresh rows', () async {
-      final seen = <List<FriendPlacing>>[];
-      final watching = friends.watchPlacings(now: today).listen(seen.add);
+      final seen = <List<DialFriend>>[];
+      final watching = friends.watchDialFriends().listen(seen.add);
       await pumpEventQueue();
       await wiring.session.lock();
       await pumpEventQueue();
 
-      expect(seen, [<FriendPlacing>[]]);
+      expect(seen, [<DialFriend>[]]);
 
       await wiring.session.unlock(profileId, '123456');
       await friends.save(aFriend());

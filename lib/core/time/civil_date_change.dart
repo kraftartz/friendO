@@ -1,8 +1,7 @@
 import 'dart:async';
 
+import 'package:friendo/core/time/clock.dart' show Clock;
 import 'package:friendo_domain/friendo_domain.dart' show CivilDate;
-
-import 'clock.dart';
 
 /// How long is left of the local day that [now] falls in.
 ///
