@@ -218,6 +218,7 @@ friendO/
 |   |   |                        Profile is unlocked, so it belongs to no
 |   |   |                        feature.
 |   |   +-- security/            App lock, screen privacy, auto-lock
+|   |   +-- text/                The fold that search matches, and nothing else
 |   |   +-- time/                Clock. Every "now" comes from here.
 |   |
 |   +-- features/                One folder per user-facing area

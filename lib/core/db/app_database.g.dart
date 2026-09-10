@@ -3,7 +3,7 @@
 part of 'app_database.dart';
 
 // ignore_for_file: type=lint
-class $FriendsTable extends Friends with TableInfo<$FriendsTable, Friend> {
+class $FriendsTable extends Friends with TableInfo<$FriendsTable, FriendRow> {
   @override
   final GeneratedDatabase attachedDatabase;
   final String? _alias;
@@ -57,7 +57,7 @@ class $FriendsTable extends Friends with TableInfo<$FriendsTable, Friend> {
   static const String $name = 'friends';
   @override
   VerificationContext validateIntegrity(
-    Insertable<Friend> instance, {
+    Insertable<FriendRow> instance, {
     bool isInserting = false,
   }) {
     final context = VerificationContext();
@@ -100,9 +100,9 @@ class $FriendsTable extends Friends with TableInfo<$FriendsTable, Friend> {
   @override
   Set<GeneratedColumn> get $primaryKey => {id};
   @override
-  Friend map(Map<String, dynamic> data, {String? tablePrefix}) {
+  FriendRow map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
-    return Friend(
+    return FriendRow(
       id: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
         data['${effectivePrefix}id'],
@@ -128,14 +128,14 @@ class $FriendsTable extends Friends with TableInfo<$FriendsTable, Friend> {
   }
 }
 
-class Friend extends DataClass implements Insertable<Friend> {
+class FriendRow extends DataClass implements Insertable<FriendRow> {
   final String id;
   final String name;
   final String nameFolded;
 
   /// The wanted Cadence, in whole days.
   final int cadenceDays;
-  const Friend({
+  const FriendRow({
     required this.id,
     required this.name,
     required this.nameFolded,
@@ -160,12 +160,12 @@ class Friend extends DataClass implements Insertable<Friend> {
     );
   }
 
-  factory Friend.fromJson(
+  factory FriendRow.fromJson(
     Map<String, dynamic> json, {
     ValueSerializer? serializer,
   }) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
-    return Friend(
+    return FriendRow(
       id: serializer.fromJson<String>(json['id']),
       name: serializer.fromJson<String>(json['name']),
       nameFolded: serializer.fromJson<String>(json['nameFolded']),
@@ -183,19 +183,19 @@ class Friend extends DataClass implements Insertable<Friend> {
     };
   }
 
-  Friend copyWith({
+  FriendRow copyWith({
     String? id,
     String? name,
     String? nameFolded,
     int? cadenceDays,
-  }) => Friend(
+  }) => FriendRow(
     id: id ?? this.id,
     name: name ?? this.name,
     nameFolded: nameFolded ?? this.nameFolded,
     cadenceDays: cadenceDays ?? this.cadenceDays,
   );
-  Friend copyWithCompanion(FriendsCompanion data) {
-    return Friend(
+  FriendRow copyWithCompanion(FriendsCompanion data) {
+    return FriendRow(
       id: data.id.present ? data.id.value : this.id,
       name: data.name.present ? data.name.value : this.name,
       nameFolded: data.nameFolded.present
@@ -209,7 +209,7 @@ class Friend extends DataClass implements Insertable<Friend> {
 
   @override
   String toString() {
-    return (StringBuffer('Friend(')
+    return (StringBuffer('FriendRow(')
           ..write('id: $id, ')
           ..write('name: $name, ')
           ..write('nameFolded: $nameFolded, ')
@@ -223,14 +223,14 @@ class Friend extends DataClass implements Insertable<Friend> {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      (other is Friend &&
+      (other is FriendRow &&
           other.id == this.id &&
           other.name == this.name &&
           other.nameFolded == this.nameFolded &&
           other.cadenceDays == this.cadenceDays);
 }
 
-class FriendsCompanion extends UpdateCompanion<Friend> {
+class FriendsCompanion extends UpdateCompanion<FriendRow> {
   final Value<String> id;
   final Value<String> name;
   final Value<String> nameFolded;
@@ -253,7 +253,7 @@ class FriendsCompanion extends UpdateCompanion<Friend> {
        name = Value(name),
        nameFolded = Value(nameFolded),
        cadenceDays = Value(cadenceDays);
-  static Insertable<Friend> custom({
+  static Insertable<FriendRow> custom({
     Expression<String>? id,
     Expression<String>? name,
     Expression<String>? nameFolded,
@@ -319,7 +319,8 @@ class FriendsCompanion extends UpdateCompanion<Friend> {
   }
 }
 
-class $MeetingsTable extends Meetings with TableInfo<$MeetingsTable, Meeting> {
+class $MeetingsTable extends Meetings
+    with TableInfo<$MeetingsTable, MeetingRow> {
   @override
   final GeneratedDatabase attachedDatabase;
   final String? _alias;
@@ -436,7 +437,7 @@ class $MeetingsTable extends Meetings with TableInfo<$MeetingsTable, Meeting> {
   static const String $name = 'meetings';
   @override
   VerificationContext validateIntegrity(
-    Insertable<Meeting> instance, {
+    Insertable<MeetingRow> instance, {
     bool isInserting = false,
   }) {
     final context = VerificationContext();
@@ -509,9 +510,9 @@ class $MeetingsTable extends Meetings with TableInfo<$MeetingsTable, Meeting> {
   @override
   Set<GeneratedColumn> get $primaryKey => {id};
   @override
-  Meeting map(Map<String, dynamic> data, {String? tablePrefix}) {
+  MeetingRow map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
-    return Meeting(
+    return MeetingRow(
       id: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
         data['${effectivePrefix}id'],
@@ -557,7 +558,7 @@ class $MeetingsTable extends Meetings with TableInfo<$MeetingsTable, Meeting> {
   }
 }
 
-class Meeting extends DataClass implements Insertable<Meeting> {
+class MeetingRow extends DataClass implements Insertable<MeetingRow> {
   final String id;
   final String friendId;
   final int happenedOn;
@@ -573,7 +574,7 @@ class Meeting extends DataClass implements Insertable<Meeting> {
   /// How the Meeting felt, in the User's own words.
   final String? feeling;
   final String? recap;
-  const Meeting({
+  const MeetingRow({
     required this.id,
     required this.friendId,
     required this.happenedOn,
@@ -633,12 +634,12 @@ class Meeting extends DataClass implements Insertable<Meeting> {
     );
   }
 
-  factory Meeting.fromJson(
+  factory MeetingRow.fromJson(
     Map<String, dynamic> json, {
     ValueSerializer? serializer,
   }) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
-    return Meeting(
+    return MeetingRow(
       id: serializer.fromJson<String>(json['id']),
       friendId: serializer.fromJson<String>(json['friendId']),
       happenedOn: serializer.fromJson<int>(json['happenedOn']),
@@ -666,7 +667,7 @@ class Meeting extends DataClass implements Insertable<Meeting> {
     };
   }
 
-  Meeting copyWith({
+  MeetingRow copyWith({
     String? id,
     String? friendId,
     int? happenedOn,
@@ -676,7 +677,7 @@ class Meeting extends DataClass implements Insertable<Meeting> {
     Value<int?> minutes = const Value.absent(),
     Value<String?> feeling = const Value.absent(),
     Value<String?> recap = const Value.absent(),
-  }) => Meeting(
+  }) => MeetingRow(
     id: id ?? this.id,
     friendId: friendId ?? this.friendId,
     happenedOn: happenedOn ?? this.happenedOn,
@@ -689,8 +690,8 @@ class Meeting extends DataClass implements Insertable<Meeting> {
     feeling: feeling.present ? feeling.value : this.feeling,
     recap: recap.present ? recap.value : this.recap,
   );
-  Meeting copyWithCompanion(MeetingsCompanion data) {
-    return Meeting(
+  MeetingRow copyWithCompanion(MeetingsCompanion data) {
+    return MeetingRow(
       id: data.id.present ? data.id.value : this.id,
       friendId: data.friendId.present ? data.friendId.value : this.friendId,
       happenedOn: data.happenedOn.present
@@ -709,7 +710,7 @@ class Meeting extends DataClass implements Insertable<Meeting> {
 
   @override
   String toString() {
-    return (StringBuffer('Meeting(')
+    return (StringBuffer('MeetingRow(')
           ..write('id: $id, ')
           ..write('friendId: $friendId, ')
           ..write('happenedOn: $happenedOn, ')
@@ -738,7 +739,7 @@ class Meeting extends DataClass implements Insertable<Meeting> {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      (other is Meeting &&
+      (other is MeetingRow &&
           other.id == this.id &&
           other.friendId == this.friendId &&
           other.happenedOn == this.happenedOn &&
@@ -750,7 +751,7 @@ class Meeting extends DataClass implements Insertable<Meeting> {
           other.recap == this.recap);
 }
 
-class MeetingsCompanion extends UpdateCompanion<Meeting> {
+class MeetingsCompanion extends UpdateCompanion<MeetingRow> {
   final Value<String> id;
   final Value<String> friendId;
   final Value<int> happenedOn;
@@ -788,7 +789,7 @@ class MeetingsCompanion extends UpdateCompanion<Meeting> {
        friendId = Value(friendId),
        happenedOn = Value(happenedOn),
        createdAt = Value(createdAt);
-  static Insertable<Meeting> custom({
+  static Insertable<MeetingRow> custom({
     Expression<String>? id,
     Expression<String>? friendId,
     Expression<int>? happenedOn,
@@ -894,7 +895,7 @@ class MeetingsCompanion extends UpdateCompanion<Meeting> {
   }
 }
 
-class $NotesTable extends Notes with TableInfo<$NotesTable, Note> {
+class $NotesTable extends Notes with TableInfo<$NotesTable, NoteRow> {
   @override
   final GeneratedDatabase attachedDatabase;
   final String? _alias;
@@ -987,7 +988,7 @@ class $NotesTable extends Notes with TableInfo<$NotesTable, Note> {
   static const String $name = 'notes';
   @override
   VerificationContext validateIntegrity(
-    Insertable<Note> instance, {
+    Insertable<NoteRow> instance, {
     bool isInserting = false,
   }) {
     final context = VerificationContext();
@@ -1049,9 +1050,9 @@ class $NotesTable extends Notes with TableInfo<$NotesTable, Note> {
   @override
   Set<GeneratedColumn> get $primaryKey => {id};
   @override
-  Note map(Map<String, dynamic> data, {String? tablePrefix}) {
+  NoteRow map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
-    return Note(
+    return NoteRow(
       id: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
         data['${effectivePrefix}id'],
@@ -1089,7 +1090,7 @@ class $NotesTable extends Notes with TableInfo<$NotesTable, Note> {
   }
 }
 
-class Note extends DataClass implements Insertable<Note> {
+class NoteRow extends DataClass implements Insertable<NoteRow> {
   final String id;
   final String friendId;
   final String label;
@@ -1103,7 +1104,7 @@ class Note extends DataClass implements Insertable<Note> {
 
   /// The Civil Date the User marked it done on. Null while it is open.
   final int? resolvedOn;
-  const Note({
+  const NoteRow({
     required this.id,
     required this.friendId,
     required this.label,
@@ -1141,12 +1142,12 @@ class Note extends DataClass implements Insertable<Note> {
     );
   }
 
-  factory Note.fromJson(
+  factory NoteRow.fromJson(
     Map<String, dynamic> json, {
     ValueSerializer? serializer,
   }) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
-    return Note(
+    return NoteRow(
       id: serializer.fromJson<String>(json['id']),
       friendId: serializer.fromJson<String>(json['friendId']),
       label: serializer.fromJson<String>(json['label']),
@@ -1170,7 +1171,7 @@ class Note extends DataClass implements Insertable<Note> {
     };
   }
 
-  Note copyWith({
+  NoteRow copyWith({
     String? id,
     String? friendId,
     String? label,
@@ -1178,7 +1179,7 @@ class Note extends DataClass implements Insertable<Note> {
     String? bodyFolded,
     int? writtenOn,
     Value<int?> resolvedOn = const Value.absent(),
-  }) => Note(
+  }) => NoteRow(
     id: id ?? this.id,
     friendId: friendId ?? this.friendId,
     label: label ?? this.label,
@@ -1187,8 +1188,8 @@ class Note extends DataClass implements Insertable<Note> {
     writtenOn: writtenOn ?? this.writtenOn,
     resolvedOn: resolvedOn.present ? resolvedOn.value : this.resolvedOn,
   );
-  Note copyWithCompanion(NotesCompanion data) {
-    return Note(
+  NoteRow copyWithCompanion(NotesCompanion data) {
+    return NoteRow(
       id: data.id.present ? data.id.value : this.id,
       friendId: data.friendId.present ? data.friendId.value : this.friendId,
       label: data.label.present ? data.label.value : this.label,
@@ -1205,7 +1206,7 @@ class Note extends DataClass implements Insertable<Note> {
 
   @override
   String toString() {
-    return (StringBuffer('Note(')
+    return (StringBuffer('NoteRow(')
           ..write('id: $id, ')
           ..write('friendId: $friendId, ')
           ..write('label: $label, ')
@@ -1223,7 +1224,7 @@ class Note extends DataClass implements Insertable<Note> {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      (other is Note &&
+      (other is NoteRow &&
           other.id == this.id &&
           other.friendId == this.friendId &&
           other.label == this.label &&
@@ -1233,7 +1234,7 @@ class Note extends DataClass implements Insertable<Note> {
           other.resolvedOn == this.resolvedOn);
 }
 
-class NotesCompanion extends UpdateCompanion<Note> {
+class NotesCompanion extends UpdateCompanion<NoteRow> {
   final Value<String> id;
   final Value<String> friendId;
   final Value<String> label;
@@ -1267,7 +1268,7 @@ class NotesCompanion extends UpdateCompanion<Note> {
        body = Value(body),
        bodyFolded = Value(bodyFolded),
        writtenOn = Value(writtenOn);
-  static Insertable<Note> custom({
+  static Insertable<NoteRow> custom({
     Expression<String>? id,
     Expression<String>? friendId,
     Expression<String>? label,
@@ -1358,7 +1359,7 @@ class NotesCompanion extends UpdateCompanion<Note> {
 }
 
 class $AffinitiesTable extends Affinities
-    with TableInfo<$AffinitiesTable, Affinity> {
+    with TableInfo<$AffinitiesTable, AffinityRow> {
   @override
   final GeneratedDatabase attachedDatabase;
   final String? _alias;
@@ -1413,7 +1414,7 @@ class $AffinitiesTable extends Affinities
   static const String $name = 'affinities';
   @override
   VerificationContext validateIntegrity(
-    Insertable<Affinity> instance, {
+    Insertable<AffinityRow> instance, {
     bool isInserting = false,
   }) {
     final context = VerificationContext();
@@ -1456,9 +1457,9 @@ class $AffinitiesTable extends Affinities
   @override
   Set<GeneratedColumn> get $primaryKey => {id};
   @override
-  Affinity map(Map<String, dynamic> data, {String? tablePrefix}) {
+  AffinityRow map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
-    return Affinity(
+    return AffinityRow(
       id: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
         data['${effectivePrefix}id'],
@@ -1484,14 +1485,14 @@ class $AffinitiesTable extends Affinities
   }
 }
 
-class Affinity extends DataClass implements Insertable<Affinity> {
+class AffinityRow extends DataClass implements Insertable<AffinityRow> {
   final String id;
   final String label;
 
   /// The Folded Text of [label], which search matches.
   final String labelFolded;
   final bool isSeed;
-  const Affinity({
+  const AffinityRow({
     required this.id,
     required this.label,
     required this.labelFolded,
@@ -1516,12 +1517,12 @@ class Affinity extends DataClass implements Insertable<Affinity> {
     );
   }
 
-  factory Affinity.fromJson(
+  factory AffinityRow.fromJson(
     Map<String, dynamic> json, {
     ValueSerializer? serializer,
   }) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
-    return Affinity(
+    return AffinityRow(
       id: serializer.fromJson<String>(json['id']),
       label: serializer.fromJson<String>(json['label']),
       labelFolded: serializer.fromJson<String>(json['labelFolded']),
@@ -1539,19 +1540,19 @@ class Affinity extends DataClass implements Insertable<Affinity> {
     };
   }
 
-  Affinity copyWith({
+  AffinityRow copyWith({
     String? id,
     String? label,
     String? labelFolded,
     bool? isSeed,
-  }) => Affinity(
+  }) => AffinityRow(
     id: id ?? this.id,
     label: label ?? this.label,
     labelFolded: labelFolded ?? this.labelFolded,
     isSeed: isSeed ?? this.isSeed,
   );
-  Affinity copyWithCompanion(AffinitiesCompanion data) {
-    return Affinity(
+  AffinityRow copyWithCompanion(AffinitiesCompanion data) {
+    return AffinityRow(
       id: data.id.present ? data.id.value : this.id,
       label: data.label.present ? data.label.value : this.label,
       labelFolded: data.labelFolded.present
@@ -1563,7 +1564,7 @@ class Affinity extends DataClass implements Insertable<Affinity> {
 
   @override
   String toString() {
-    return (StringBuffer('Affinity(')
+    return (StringBuffer('AffinityRow(')
           ..write('id: $id, ')
           ..write('label: $label, ')
           ..write('labelFolded: $labelFolded, ')
@@ -1577,14 +1578,14 @@ class Affinity extends DataClass implements Insertable<Affinity> {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      (other is Affinity &&
+      (other is AffinityRow &&
           other.id == this.id &&
           other.label == this.label &&
           other.labelFolded == this.labelFolded &&
           other.isSeed == this.isSeed);
 }
 
-class AffinitiesCompanion extends UpdateCompanion<Affinity> {
+class AffinitiesCompanion extends UpdateCompanion<AffinityRow> {
   final Value<String> id;
   final Value<String> label;
   final Value<String> labelFolded;
@@ -1607,7 +1608,7 @@ class AffinitiesCompanion extends UpdateCompanion<Affinity> {
        label = Value(label),
        labelFolded = Value(labelFolded),
        isSeed = Value(isSeed);
-  static Insertable<Affinity> custom({
+  static Insertable<AffinityRow> custom({
     Expression<String>? id,
     Expression<String>? label,
     Expression<String>? labelFolded,
@@ -1674,7 +1675,7 @@ class AffinitiesCompanion extends UpdateCompanion<Affinity> {
 }
 
 class $FriendAffinitiesTable extends FriendAffinities
-    with TableInfo<$FriendAffinitiesTable, FriendAffinity> {
+    with TableInfo<$FriendAffinitiesTable, FriendAffinityRow> {
   @override
   final GeneratedDatabase attachedDatabase;
   final String? _alias;
@@ -1710,7 +1711,7 @@ class $FriendAffinitiesTable extends FriendAffinities
   static const String $name = 'friend_affinities';
   @override
   VerificationContext validateIntegrity(
-    Insertable<FriendAffinity> instance, {
+    Insertable<FriendAffinityRow> instance, {
     bool isInserting = false,
   }) {
     final context = VerificationContext();
@@ -1737,9 +1738,9 @@ class $FriendAffinitiesTable extends FriendAffinities
   @override
   Set<GeneratedColumn> get $primaryKey => {friendId, affinityId};
   @override
-  FriendAffinity map(Map<String, dynamic> data, {String? tablePrefix}) {
+  FriendAffinityRow map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
-    return FriendAffinity(
+    return FriendAffinityRow(
       friendId: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
         data['${effectivePrefix}friend_id'],
@@ -1757,10 +1758,11 @@ class $FriendAffinitiesTable extends FriendAffinities
   }
 }
 
-class FriendAffinity extends DataClass implements Insertable<FriendAffinity> {
+class FriendAffinityRow extends DataClass
+    implements Insertable<FriendAffinityRow> {
   final String friendId;
   final String affinityId;
-  const FriendAffinity({required this.friendId, required this.affinityId});
+  const FriendAffinityRow({required this.friendId, required this.affinityId});
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
@@ -1776,12 +1778,12 @@ class FriendAffinity extends DataClass implements Insertable<FriendAffinity> {
     );
   }
 
-  factory FriendAffinity.fromJson(
+  factory FriendAffinityRow.fromJson(
     Map<String, dynamic> json, {
     ValueSerializer? serializer,
   }) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
-    return FriendAffinity(
+    return FriendAffinityRow(
       friendId: serializer.fromJson<String>(json['friendId']),
       affinityId: serializer.fromJson<String>(json['affinityId']),
     );
@@ -1795,13 +1797,13 @@ class FriendAffinity extends DataClass implements Insertable<FriendAffinity> {
     };
   }
 
-  FriendAffinity copyWith({String? friendId, String? affinityId}) =>
-      FriendAffinity(
+  FriendAffinityRow copyWith({String? friendId, String? affinityId}) =>
+      FriendAffinityRow(
         friendId: friendId ?? this.friendId,
         affinityId: affinityId ?? this.affinityId,
       );
-  FriendAffinity copyWithCompanion(FriendAffinitiesCompanion data) {
-    return FriendAffinity(
+  FriendAffinityRow copyWithCompanion(FriendAffinitiesCompanion data) {
+    return FriendAffinityRow(
       friendId: data.friendId.present ? data.friendId.value : this.friendId,
       affinityId: data.affinityId.present
           ? data.affinityId.value
@@ -1811,7 +1813,7 @@ class FriendAffinity extends DataClass implements Insertable<FriendAffinity> {
 
   @override
   String toString() {
-    return (StringBuffer('FriendAffinity(')
+    return (StringBuffer('FriendAffinityRow(')
           ..write('friendId: $friendId, ')
           ..write('affinityId: $affinityId')
           ..write(')'))
@@ -1823,12 +1825,12 @@ class FriendAffinity extends DataClass implements Insertable<FriendAffinity> {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      (other is FriendAffinity &&
+      (other is FriendAffinityRow &&
           other.friendId == this.friendId &&
           other.affinityId == this.affinityId);
 }
 
-class FriendAffinitiesCompanion extends UpdateCompanion<FriendAffinity> {
+class FriendAffinitiesCompanion extends UpdateCompanion<FriendAffinityRow> {
   final Value<String> friendId;
   final Value<String> affinityId;
   final Value<int> rowid;
@@ -1843,7 +1845,7 @@ class FriendAffinitiesCompanion extends UpdateCompanion<FriendAffinity> {
     this.rowid = const Value.absent(),
   }) : friendId = Value(friendId),
        affinityId = Value(affinityId);
-  static Insertable<FriendAffinity> custom({
+  static Insertable<FriendAffinityRow> custom({
     Expression<String>? friendId,
     Expression<String>? affinityId,
     Expression<int>? rowid,
@@ -1893,7 +1895,7 @@ class FriendAffinitiesCompanion extends UpdateCompanion<FriendAffinity> {
   }
 }
 
-class $FactsTable extends Facts with TableInfo<$FactsTable, Fact> {
+class $FactsTable extends Facts with TableInfo<$FactsTable, FactRow> {
   @override
   final GeneratedDatabase attachedDatabase;
   final String? _alias;
@@ -1956,7 +1958,7 @@ class $FactsTable extends Facts with TableInfo<$FactsTable, Fact> {
   static const String $name = 'facts';
   @override
   VerificationContext validateIntegrity(
-    Insertable<Fact> instance, {
+    Insertable<FactRow> instance, {
     bool isInserting = false,
   }) {
     final context = VerificationContext();
@@ -2004,9 +2006,9 @@ class $FactsTable extends Facts with TableInfo<$FactsTable, Fact> {
   @override
   Set<GeneratedColumn> get $primaryKey => {id};
   @override
-  Fact map(Map<String, dynamic> data, {String? tablePrefix}) {
+  FactRow map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
-    return Fact(
+    return FactRow(
       id: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
         data['${effectivePrefix}id'],
@@ -2036,7 +2038,7 @@ class $FactsTable extends Facts with TableInfo<$FactsTable, Fact> {
   }
 }
 
-class Fact extends DataClass implements Insertable<Fact> {
+class FactRow extends DataClass implements Insertable<FactRow> {
   final String id;
   final String friendId;
   final String label;
@@ -2044,7 +2046,7 @@ class Fact extends DataClass implements Insertable<Fact> {
 
   /// Where the Fact sits in the Friend's own order, from zero.
   final int position;
-  const Fact({
+  const FactRow({
     required this.id,
     required this.friendId,
     required this.label,
@@ -2072,12 +2074,12 @@ class Fact extends DataClass implements Insertable<Fact> {
     );
   }
 
-  factory Fact.fromJson(
+  factory FactRow.fromJson(
     Map<String, dynamic> json, {
     ValueSerializer? serializer,
   }) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
-    return Fact(
+    return FactRow(
       id: serializer.fromJson<String>(json['id']),
       friendId: serializer.fromJson<String>(json['friendId']),
       label: serializer.fromJson<String>(json['label']),
@@ -2097,21 +2099,21 @@ class Fact extends DataClass implements Insertable<Fact> {
     };
   }
 
-  Fact copyWith({
+  FactRow copyWith({
     String? id,
     String? friendId,
     String? label,
     String? value,
     int? position,
-  }) => Fact(
+  }) => FactRow(
     id: id ?? this.id,
     friendId: friendId ?? this.friendId,
     label: label ?? this.label,
     value: value ?? this.value,
     position: position ?? this.position,
   );
-  Fact copyWithCompanion(FactsCompanion data) {
-    return Fact(
+  FactRow copyWithCompanion(FactsCompanion data) {
+    return FactRow(
       id: data.id.present ? data.id.value : this.id,
       friendId: data.friendId.present ? data.friendId.value : this.friendId,
       label: data.label.present ? data.label.value : this.label,
@@ -2122,7 +2124,7 @@ class Fact extends DataClass implements Insertable<Fact> {
 
   @override
   String toString() {
-    return (StringBuffer('Fact(')
+    return (StringBuffer('FactRow(')
           ..write('id: $id, ')
           ..write('friendId: $friendId, ')
           ..write('label: $label, ')
@@ -2137,7 +2139,7 @@ class Fact extends DataClass implements Insertable<Fact> {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      (other is Fact &&
+      (other is FactRow &&
           other.id == this.id &&
           other.friendId == this.friendId &&
           other.label == this.label &&
@@ -2145,7 +2147,7 @@ class Fact extends DataClass implements Insertable<Fact> {
           other.position == this.position);
 }
 
-class FactsCompanion extends UpdateCompanion<Fact> {
+class FactsCompanion extends UpdateCompanion<FactRow> {
   final Value<String> id;
   final Value<String> friendId;
   final Value<String> label;
@@ -2172,7 +2174,7 @@ class FactsCompanion extends UpdateCompanion<Fact> {
        label = Value(label),
        value = Value(value),
        position = Value(position);
-  static Insertable<Fact> custom({
+  static Insertable<FactRow> custom({
     Expression<String>? id,
     Expression<String>? friendId,
     Expression<String>? label,
@@ -2247,7 +2249,7 @@ class FactsCompanion extends UpdateCompanion<Fact> {
 }
 
 class $MilestonesTable extends Milestones
-    with TableInfo<$MilestonesTable, Milestone> {
+    with TableInfo<$MilestonesTable, MilestoneRow> {
   @override
   final GeneratedDatabase attachedDatabase;
   final String? _alias;
@@ -2319,7 +2321,7 @@ class $MilestonesTable extends Milestones
   static const String $name = 'milestones';
   @override
   VerificationContext validateIntegrity(
-    Insertable<Milestone> instance, {
+    Insertable<MilestoneRow> instance, {
     bool isInserting = false,
   }) {
     final context = VerificationContext();
@@ -2370,9 +2372,9 @@ class $MilestonesTable extends Milestones
   @override
   Set<GeneratedColumn> get $primaryKey => {id};
   @override
-  Milestone map(Map<String, dynamic> data, {String? tablePrefix}) {
+  MilestoneRow map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
-    return Milestone(
+    return MilestoneRow(
       id: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
         data['${effectivePrefix}id'],
@@ -2402,13 +2404,13 @@ class $MilestonesTable extends Milestones
   }
 }
 
-class Milestone extends DataClass implements Insertable<Milestone> {
+class MilestoneRow extends DataClass implements Insertable<MilestoneRow> {
   final String id;
   final String friendId;
   final String label;
   final int onDate;
   final bool repeatsYearly;
-  const Milestone({
+  const MilestoneRow({
     required this.id,
     required this.friendId,
     required this.label,
@@ -2436,12 +2438,12 @@ class Milestone extends DataClass implements Insertable<Milestone> {
     );
   }
 
-  factory Milestone.fromJson(
+  factory MilestoneRow.fromJson(
     Map<String, dynamic> json, {
     ValueSerializer? serializer,
   }) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
-    return Milestone(
+    return MilestoneRow(
       id: serializer.fromJson<String>(json['id']),
       friendId: serializer.fromJson<String>(json['friendId']),
       label: serializer.fromJson<String>(json['label']),
@@ -2461,21 +2463,21 @@ class Milestone extends DataClass implements Insertable<Milestone> {
     };
   }
 
-  Milestone copyWith({
+  MilestoneRow copyWith({
     String? id,
     String? friendId,
     String? label,
     int? onDate,
     bool? repeatsYearly,
-  }) => Milestone(
+  }) => MilestoneRow(
     id: id ?? this.id,
     friendId: friendId ?? this.friendId,
     label: label ?? this.label,
     onDate: onDate ?? this.onDate,
     repeatsYearly: repeatsYearly ?? this.repeatsYearly,
   );
-  Milestone copyWithCompanion(MilestonesCompanion data) {
-    return Milestone(
+  MilestoneRow copyWithCompanion(MilestonesCompanion data) {
+    return MilestoneRow(
       id: data.id.present ? data.id.value : this.id,
       friendId: data.friendId.present ? data.friendId.value : this.friendId,
       label: data.label.present ? data.label.value : this.label,
@@ -2488,7 +2490,7 @@ class Milestone extends DataClass implements Insertable<Milestone> {
 
   @override
   String toString() {
-    return (StringBuffer('Milestone(')
+    return (StringBuffer('MilestoneRow(')
           ..write('id: $id, ')
           ..write('friendId: $friendId, ')
           ..write('label: $label, ')
@@ -2503,7 +2505,7 @@ class Milestone extends DataClass implements Insertable<Milestone> {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      (other is Milestone &&
+      (other is MilestoneRow &&
           other.id == this.id &&
           other.friendId == this.friendId &&
           other.label == this.label &&
@@ -2511,7 +2513,7 @@ class Milestone extends DataClass implements Insertable<Milestone> {
           other.repeatsYearly == this.repeatsYearly);
 }
 
-class MilestonesCompanion extends UpdateCompanion<Milestone> {
+class MilestonesCompanion extends UpdateCompanion<MilestoneRow> {
   final Value<String> id;
   final Value<String> friendId;
   final Value<String> label;
@@ -2538,7 +2540,7 @@ class MilestonesCompanion extends UpdateCompanion<Milestone> {
        label = Value(label),
        onDate = Value(onDate),
        repeatsYearly = Value(repeatsYearly);
-  static Insertable<Milestone> custom({
+  static Insertable<MilestoneRow> custom({
     Expression<String>? id,
     Expression<String>? friendId,
     Expression<String>? label,
@@ -2747,14 +2749,14 @@ class $$FriendsTableTableManager
         RootTableManager<
           _$AppDatabase,
           $FriendsTable,
-          Friend,
+          FriendRow,
           $$FriendsTableFilterComposer,
           $$FriendsTableOrderingComposer,
           $$FriendsTableAnnotationComposer,
           $$FriendsTableCreateCompanionBuilder,
           $$FriendsTableUpdateCompanionBuilder,
-          (Friend, BaseReferences<_$AppDatabase, $FriendsTable, Friend>),
-          Friend,
+          (FriendRow, BaseReferences<_$AppDatabase, $FriendsTable, FriendRow>),
+          FriendRow,
           PrefetchHooks Function()
         > {
   $$FriendsTableTableManager(_$AppDatabase db, $FriendsTable table)
@@ -2808,14 +2810,14 @@ typedef $$FriendsTableProcessedTableManager =
     ProcessedTableManager<
       _$AppDatabase,
       $FriendsTable,
-      Friend,
+      FriendRow,
       $$FriendsTableFilterComposer,
       $$FriendsTableOrderingComposer,
       $$FriendsTableAnnotationComposer,
       $$FriendsTableCreateCompanionBuilder,
       $$FriendsTableUpdateCompanionBuilder,
-      (Friend, BaseReferences<_$AppDatabase, $FriendsTable, Friend>),
-      Friend,
+      (FriendRow, BaseReferences<_$AppDatabase, $FriendsTable, FriendRow>),
+      FriendRow,
       PrefetchHooks Function()
     >;
 typedef $$MeetingsTableCreateCompanionBuilder =
@@ -3001,14 +3003,17 @@ class $$MeetingsTableTableManager
         RootTableManager<
           _$AppDatabase,
           $MeetingsTable,
-          Meeting,
+          MeetingRow,
           $$MeetingsTableFilterComposer,
           $$MeetingsTableOrderingComposer,
           $$MeetingsTableAnnotationComposer,
           $$MeetingsTableCreateCompanionBuilder,
           $$MeetingsTableUpdateCompanionBuilder,
-          (Meeting, BaseReferences<_$AppDatabase, $MeetingsTable, Meeting>),
-          Meeting,
+          (
+            MeetingRow,
+            BaseReferences<_$AppDatabase, $MeetingsTable, MeetingRow>,
+          ),
+          MeetingRow,
           PrefetchHooks Function()
         > {
   $$MeetingsTableTableManager(_$AppDatabase db, $MeetingsTable table)
@@ -3082,14 +3087,14 @@ typedef $$MeetingsTableProcessedTableManager =
     ProcessedTableManager<
       _$AppDatabase,
       $MeetingsTable,
-      Meeting,
+      MeetingRow,
       $$MeetingsTableFilterComposer,
       $$MeetingsTableOrderingComposer,
       $$MeetingsTableAnnotationComposer,
       $$MeetingsTableCreateCompanionBuilder,
       $$MeetingsTableUpdateCompanionBuilder,
-      (Meeting, BaseReferences<_$AppDatabase, $MeetingsTable, Meeting>),
-      Meeting,
+      (MeetingRow, BaseReferences<_$AppDatabase, $MeetingsTable, MeetingRow>),
+      MeetingRow,
       PrefetchHooks Function()
     >;
 typedef $$NotesTableCreateCompanionBuilder =
@@ -3244,14 +3249,14 @@ class $$NotesTableTableManager
         RootTableManager<
           _$AppDatabase,
           $NotesTable,
-          Note,
+          NoteRow,
           $$NotesTableFilterComposer,
           $$NotesTableOrderingComposer,
           $$NotesTableAnnotationComposer,
           $$NotesTableCreateCompanionBuilder,
           $$NotesTableUpdateCompanionBuilder,
-          (Note, BaseReferences<_$AppDatabase, $NotesTable, Note>),
-          Note,
+          (NoteRow, BaseReferences<_$AppDatabase, $NotesTable, NoteRow>),
+          NoteRow,
           PrefetchHooks Function()
         > {
   $$NotesTableTableManager(_$AppDatabase db, $NotesTable table)
@@ -3317,14 +3322,14 @@ typedef $$NotesTableProcessedTableManager =
     ProcessedTableManager<
       _$AppDatabase,
       $NotesTable,
-      Note,
+      NoteRow,
       $$NotesTableFilterComposer,
       $$NotesTableOrderingComposer,
       $$NotesTableAnnotationComposer,
       $$NotesTableCreateCompanionBuilder,
       $$NotesTableUpdateCompanionBuilder,
-      (Note, BaseReferences<_$AppDatabase, $NotesTable, Note>),
-      Note,
+      (NoteRow, BaseReferences<_$AppDatabase, $NotesTable, NoteRow>),
+      NoteRow,
       PrefetchHooks Function()
     >;
 typedef $$AffinitiesTableCreateCompanionBuilder =
@@ -3433,14 +3438,17 @@ class $$AffinitiesTableTableManager
         RootTableManager<
           _$AppDatabase,
           $AffinitiesTable,
-          Affinity,
+          AffinityRow,
           $$AffinitiesTableFilterComposer,
           $$AffinitiesTableOrderingComposer,
           $$AffinitiesTableAnnotationComposer,
           $$AffinitiesTableCreateCompanionBuilder,
           $$AffinitiesTableUpdateCompanionBuilder,
-          (Affinity, BaseReferences<_$AppDatabase, $AffinitiesTable, Affinity>),
-          Affinity,
+          (
+            AffinityRow,
+            BaseReferences<_$AppDatabase, $AffinitiesTable, AffinityRow>,
+          ),
+          AffinityRow,
           PrefetchHooks Function()
         > {
   $$AffinitiesTableTableManager(_$AppDatabase db, $AffinitiesTable table)
@@ -3494,14 +3502,17 @@ typedef $$AffinitiesTableProcessedTableManager =
     ProcessedTableManager<
       _$AppDatabase,
       $AffinitiesTable,
-      Affinity,
+      AffinityRow,
       $$AffinitiesTableFilterComposer,
       $$AffinitiesTableOrderingComposer,
       $$AffinitiesTableAnnotationComposer,
       $$AffinitiesTableCreateCompanionBuilder,
       $$AffinitiesTableUpdateCompanionBuilder,
-      (Affinity, BaseReferences<_$AppDatabase, $AffinitiesTable, Affinity>),
-      Affinity,
+      (
+        AffinityRow,
+        BaseReferences<_$AppDatabase, $AffinitiesTable, AffinityRow>,
+      ),
+      AffinityRow,
       PrefetchHooks Function()
     >;
 typedef $$FriendAffinitiesTableCreateCompanionBuilder =
@@ -3580,21 +3591,21 @@ class $$FriendAffinitiesTableTableManager
         RootTableManager<
           _$AppDatabase,
           $FriendAffinitiesTable,
-          FriendAffinity,
+          FriendAffinityRow,
           $$FriendAffinitiesTableFilterComposer,
           $$FriendAffinitiesTableOrderingComposer,
           $$FriendAffinitiesTableAnnotationComposer,
           $$FriendAffinitiesTableCreateCompanionBuilder,
           $$FriendAffinitiesTableUpdateCompanionBuilder,
           (
-            FriendAffinity,
+            FriendAffinityRow,
             BaseReferences<
               _$AppDatabase,
               $FriendAffinitiesTable,
-              FriendAffinity
+              FriendAffinityRow
             >,
           ),
-          FriendAffinity,
+          FriendAffinityRow,
           PrefetchHooks Function()
         > {
   $$FriendAffinitiesTableTableManager(
@@ -3642,17 +3653,21 @@ typedef $$FriendAffinitiesTableProcessedTableManager =
     ProcessedTableManager<
       _$AppDatabase,
       $FriendAffinitiesTable,
-      FriendAffinity,
+      FriendAffinityRow,
       $$FriendAffinitiesTableFilterComposer,
       $$FriendAffinitiesTableOrderingComposer,
       $$FriendAffinitiesTableAnnotationComposer,
       $$FriendAffinitiesTableCreateCompanionBuilder,
       $$FriendAffinitiesTableUpdateCompanionBuilder,
       (
-        FriendAffinity,
-        BaseReferences<_$AppDatabase, $FriendAffinitiesTable, FriendAffinity>,
+        FriendAffinityRow,
+        BaseReferences<
+          _$AppDatabase,
+          $FriendAffinitiesTable,
+          FriendAffinityRow
+        >,
       ),
-      FriendAffinity,
+      FriendAffinityRow,
       PrefetchHooks Function()
     >;
 typedef $$FactsTableCreateCompanionBuilder =
@@ -3773,14 +3788,14 @@ class $$FactsTableTableManager
         RootTableManager<
           _$AppDatabase,
           $FactsTable,
-          Fact,
+          FactRow,
           $$FactsTableFilterComposer,
           $$FactsTableOrderingComposer,
           $$FactsTableAnnotationComposer,
           $$FactsTableCreateCompanionBuilder,
           $$FactsTableUpdateCompanionBuilder,
-          (Fact, BaseReferences<_$AppDatabase, $FactsTable, Fact>),
-          Fact,
+          (FactRow, BaseReferences<_$AppDatabase, $FactsTable, FactRow>),
+          FactRow,
           PrefetchHooks Function()
         > {
   $$FactsTableTableManager(_$AppDatabase db, $FactsTable table)
@@ -3838,14 +3853,14 @@ typedef $$FactsTableProcessedTableManager =
     ProcessedTableManager<
       _$AppDatabase,
       $FactsTable,
-      Fact,
+      FactRow,
       $$FactsTableFilterComposer,
       $$FactsTableOrderingComposer,
       $$FactsTableAnnotationComposer,
       $$FactsTableCreateCompanionBuilder,
       $$FactsTableUpdateCompanionBuilder,
-      (Fact, BaseReferences<_$AppDatabase, $FactsTable, Fact>),
-      Fact,
+      (FactRow, BaseReferences<_$AppDatabase, $FactsTable, FactRow>),
+      FactRow,
       PrefetchHooks Function()
     >;
 typedef $$MilestonesTableCreateCompanionBuilder =
@@ -3969,17 +3984,17 @@ class $$MilestonesTableTableManager
         RootTableManager<
           _$AppDatabase,
           $MilestonesTable,
-          Milestone,
+          MilestoneRow,
           $$MilestonesTableFilterComposer,
           $$MilestonesTableOrderingComposer,
           $$MilestonesTableAnnotationComposer,
           $$MilestonesTableCreateCompanionBuilder,
           $$MilestonesTableUpdateCompanionBuilder,
           (
-            Milestone,
-            BaseReferences<_$AppDatabase, $MilestonesTable, Milestone>,
+            MilestoneRow,
+            BaseReferences<_$AppDatabase, $MilestonesTable, MilestoneRow>,
           ),
-          Milestone,
+          MilestoneRow,
           PrefetchHooks Function()
         > {
   $$MilestonesTableTableManager(_$AppDatabase db, $MilestonesTable table)
@@ -4037,14 +4052,17 @@ typedef $$MilestonesTableProcessedTableManager =
     ProcessedTableManager<
       _$AppDatabase,
       $MilestonesTable,
-      Milestone,
+      MilestoneRow,
       $$MilestonesTableFilterComposer,
       $$MilestonesTableOrderingComposer,
       $$MilestonesTableAnnotationComposer,
       $$MilestonesTableCreateCompanionBuilder,
       $$MilestonesTableUpdateCompanionBuilder,
-      (Milestone, BaseReferences<_$AppDatabase, $MilestonesTable, Milestone>),
-      Milestone,
+      (
+        MilestoneRow,
+        BaseReferences<_$AppDatabase, $MilestonesTable, MilestoneRow>,
+      ),
+      MilestoneRow,
       PrefetchHooks Function()
     >;
 

@@ -4,6 +4,7 @@ import 'package:drift/drift.dart';
 ///
 /// [nameFolded] is the Folded Text that search matches. It sits beside the
 /// name it folds, and nothing shows it. See ADR-0033.
+@DataClassName('FriendRow')
 class Friends extends Table {
   TextColumn get id => text()();
 
@@ -23,6 +24,7 @@ class Friends extends Table {
 /// [happenedOn] is a Civil Date, held as the count of days from 1970-01-01.
 /// It is the only field the Dial reads. [happenedAtMinute] is the optional
 /// time of day, in minutes from midnight, and it is shown and never drawn.
+@DataClassName('MeetingRow')
 class Meetings extends Table {
   TextColumn get id => text()();
 
@@ -53,6 +55,7 @@ class Meetings extends Table {
 ///
 /// [label] tells the three apart and changes nothing else. The app never
 /// clears one of these rows by itself. See ADR-0017.
+@DataClassName('NoteRow')
 class Notes extends Table {
   TextColumn get id => text()();
 
@@ -80,6 +83,7 @@ class Notes extends Table {
 /// It has its own table because the Directory filters by it, and two
 /// spellings of one label would be a defect. [isSeed] marks the labels the
 /// app ships.
+@DataClassName('AffinityRow')
 class Affinities extends Table {
   TextColumn get id => text()();
 
@@ -95,6 +99,7 @@ class Affinities extends Table {
 }
 
 /// Which Affinities a Friend carries.
+@DataClassName('FriendAffinityRow')
 class FriendAffinities extends Table {
   TextColumn get friendId => text()();
 
@@ -108,6 +113,7 @@ class FriendAffinities extends Table {
 ///
 /// The User writes both the label and the value, and there is no table of
 /// labels: a label is text to show, and not a thing to filter by.
+@DataClassName('FactRow')
 class Facts extends Table {
   TextColumn get id => text()();
 
@@ -127,6 +133,7 @@ class Facts extends Table {
 /// A fixed Civil Date that belongs to a Friend, such as a birthday.
 ///
 /// A Milestone moves no Bead. The Dial draws Cadence alone.
+@DataClassName('MilestoneRow')
 class Milestones extends Table {
   TextColumn get id => text()();
 
