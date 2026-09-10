@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../features/dial/view/dial_page.dart';
+import '../../features/friends/bloc/friends_cubit.dart';
 import '../../features/friends/view/friends_page.dart';
 import '../../features/settings/view/settings_page.dart';
 import 'app_section.dart';
@@ -36,6 +37,10 @@ class HomeShell extends StatelessWidget {
               DialPage(
                 onAddFriend: () =>
                     context.read<NavigationCubit>().select(AppSection.friends),
+                onShowOrbit: (orbit) {
+                  context.read<FriendsCubit>().showOrbit(orbit);
+                  context.read<NavigationCubit>().select(AppSection.friends);
+                },
               ),
               const FriendsPage(),
               const SettingsPage(),

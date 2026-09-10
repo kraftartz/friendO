@@ -37,6 +37,8 @@ final class FriendCard extends Equatable {
 
   String get name => friend.name;
 
+  String get avatarSeed => friend.avatarSeed;
+
   Orbit get orbit => friend.cadence.orbit;
 
   int get cadenceDays => friend.cadence.days;

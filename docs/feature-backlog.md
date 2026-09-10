@@ -150,3 +150,16 @@ a restart.
 | Orbit radii | 62 / 102 / 142 | 62 / 102 / 142 | Settled. ADR-0014 already agrees. |
 | Bead name label | A name under every Bead | ADR-0014 spaces Beads 4 units apart | Drop the label. Name the Friend on a tap |
 | Cadence presets | 7/30/90 and 7/14/30/60 | Free duration | Pick one preset list |
+
+### From the Friends List
+
+The Friends List designs raise five more. Four of them are new here. The fifth, the time of a
+Meeting, is the row above.
+
+| Item | Design | ADR | Action |
+|---|---|---|---|
+| The Overdue banner | Names Friends due in 2d and 4d | The PRD names Friends whose Due Date has passed | Name Overdue Friends only |
+| The word for it | `2 Friend Orbits Drifting` | `drifting` is a banned word for Overdue | Use Overdue |
+| The fifth chip | `Due Soon (2)` beside three Orbits | Two axes in one row, and a banned word for Nearing | Four chips, one axis |
+| The chip label | `Inner • 7d` | An Orbit is a range of Cadences, ADR-0008 | The chip carries a name and a count |
+| The empty state | `No souls in this orbit` | The glossary word is Friend | Plain words, and three states with three next actions |

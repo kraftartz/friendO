@@ -1,14 +1,34 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart' show BlocBuilder, ReadContext;
+import 'package:friendo/features/friends/bloc/friends_cubit.dart'
+    show FriendsCubit;
+import 'package:friendo/features/friends/bloc/friends_state.dart'
+    show FriendsListState;
+import 'package:friendo/features/friends/view/friends_body.dart'
+    show FriendsBody;
 
-/// A placeholder for the Friends screen.
-///
-/// It holds no behaviour. It exists so the navigation bar has somewhere to go
-/// while the real screen is still a preplanned unit of work.
+/// The Friends List, joined to its state.
 class FriendsPage extends StatelessWidget {
-  /// Create the page.
-  const FriendsPage({super.key});
+  const FriendsPage({this.onAddFriend, this.onOpenFriend, super.key});
+
+  final VoidCallback? onAddFriend;
+
+  final void Function(String friendId)? onOpenFriend;
 
   @override
-  Widget build(BuildContext context) =>
-      const Center(child: Text('Friends page'));
+  Widget build(BuildContext context) {
+    final list = context.read<FriendsCubit>();
+
+    return BlocBuilder<FriendsCubit, FriendsListState>(
+      builder: (context, reading) => FriendsBody(
+        reading: reading,
+        onSearch: list.search,
+        onShowOrbit: list.showOrbit,
+        onReview: list.review,
+        onLogMeeting: list.logMeeting,
+        onAddFriend: onAddFriend,
+        onOpenFriend: onOpenFriend,
+      ),
+    );
+  }
 }

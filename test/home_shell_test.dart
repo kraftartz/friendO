@@ -4,6 +4,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:friendo/app/app.dart';
 import 'package:friendo/app/navigation/app_section.dart';
 import 'package:friendo/features/dial/view/dial_view.dart' show DialView;
+import 'package:friendo/features/friends/view/friends_body.dart'
+    show FriendsBody;
 
 import 'support/wiring.dart';
 
@@ -42,12 +44,12 @@ void main() {
 
     testWidgets('the bar switches the visible page', (tester) async {
       await tester.pumpWidget(aFriendoApp());
-      expect(find.text('Friends page'), findsNothing);
+      expect(find.byType(FriendsBody), findsNothing);
 
       await tester.tap(find.text('Friends'));
       await tester.pumpAndSettle();
 
-      expect(find.text('Friends page'), findsOneWidget);
+      expect(find.byType(FriendsBody), findsOneWidget);
       // The Dial is still built, but the IndexedStack now keeps it offstage.
       expect(find.byType(DialView), findsNothing);
     });
