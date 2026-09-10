@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:friendo_ui/friendo_ui.dart';
+import 'package:friendo_ui/friendo_ui.dart' show PinDots, PinKeypad, SoftCard;
 
+import '../../../core/profiles/pin.dart';
 import '../bloc/first_run_cubit.dart';
 import '../bloc/first_run_state.dart';
 

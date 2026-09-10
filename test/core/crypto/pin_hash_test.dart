@@ -125,4 +125,41 @@ void main() {
       expect(() => hashPin('123456', future), throwsA(isA<ArgumentError>()));
     });
   });
+
+  group('the digest it compares', () {
+    test('is the same one when the work runs away from this isolate', () async {
+      final params = KdfParams.forNewPin(
+        salt: Uint8List.fromList(List.filled(16, 3)),
+        security: Argon2Security.test,
+      );
+
+      expect(await hashPinAsync('123456', params), hashPin('123456', params));
+    });
+
+    test('matches itself', () {
+      final digest = Uint8List.fromList([1, 2, 3, 4]);
+
+      expect(samePinHash(digest, Uint8List.fromList([1, 2, 3, 4])), isTrue);
+    });
+
+    test('differs when one byte differs', () {
+      expect(
+        samePinHash(
+          Uint8List.fromList([1, 2, 3, 4]),
+          Uint8List.fromList([1, 2, 3, 5]),
+        ),
+        isFalse,
+      );
+    });
+
+    test('differs when the lengths differ', () {
+      expect(
+        samePinHash(
+          Uint8List.fromList([1, 2, 3]),
+          Uint8List.fromList([1, 2, 3, 4]),
+        ),
+        isFalse,
+      );
+    });
+  });
 }

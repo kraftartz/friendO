@@ -1,7 +1,7 @@
 # ADR-0031: A forgotten PIN loses the Profile
 
 **Status:** Accepted
-**Date:** 2026-09-09
+**Date:** 2026-09-09. Wording aligned to the PIN Delay 2026-09-10.
 
 Partly supersedes [ADR-0006](0006-keystore-dek-with-pin-gate.md). The key design in ADR-0006 stands.
 Its promise of a reset flow does not.
@@ -60,8 +60,8 @@ exist**, and the wipe is total. That is accepted.
 | Wrong attempts | What happens |
 |---|---|
 | 1 to 4 | Nothing. A User mistypes. |
-| 5 | The keypad rests for 30 seconds. |
-| 6 and up | The rest doubles: 1, 2, 4, 8 minutes, and stops at 15. |
+| 5 | The keypad waits 30 seconds. |
+| 6 and up | The delay doubles: 1, 2, 4, 8 minutes, and stops at 15. |
 
 A correct PIN clears the count. The count belongs to one Profile, so failures against one never
 delay the other.
@@ -72,7 +72,7 @@ delay the other.
 { id, displayName, pinHash, kdfParams, failedAttempts }
 ```
 
-**Store the count, not a deadline.** Measure the rest with a timer inside the app, from the moment
+**Store the count, not a deadline.** Measure the delay with a timer inside the app, from the moment
 the PIN screen appears. A stored "locked until" time is beaten by changing the phone clock. A count
 held only in memory is beaten by closing the app. A stored count with an in-app timer is beaten by
 neither, and it is less code than either.

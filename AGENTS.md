@@ -186,6 +186,16 @@ which would let the domain resolve Flutter and reduce the boundary to a lint.
 - Nothing in the domain reads the clock. A function that needs the current time takes it as an
   argument, which is also what makes it testable.
 
+### Imports
+
+Name what you take. Put a `show` on an import of a barrel, and list the symbols the file uses. This
+holds for every import of `package:friendo_ui/friendo_ui.dart`, which exports `Soft`, `PinKeypad`,
+`PinDot`, `PinDots`, `SoftCard`, `initialOf` and `colourOf`. A reader then sees what the file needs
+without reading the file. Copy the shape of `import 'dart:ui' show lerpDouble;` in
+`packages/friendo_ui/lib/src/tokens/soft.dart`.
+
+Import the barrel, never a file under `src/`. The `implementation_imports` lint fails that build.
+
 ### Tests
 
 Test real behaviour against a real engine. Do not assert on mocks. See

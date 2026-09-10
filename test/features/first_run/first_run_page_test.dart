@@ -8,10 +8,11 @@ import 'package:friendo/core/db/database_session.dart';
 import 'package:friendo/core/profiles/data_key_store.dart';
 import 'package:friendo/core/profiles/profile_creator.dart';
 import 'package:friendo/core/profiles/profile_list.dart';
+import 'package:friendo/core/profiles/profile_session.dart';
 import 'package:friendo/features/first_run/bloc/first_run_cubit.dart';
 import 'package:friendo/features/first_run/bloc/first_run_state.dart';
 import 'package:friendo/features/first_run/view/first_run_page.dart';
-import 'package:friendo_ui/friendo_ui.dart';
+import 'package:friendo_ui/friendo_ui.dart' show PinKeypad, Soft;
 import 'package:hashlib/hashlib.dart';
 
 /// What the screens must show, and nothing that the cubit tests already hold.
@@ -36,6 +37,11 @@ void main() {
         databases: databases,
         dataKeys: const DataKeyStore(),
         security: Argon2Security.test,
+      ),
+      ProfileSession(
+        profiles: ProfileList(directory),
+        databases: databases,
+        dataKeys: const DataKeyStore(),
       ),
     );
   });

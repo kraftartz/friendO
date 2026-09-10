@@ -98,6 +98,8 @@ Friends come first, oldest Due Date first.
 _Avoid_: queue, ranking, backlog, sort order, list
 The banned `queue` is the bare word. The **Beads Queue** is a different thing with its own entry: a
 drawing, not a ranking.
+The banned `list` is the word for a ranking. A plain collection of things keeps the word, as in the
+Profile list, which ranks nothing.
 
 **On Track**:
 Every Friend who is not Overdue. It is the second half of the Priority Order, ranked by highest
@@ -108,6 +110,8 @@ _Avoid_: healthy, safe, ok, current
 One Friend reduced to what the Dial needs: their Cadence, Due Date, Phase and Standing. The app
 works one out on read and never stores one.
 _Avoid_: item, row, entry, record, DTO
+The banned `row` is the word for a Friend the Dial draws. A row in a database table keeps the word,
+because it is a thing in the store and not a reading of a Friend.
 
 ### The Dial
 
@@ -190,6 +194,16 @@ _Avoid_: event, reminder, key date
 **PIN**:
 The short code that unlocks a Profile.
 _Avoid_: passcode, password, passphrase, code
+
+**PIN Delay**:
+The wait the keypad imposes after wrong PINs. It grows with each further wrong try, and it is
+measured from the moment the keypad appears. See
+[ADR-0031](docs/adr/0031-a-forgotten-pin-loses-the-profile.md).
+_Avoid_: rest, cooldown, lockout, backoff, penalty, throttle
+The banned `rest` is the word for this wait. A Bead resting at 12:00 keeps the word, and so does a
+Friend resting on their Due Date, which **Nearing** already writes that way.
+`timeout` is not banned. It names the auto-lock's idle limit, which is a different wait with a
+different trigger. Nor is the bare `delay`, which is free for anything else that waits.
 
 **Backup Passphrase**:
 The separate, longer secret that unlocks a Backup. It is never the PIN.

@@ -38,7 +38,7 @@ holding a Friend is holding private text behind a PIN screen. A write that arriv
 late has nowhere to go.
 
 **A wrong PIN has to cost something.** [ADR-0031](../adr/0031-a-forgotten-pin-loses-the-profile.md)
-rests the keypad after five wrong tries, and the rest must survive the User closing the app and
+delays the keypad after five wrong tries, and the delay must survive the User closing the app and
 moving the phone's clock.
 
 ## Solution
@@ -96,12 +96,12 @@ the six digits.
 
 14. As a User, I want the first four mistakes to cost nothing, so that a mistyped digit is not
     punished.
-15. As a User, I want the keypad to rest after five wrong tries, so that somebody guessing my PIN
+15. As a User, I want the keypad to wait after five wrong tries, so that somebody guessing my PIN
     runs out of patience.
-16. As a User, I want each further wrong try to rest longer, so that guessing gets worse and worse.
-17. As a User, I want the rest to survive me closing the app, so that a guesser cannot skip it by
+16. As a User, I want each further wrong try to wait longer, so that guessing gets worse and worse.
+17. As a User, I want the delay to survive me closing the app, so that a guesser cannot skip it by
     force-quitting.
-18. As a User, I want the rest to survive the phone's clock changing, so that a guesser cannot skip
+18. As a User, I want the delay to survive the phone's clock changing, so that a guesser cannot skip
     it by moving the date.
 19. As a User, I want a correct PIN to clear the count, so that yesterday's mistakes do not follow
     me.
@@ -109,7 +109,7 @@ the six digits.
     bad memory is not my problem.
 21. As a User, I want the app never to wipe a Profile after wrong tries, so that a child at the
     keypad cannot destroy my Friends.
-22. As a User, I want to see how long the rest has left, so that I know the app is not broken.
+22. As a User, I want to see how long the delay has left, so that I know the app is not broken.
 
 ### Being away from the app
 
@@ -178,7 +178,7 @@ The work splits along lines the records already drew. Nothing here invents a new
 | `core/profiles/` | `profiles.json`, the PIN hash, the wrapped data key by name | Reading, verifying, unlocking, the attempt count |
 | `core/db/` | The open connection, the schema, migrations | Everything except the create-and-close half |
 | `core/security/` | *When* to lock: the timer, the lifecycle, screen privacy | All of it |
-| `features/auth/` | The picker, the keypad, the rest countdown | All of it |
+| `features/auth/` | The picker, the keypad, the PIN Delay countdown | All of it |
 
 [ADR-0025](../adr/0025-one-owner-for-the-database-connection.md) sets the split between the last
 three: `core/security/` decides when to lock, and `core/db/` decides what closing means. The timer
@@ -216,7 +216,7 @@ One object in `core/profiles/` walks the whole path from six digits to an open c
 the only new seam this spec adds.
 
 ```
-unlock(profileId, pin) -> Unlocked | WrongPin(attempts) | Resting(remaining) | Failed(reason)
+unlock(profileId, pin) -> Unlocked | WrongPin(attempts) | PinDelayed(remaining) | Failed(reason)
 lock()                                  closes the connection and drops the key
 ```
 
@@ -238,7 +238,7 @@ fix and the other does not.
 
 ```
 1. read     the Profile row: pinHash, kdfParams (with the salt), failedAttempts
-2. rest     if failedAttempts is 5 or more, refuse and report the remaining time
+2. delay    if failedAttempts is 5 or more, refuse and report the remaining time
 3. hash     the PIN with the row's own kdfParams, in a separate isolate
 4. compare  the digest against pinHash, in constant time
 5. count    on a mismatch, write failedAttempts + 1 and stop
@@ -276,7 +276,7 @@ install unfixable.
 | What happened | What the User is told | What the app does |
 |---|---|---|
 | The digest does not match | The PIN is wrong | Counts the attempt |
-| `failedAttempts` is 5 or more | The keypad is resting, with the time left | Refuses before hashing |
+| `failedAttempts` is 5 or more | The keypad is waiting, with the time left | Refuses before hashing |
 | `dataKey.<profileId>` is missing | This Profile cannot be opened on this phone | Counts nothing |
 | The file will not open with the stored key | This Profile cannot be opened | Counts nothing |
 | The migration fails | The app could not update the stored data | Counts nothing |
@@ -285,27 +285,27 @@ The last three are not the User's mistake, so none of them touches `failedAttemp
 after a successful hash means the store lost the item or the app data was partly cleared. It is
 rare, it is final, and it must not read as "try again".
 
-### The rest, and which clock measures it
+### The PIN Delay, and which clock measures it
 
 [ADR-0031](../adr/0031-a-forgotten-pin-loses-the-profile.md) fixes the table and the storage:
 
-| Wrong attempts | Rest |
+| Wrong attempts | PIN Delay |
 |---|---|
 | 1 to 4 | none |
 | 5 | 30 seconds |
 | 6 and up | 1, 2, 4, 8 minutes, and then 15 for every further try |
 
-The count is stored. The deadline is not. The rest is measured **from the moment the PIN screen
+The count is stored. The deadline is not. The delay is measured **from the moment the PIN screen
 appears**, by a timer inside the app.
 
 Two timers exist in this spec and they use different clocks on purpose.
 
 | Timer | Clock | Why |
 |---|---|---|
-| The rest after wrong PINs | An in-app timer, from when the screen appears | The phone's clock belongs to whoever holds the phone |
+| The PIN Delay after wrong PINs | An in-app timer, from when the screen appears | The phone's clock belongs to whoever holds the phone |
 | The auto-lock | Wall clock, through `core/time/` | The app is not running to hold a timer while suspended |
 
-The rest applies **on arrival at the keypad**, computed from the stored count, and not only after a
+The delay applies **on arrival at the keypad**, computed from the stored count, and not only after a
 failure in this run of the app. That is what makes closing the app cost the guesser the wait
 instead of skipping it.
 
@@ -355,11 +355,14 @@ state                      Stream<DatabaseState>:  locked | opening | open
 database                   the drift database while open; throws while locked
 ```
 
-- `opening` exists so that the keypad can show that work is happening. It covers the hash, the
-  unwrap, the open and the migration, which together are the only visible wait in the app.
-- `state` is a broadcast stream and it replays its current value to a new listener. A repository
-  that subscribes after the Profile opened must not wait for the next change to learn that it is
-  open.
+- `opening` exists so that the keypad can show that work is happening. It covers the unwrap, the
+  open and the migration. It does **not** cover the hash, which runs before the connection owner
+  is asked for anything and is most of the wait. The keypad therefore draws its working sign from
+  its own step, and `opening` says where the connection stands rather than what the User waits on.
+- `state` takes many listeners and replays its current value to each new one. A repository that
+  subscribes after the Profile opened must not wait for the next change to learn that it is open.
+  It is not a broadcast stream: a broadcast stream replays nothing, so `Stream.multi` is what
+  gives the late listener the first fact it needs.
 - `close()` is safe to call while already locked, because the auto-lock and a deliberate lock can
   both arrive.
 - `open()` on an already-open Profile is a defect and throws. Switching Profile closes first.
@@ -512,13 +515,13 @@ that would have to be deleted when the real schema arrives.
     than a wrong PIN.
 17. Unlocking Profile A and then Profile B reads only B's Friends, with A's file closed.
 
-**The rest:**
+**The PIN Delay:**
 
-18. Four wrong PINs impose no rest.
+18. Four wrong PINs impose no delay.
 19. The fifth wrong PIN sets the count to 5, and the next arrival at the keypad is refused with a
-    30-second rest.
-20. A refusal while resting does not increment the count further, and does not hash the PIN.
-21. The rest doubles with each further wrong try and stops at 15 minutes.
+    30-second delay.
+20. A refusal while waiting does not increment the count further, and does not hash the PIN.
+21. The delay doubles with each further wrong try and stops at 15 minutes.
 22. A correct PIN after four wrong ones opens the Profile and clears the count.
 23. Wrong tries against one Profile leave the other Profile's count at `0`.
 24. A new Profile session, made after the count reached 5, still refuses. The count survives a
@@ -549,7 +552,7 @@ that would have to be deleted when the real schema arrives.
 37. A bloc holding data clears it when `state` becomes `locked`.
 38. A bloc distinguishes "locked" from "no rows", and does not draw an empty list while locked.
 39. The keypad submits on the sixth digit and not on the fifth.
-40. The keypad reports the remaining rest while resting, and refuses input.
+40. The keypad reports the remaining delay while waiting, and refuses input.
 
 ### Prior art
 
@@ -565,7 +568,11 @@ that would have to be deleted when the real schema arrives.
 ## Out of Scope
 
 **First Run.** [docs/spec/first-run.md](first-run.md) holds it. This spec consumes what that one
-creates and adds nothing to the creation path.
+creates, and adds one call to the creation path: First Run opens the Profile it has just made.
+[ADR-0030](../adr/0030-first-run-creates-one-profile.md) says First Run is three screens and the
+third one is the app, so a keypad between the cost screen and the Dial would contradict the record.
+The call is `ProfileSession.openProfile`, which takes no PIN, because the User chose that PIN and
+typed it twice a moment before.
 
 **The Friend aggregate and the schema.** `friendO-xdb` owns the tables and the rows. This spec owns
 the connection those tables live in, the migration machinery that moves them forward, and the

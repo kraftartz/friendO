@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:friendo_ui/friendo_ui.dart';
+import 'package:friendo_ui/friendo_ui.dart' show PinDots, PinKeypad, Soft;
 import 'package:widgetbook/widgetbook.dart';
 
 Widget pinKeypadUseCase(BuildContext context) {

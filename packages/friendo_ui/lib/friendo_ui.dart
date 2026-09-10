@@ -6,6 +6,7 @@
 /// and previewable.
 library;
 
+export 'src/text/text_look.dart';
 export 'src/tokens/soft.dart';
 export 'src/widgets/pin_keypad.dart';
 export 'src/widgets/soft_card.dart';

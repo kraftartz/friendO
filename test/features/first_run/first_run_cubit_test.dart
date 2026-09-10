@@ -7,6 +7,7 @@ import 'package:friendo/core/db/database_session.dart';
 import 'package:friendo/core/profiles/data_key_store.dart';
 import 'package:friendo/core/profiles/profile_creator.dart';
 import 'package:friendo/core/profiles/profile_list.dart';
+import 'package:friendo/core/profiles/profile_session.dart';
 import 'package:friendo/features/first_run/bloc/first_run_cubit.dart';
 import 'package:friendo/features/first_run/bloc/first_run_state.dart';
 import 'package:hashlib/hashlib.dart';
@@ -53,7 +54,14 @@ void main() {
     directory.deleteSync(recursive: true);
   });
 
-  FirstRunCubit build() => FirstRunCubit(creator);
+  FirstRunCubit build() => FirstRunCubit(
+    creator,
+    ProfileSession(
+      profiles: profiles,
+      databases: databases,
+      dataKeys: const DataKeyStore(),
+    ),
+  );
 
   FirstRunCubit named([String name = 'Michal']) => build()..submitName(name);
 
@@ -173,6 +181,11 @@ void main() {
           databases: UncreatableDatabase(directory),
           dataKeys: const DataKeyStore(),
           security: Argon2Security.test,
+        ),
+        ProfileSession(
+          profiles: profiles,
+          databases: databases,
+          dataKeys: const DataKeyStore(),
         ),
       )..submitName('Michal');
     });

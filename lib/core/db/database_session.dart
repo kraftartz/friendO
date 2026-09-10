@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 import 'dart:typed_data';
 
@@ -8,94 +9,172 @@ import 'package:sqlite3/sqlite3.dart' as sqlite;
 import '../crypto/hex.dart';
 import 'app_database.dart';
 
-/// The one owner of the open connection.
+/// Where the one connection stands.
 ///
-/// Nothing else opens or closes a database file. A second owner would keep a
-/// dead handle after a close, and the key would stay in it.
+/// `opening` covers the hash, the unwrap, the open and the migration together,
+/// which is the only visible wait in the app.
+enum DatabaseState { locked, opening, open }
+
+/// Thrown by every read and every write that arrives while no Profile is open.
 ///
-/// It opens, it closes, and it hands out the database while one is open. It
-/// publishes no state stream yet, so nothing can watch it across a lock.
+/// A write cannot wait for the next unlock and it must not be dropped in
+/// silence, so it fails with this and the caller says so.
+class DatabaseLockedError implements Exception {
+  const DatabaseLockedError();
+
+  @override
+  String toString() => 'DatabaseLockedError: no Profile is open';
+}
+
+/// The one owner of the connection to a Profile's encrypted file.
+///
+/// It opens one file at a time, publishes where it stands, and hands out the
+/// database while that file is open. It keeps the key no longer than the file.
 class DatabaseSession {
   DatabaseSession(this.directory);
 
-  /// The directory that holds the files. It arrives as an argument, so this
-  /// code asks the phone for no path of its own.
   final Directory directory;
+
+  final StreamController<DatabaseState> _changes =
+      StreamController<DatabaseState>.broadcast();
+
+  DatabaseState _state = DatabaseState.locked;
 
   AppDatabase? _database;
 
-  /// The open database.
+  /// Where the connection stands at this moment.
   ///
-  /// Throws [StateError] while no Profile is open, because a query with no key
-  /// behind it has no answer.
+  /// A caller that must decide now reads this. A caller that must follow the
+  /// changes listens to [state]. Both read the one field.
+  DatabaseState get stateNow => _state;
+
+  /// Where the connection stands, from now on.
+  ///
+  /// A listener that arrives late reads where it stands first, so that it
+  /// learns the Profile is open without waiting for the next change.
+  Stream<DatabaseState> get state => Stream<DatabaseState>.multi((listener) {
+    listener.add(_state);
+    listener.addStream(_changes.stream);
+  });
+
   AppDatabase get database {
     final open = _database;
     if (open == null) {
-      throw StateError('No Profile is open.');
+      throw const DatabaseLockedError();
     }
 
     return open;
   }
 
-  /// The file that holds the Profile with this id.
   File fileOf(String profileId) =>
       File(p.join(directory.path, 'friendo_$profileId.db'));
 
-  /// Opens the file of [profileId] with [dataKey], and creates it when it is
-  /// absent.
+  /// Opens the Profile's file with [dataKey] and migrates it.
   ///
-  /// It returns a database that stands at the current schema version, because
-  /// it runs the migration before it returns.
-  ///
-  /// Throws when [dataKey] does not open the file. An encrypted file read with
-  /// the wrong key is not a database.
+  /// It throws a [StateError] when a Profile is already open. Switching
+  /// Profile closes the first file, and an open over an open one is a defect.
   Future<AppDatabase> open(String profileId, Uint8List dataKey) async {
-    await close();
+    if (_database != null) {
+      throw StateError('A Profile is already open.');
+    }
+
+    _publish(DatabaseState.opening);
 
     final database = AppDatabase(
       NativeDatabase(fileOf(profileId), setup: (raw) => _unlock(raw, dataKey)),
     );
 
     try {
+      // The migration and a wrong key both show themselves on the first
+      // query, so open means open only after one has run.
       await database.customSelect('select 1').getSingle();
     } on Object {
       await database.close();
+      _publish(DatabaseState.locked);
       rethrow;
     }
     _database = database;
+    _publish(DatabaseState.open);
 
     return database;
   }
 
-  /// Closes the open database, and does nothing when none is open.
+  /// Closes the file, if one is open, and reports the Profile locked.
   ///
-  /// The key leaves the connection here. That is what makes a lock a lock.
+  /// It is safe while already locked, because a timer and a deliberate lock
+  /// can both arrive. The key goes with the closed handle that held it.
   Future<void> close() async {
     final open = _database;
     _database = null;
     await open?.close();
+    _publish(DatabaseState.locked);
   }
 
-  /// Hands the key to the engine, and holds the file to the settings that keep
-  /// all of it private.
+  /// Follows [query] while the Profile is open, and goes quiet while it is not.
   ///
-  /// The key comes first. A statement before it reads a file the engine cannot
-  /// decrypt yet.
+  /// The returned stream stays alive across a lock, so one subscription lasts
+  /// the life of a screen. It runs [query] again on every unlock, which is
+  /// what makes the rows after a lock fresh rather than stale.
+  Stream<T> watch<T>(Stream<T> Function(AppDatabase database) query) {
+    StreamSubscription<DatabaseState>? whileOpen;
+    StreamSubscription<T>? rows;
+    late StreamController<T> found;
+    var turn = 0;
+
+    // Stream.listen does not hold the next event back while an async handler
+    // runs, so every await below is a place the next state can arrive first.
+    // The turn says which call is still the current one. A call that finds
+    // the number moved gives up, because a later call already knows better.
+    Future<void> follow(DatabaseState state) async {
+      final mine = ++turn;
+
+      await rows?.cancel();
+      if (mine != turn) return;
+
+      rows = null;
+      if (state != DatabaseState.open) return;
+
+      // Not the throwing getter. close() drops the handle before it says
+      // locked, so an open that was true when this call started can be false
+      // by the time it gets here.
+      final database = _database;
+      if (database == null) return;
+
+      rows = query(database).listen(found.add, onError: found.addError);
+    }
+
+    found = StreamController<T>(
+      onListen: () => whileOpen = state.listen(follow),
+      onCancel: () async {
+        await whileOpen?.cancel();
+        await rows?.cancel();
+      },
+    );
+
+    return found.stream;
+  }
+
+  /// Closes the stream of changes. The session serves nothing after this.
+  ///
+  /// A session lives as long as the app, so this exists for a test that builds
+  /// many of them rather than for the running app.
+  Future<void> dispose() async {
+    await close();
+    await _changes.close();
+  }
+
+  void _publish(DatabaseState state) {
+    _state = state;
+    _changes.add(state);
+  }
+
   void _unlock(sqlite.Database raw, Uint8List dataKey) {
-    // The cipher is named rather than left to the default, so a later build
-    // with a different default cannot quietly change what the file is
-    // encrypted with. It must be chosen before the key is given.
     raw.execute('pragma cipher = chacha20');
 
     raw.execute("pragma key = \"x'${hex(dataKey)}'\"");
 
-    // A sort that spills to a file writes private text in the clear, because
-    // sqlite3mc encrypts the database, the journal and the write-ahead log,
-    // and not the temporary files.
     raw.execute('pragma temp_store = 2');
 
-    // No part of the file is readable, and the write-ahead log is encrypted
-    // too. Both are the defaults, and both are cheap to state.
     raw.execute('pragma plaintext_header_size = 0');
     raw.execute('pragma mc_legacy_wal = 0');
   }

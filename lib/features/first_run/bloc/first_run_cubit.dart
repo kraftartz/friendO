@@ -2,12 +2,10 @@ import 'dart:async';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../core/profiles/pin.dart';
 import '../../../core/profiles/profile_creator.dart';
+import '../../../core/profiles/profile_session.dart';
 import 'first_run_state.dart';
-
-/// The number of digits in a PIN. The last one submits it, so no confirm
-/// button is needed here or at any later unlock.
-const pinLength = 6;
 
 /// Walks First Run from an empty phone to a Profile that opens.
 ///
@@ -15,9 +13,11 @@ const pinLength = 6;
 /// cost screen appears. The PIN then leaves this state at the earliest moment
 /// it can, and the cost screen has no way to fail.
 class FirstRunCubit extends Cubit<FirstRunState> {
-  FirstRunCubit(this._creator) : super(const FirstRunState());
+  FirstRunCubit(this._creator, this._session) : super(const FirstRunState());
 
   final ProfileCreator _creator;
+
+  final ProfileSession _session;
 
   /// Takes the name and asks for the PIN.
   ///
@@ -83,7 +83,12 @@ class FirstRunCubit extends Cubit<FirstRunState> {
     emit(FirstRunState(step: FirstRunStep.working, name: name));
 
     try {
-      await _creator.createProfile(name, pin);
+      final profile = await _creator.createProfile(name, pin);
+      // The User chose this PIN and typed it twice a moment ago, so the
+      // Profile opens without a third asking. A Profile that will not open
+      // still reaches the cost screen: it exists, and making a second one
+      // would be worse than asking for the PIN at the next start.
+      await _session.openProfile(profile.id);
       emit(FirstRunState(step: FirstRunStep.cost, name: name));
     } on Object {
       emit(

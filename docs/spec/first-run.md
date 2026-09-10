@@ -440,7 +440,7 @@ connections to repositories. None of it is here.
 an object that publishes `locked`, `opening` and `open`, closes on a timer and re-opens. This spec
 builds only the part that creates a file. The rest arrives with the unlock work.
 
-**The retry delay.** [ADR-0031](../adr/0031-a-forgotten-pin-loses-the-profile.md) sets a rest after
+**The retry delay.** [ADR-0031](../adr/0031-a-forgotten-pin-loses-the-profile.md) sets a delay after
 five wrong attempts. First Run writes `failedAttempts: 0` and reads it never.
 
 **The Profile picker**, which appears only when two Profiles exist.

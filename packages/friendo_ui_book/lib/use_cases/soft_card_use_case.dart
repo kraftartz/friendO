@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:friendo_ui/friendo_ui.dart';
+import 'package:friendo_ui/friendo_ui.dart' show Soft, SoftCard;
 import 'package:widgetbook/widgetbook.dart';
 
 /// Show a SoftCard whose corner radius is bound to a slider.

@@ -198,6 +198,7 @@ friendO/
 |   |                            The aggregate. It refuses to lose its last meeting.
 |   |
 |   +-- friendo_ui/              Flutter. No BLoC. No repository. No domain.
+|   |   +-- text/                A colour and an initial, from any text.
 |   |   +-- tokens/              Soft theme extension. Colours, shadows, radii.
 |   |   +-- widgets/             SoftCard, SoftWell, SoftButton, Pill, Glow, AvatarHalo
 |   |
@@ -206,8 +207,9 @@ friendO/
 +-- lib/
 |   +-- core/                    Shared services used by many features
 |   |   +-- crypto/              Key wrapping, Argon2id, framed AES-GCM
-|   |   +-- db/                  drift tables, SQLCipher setup, migrations, and
-|   |   |                        the one owner of the open connection
+|   |   +-- db/                  SQLCipher setup, migrations, and the one owner of
+|   |   |                        the open connection. One file per table in
+|   |   |                        tables/.
 |   |   +-- friends/             FriendRepository. The whole aggregate, and the
 |   |   |                        only place that reads or writes these tables.
 |   |   +-- reminders/           Watches the repository. Reschedules. No feature
@@ -218,6 +220,7 @@ friendO/
 |   |   |                        Profile is unlocked, so it belongs to no
 |   |   |                        feature.
 |   |   +-- security/            App lock, screen privacy, auto-lock
+|   |   +-- text/                The fold that search matches, and nothing else
 |   |   +-- time/                Clock. Every "now" comes from here.
 |   |
 |   +-- features/                One folder per user-facing area
