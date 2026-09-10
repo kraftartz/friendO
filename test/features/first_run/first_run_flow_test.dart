@@ -14,6 +14,8 @@ import 'package:friendo/features/first_run/bloc/first_run_state.dart';
 import 'package:friendo/features/first_run/view/first_run_page.dart';
 import 'package:hashlib/hashlib.dart';
 
+import '../../support/creator_in.dart';
+
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
@@ -42,14 +44,20 @@ void main() {
     tester,
   ) async {
     await tester.pumpWidget(
-      FriendoApp(creator: creator, firstScreen: const StartFirstRun()),
+      FriendoApp(
+        creator: creator,
+        session: sessionIn(directory),
+        firstScreen: const StartFirstRun(),
+      ),
     );
 
     expect(find.byType(FirstRunPage), findsOneWidget);
   });
 
   testWidgets('a phone with a Profile starts on the Dial', (tester) async {
-    await tester.pumpWidget(FriendoApp(creator: creator));
+    await tester.pumpWidget(
+      FriendoApp(creator: creator, session: sessionIn(directory)),
+    );
 
     expect(find.byType(FirstRunPage), findsNothing);
     expect(find.text('Dial'), findsOneWidget);
@@ -57,7 +65,11 @@ void main() {
 
   testWidgets('the cost screen leads to the Dial', (tester) async {
     await tester.pumpWidget(
-      FriendoApp(creator: creator, firstScreen: const StartFirstRun()),
+      FriendoApp(
+        creator: creator,
+        session: sessionIn(directory),
+        firstScreen: const StartFirstRun(),
+      ),
     );
 
     final cubit = BlocProvider.of<FirstRunCubit>(

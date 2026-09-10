@@ -7,6 +7,7 @@ import 'core/db/database_session.dart';
 import 'core/profiles/data_key_store.dart';
 import 'core/profiles/profile_creator.dart';
 import 'core/profiles/profile_list.dart';
+import 'core/profiles/profile_session.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -20,6 +21,11 @@ Future<void> main() async {
     FriendoApp(
       firstScreen: await readFirstScreen(profiles),
       creator: ProfileCreator(
+        profiles: profiles,
+        databases: databases,
+        dataKeys: dataKeys,
+      ),
+      session: ProfileSession(
         profiles: profiles,
         databases: databases,
         dataKeys: dataKeys,

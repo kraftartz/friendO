@@ -12,7 +12,10 @@ void main() {
       tester,
     ) async {
       await tester.pumpWidget(
-        FriendoApp(creator: creatorIn(Directory.systemTemp)),
+        FriendoApp(
+          creator: creatorIn(Directory.systemTemp),
+          session: sessionIn(Directory.systemTemp),
+        ),
       );
 
       // 12 days into a 30 day Cadence.
@@ -21,7 +24,10 @@ void main() {
 
     testWidgets('shows one destination per section', (tester) async {
       await tester.pumpWidget(
-        FriendoApp(creator: creatorIn(Directory.systemTemp)),
+        FriendoApp(
+          creator: creatorIn(Directory.systemTemp),
+          session: sessionIn(Directory.systemTemp),
+        ),
       );
 
       for (final section in AppSection.values) {
@@ -31,7 +37,10 @@ void main() {
 
     testWidgets('the bar switches the visible page', (tester) async {
       await tester.pumpWidget(
-        FriendoApp(creator: creatorIn(Directory.systemTemp)),
+        FriendoApp(
+          creator: creatorIn(Directory.systemTemp),
+          session: sessionIn(Directory.systemTemp),
+        ),
       );
       expect(find.text('Friends page'), findsNothing);
 
@@ -45,7 +54,10 @@ void main() {
 
     testWidgets('returns to the Dial with its state intact', (tester) async {
       await tester.pumpWidget(
-        FriendoApp(creator: creatorIn(Directory.systemTemp)),
+        FriendoApp(
+          creator: creatorIn(Directory.systemTemp),
+          session: sessionIn(Directory.systemTemp),
+        ),
       );
 
       await tester.tap(find.text('Settings'));
