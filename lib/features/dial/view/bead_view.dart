@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:friendo/features/dial/bloc/dial_state.dart' show DialBead;
-import 'package:friendo_ui/friendo_ui.dart'
-    show AvatarHalo, colourOf, initialOf;
+import 'package:friendo_ui/friendo_ui.dart' show AvatarHalo, initialOf;
 
 /// One Friend, drawn on their Orbit.
 ///
@@ -16,6 +15,7 @@ import 'package:friendo_ui/friendo_ui.dart'
 class BeadView extends StatelessWidget {
   const BeadView({
     required this.bead,
+    required this.colour,
     required this.width,
     required this.onTap,
     this.isEmphasised = false,
@@ -23,6 +23,11 @@ class BeadView extends StatelessWidget {
   });
 
   final DialBead bead;
+
+  /// The Avatar's colour. It arrives as an argument because no two Friends on
+  /// one Dial may share one, and that is an assignment made against the whole
+  /// roster rather than a reading of this one Friend.
+  final Color colour;
 
   final double width;
 
@@ -38,7 +43,7 @@ class BeadView extends StatelessWidget {
       onTap: onTap,
       child: AvatarHalo(
         label: initialOf(bead.name),
-        colour: colourOf(bead.friend.avatarSeed),
+        colour: colour,
         size: width,
         isLit: isEmphasised,
       ),

@@ -14,7 +14,7 @@ import 'package:friendo/features/dial/view/instrument_painter.dart'
 import 'package:friendo/features/dial/view/overflow_badge_view.dart'
     show OverflowBadgeView;
 import 'package:friendo_domain/friendo_domain.dart' show Orbit;
-import 'package:friendo_ui/friendo_ui.dart' show Soft;
+import 'package:friendo_ui/friendo_ui.dart' show Soft, colourOf, coloursFor;
 
 /// Where one Bead is travelling, and between which two Orbits.
 class _Journey {
@@ -73,11 +73,16 @@ class _DialViewState extends State<DialView>
 
   Timer? _resting;
 
+  /// One colour per Friend on the Dial, worked out against the whole roster so
+  /// that no two of them are alike.
+  late Map<String, Color> _colours = _coloursIn(widget.reading);
+
   @override
   void didUpdateWidget(DialView old) {
     super.didUpdateWidget(old);
     if (widget.reading == old.reading) return;
 
+    _colours = _coloursIn(widget.reading);
     _setOff(from: old.reading, to: widget.reading);
   }
 
@@ -209,6 +214,11 @@ class _DialViewState extends State<DialView>
     return null;
   }
 
+  Map<String, Color> _coloursIn(DialState reading) => coloursFor([
+    for (final orbit in reading.orbits)
+      for (final bead in orbit.beads) bead.friend.avatarSeed,
+  ]);
+
   Map<String, ({Orbit orbit, double lapFraction})> _placesIn(
     DialState reading,
   ) => {
@@ -230,6 +240,7 @@ class _DialViewState extends State<DialView>
           BeadView(
             key: Key('bead-${bead.id}'),
             bead: bead,
+            colour: _colourOf(bead),
             width: widget.geometry.beadWidth,
             isEmphasised: bead.id == widget.reading.emphasisedId,
             onTap: () => widget.onTapBead?.call(bead),
@@ -265,6 +276,11 @@ class _DialViewState extends State<DialView>
     return waiting ? badge.count - 1 : badge.count;
   }
 
+  /// A Bead on its way into the Overflow is no longer in the roster the
+  /// colours were worked out from, so it keeps the one it asked for.
+  Color _colourOf(DialBead bead) =>
+      _colours[bead.friend.avatarSeed] ?? colourOf(bead.friend.avatarSeed);
+
   Widget _leavingBead(DialBead bead) => _at(
     bead.id,
     bead.friend.cadence.orbit,
@@ -272,6 +288,7 @@ class _DialViewState extends State<DialView>
     BeadView(
       key: Key('bead-${bead.id}'),
       bead: bead,
+      colour: _colourOf(bead),
       width: widget.geometry.beadWidth,
       onTap: () => widget.onTapBead?.call(bead),
     ),

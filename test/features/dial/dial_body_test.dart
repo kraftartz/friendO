@@ -8,6 +8,7 @@ import 'package:friendo/features/dial/packing/dial_geometry.dart'
     show DialGeometry;
 import 'package:friendo/features/dial/packing/dial_reading.dart' show readDial;
 import 'package:friendo/features/dial/view/dial_body.dart' show DialBody;
+import 'package:friendo/features/dial/view/bead_view.dart' show BeadView;
 import 'package:friendo/features/dial/view/dial_view.dart' show DialView;
 import 'package:friendo_domain/friendo_domain.dart'
     show Cadence, CivilDate, DialCounts, Orbit, Standing;
@@ -254,5 +255,35 @@ void main() {
       find.byType(RepaintBoundary).last,
       matchesGoldenFile('goldens/dial.png'),
     );
+  });
+
+  testWidgets('no two Friends on the Dial draw the same colour', (
+    tester,
+  ) async {
+    // Thirty on one Orbit, which is more than it can draw, so the Beads that
+    // fit come from a roster large enough for a collision to be likely.
+    await show(
+      tester,
+      reading(
+        orbits: [
+          DialOrbit(
+            orbit: Orbit.middle,
+            beads: [
+              for (var index = 0; index < 20; index++)
+                aBead('friend-$index', 1 - index * 0.04),
+            ],
+          ),
+        ],
+        emphasisedId: 'friend-0',
+      ),
+    );
+
+    final drawn = tester
+        .widgetList<BeadView>(find.byType(BeadView))
+        .map((bead) => bead.colour)
+        .toList();
+
+    expect(drawn, hasLength(20));
+    expect(drawn.toSet(), hasLength(20));
   });
 }
