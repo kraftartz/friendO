@@ -27,7 +27,7 @@ void main() {
   });
 
   tearDown(() async {
-    await wiring.databases.close();
+    await wiring.dispose();
     directory.deleteSync(recursive: true);
   });
 

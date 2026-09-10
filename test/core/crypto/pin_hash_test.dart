@@ -133,7 +133,7 @@ void main() {
         security: Argon2Security.test,
       );
 
-      expect(await hashPinApart('123456', params), hashPin('123456', params));
+      expect(await hashPinAsync('123456', params), hashPin('123456', params));
     });
 
     test('matches itself', () {

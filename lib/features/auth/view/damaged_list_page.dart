@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:friendo_ui/friendo_ui.dart';
+import 'package:friendo_ui/friendo_ui.dart' show SoftCard;
 
 /// The stop the app makes when it cannot read the list of Profiles.
 ///

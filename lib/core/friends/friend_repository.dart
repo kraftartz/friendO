@@ -78,6 +78,9 @@ class FriendRepository {
             ),
           );
 
+      // Read before the clear, because the clear takes the answer away.
+      final born = await _bornAtOf(database, friend.id);
+
       await _clearChildrenOf(database, friend.id);
 
       for (final meeting in friend.meetings) {
@@ -89,7 +92,8 @@ class FriendRepository {
                 friendId: friend.id,
                 happenedOn: meeting.happenedOn.epochDay,
                 happenedAtMinute: Value(meeting.happenedAtMinute),
-                createdAt: clock.now().millisecondsSinceEpoch,
+                createdAt:
+                    born[meeting.id] ?? clock.now().millisecondsSinceEpoch,
                 place: Value(meeting.place),
                 lengthInMinutes: Value(meeting.lengthInMinutes),
                 feeling: Value(meeting.feeling),
@@ -188,6 +192,11 @@ class FriendRepository {
   ///
   /// The last Meeting is the largest Civil Date the Meetings hold, worked out
   /// in the query. Nothing stores it. See ADR-0016.
+  ///
+  /// [now] is read once and holds for the life of the stream. A Standing that
+  /// turns at midnight therefore needs a caller that reads again when the
+  /// Civil Date changes, which is what `core/time` announces. A stream that
+  /// re-read the clock on every row would move a Bead nobody touched.
   Stream<List<FriendPlacing>> watchPlacings({required DateTime now}) =>
       databases.watch(
         (database) => database
@@ -217,6 +226,23 @@ class FriendRepository {
                   .toList(),
             ),
       );
+
+  /// When the store first wrote each Meeting this Friend holds.
+  ///
+  /// A whole save takes every child row away and puts it back. Without this
+  /// the instant would be the time of the last write, and ADR-0021 asks it to
+  /// break a tie between two Meetings on one Civil Date, which a moving
+  /// instant cannot do.
+  Future<Map<String, int>> _bornAtOf(
+    AppDatabase database,
+    String friendId,
+  ) async {
+    final rows = await (database.select(
+      database.meetings,
+    )..where((row) => row.friendId.equals(friendId))).get();
+
+    return {for (final row in rows) row.id: row.createdAt};
+  }
 
   Future<void> _clearChildrenOf(AppDatabase database, String friendId) async {
     await (database.delete(
@@ -327,8 +353,10 @@ class FriendRepository {
 
     return rows
         .map(
-          (row) =>
-              Affinity(id: row.read<String>('id'), label: row.read('label')),
+          (row) => Affinity(
+            id: row.read<String>('id'),
+            label: row.read<String>('label'),
+          ),
         )
         .toList();
   }

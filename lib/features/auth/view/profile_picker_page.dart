@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:friendo_ui/friendo_ui.dart' show colourOf, initialOf;
 
 import '../../../core/profiles/profile.dart';
-import 'profile_look.dart';
 
 /// The choice of Profile, for a phone that holds more than one.
 ///

@@ -119,11 +119,26 @@ class DatabaseSession {
     StreamSubscription<DatabaseState>? whileOpen;
     StreamSubscription<T>? rows;
     late StreamController<T> found;
+    var turn = 0;
 
+    // Stream.listen does not hold the next event back while an async handler
+    // runs, so every await below is a place the next state can arrive first.
+    // The turn says which call is still the current one. A call that finds
+    // the number moved gives up, because a later call already knows better.
     Future<void> follow(DatabaseState state) async {
+      final mine = ++turn;
+
       await rows?.cancel();
+      if (mine != turn) return;
+
       rows = null;
       if (state != DatabaseState.open) return;
+
+      // Not the throwing getter. close() drops the handle before it says
+      // locked, so an open that was true when this call started can be false
+      // by the time it gets here.
+      final database = _database;
+      if (database == null) return;
 
       rows = query(database).listen(found.add, onError: found.addError);
     }
@@ -137,6 +152,15 @@ class DatabaseSession {
     );
 
     return found.stream;
+  }
+
+  /// Closes the stream of changes. The session serves nothing after this.
+  ///
+  /// A session lives as long as the app, so this exists for a test that builds
+  /// many of them rather than for the running app.
+  Future<void> dispose() async {
+    await close();
+    await _changes.close();
   }
 
   void _publish(DatabaseState state) {

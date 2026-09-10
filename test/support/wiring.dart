@@ -35,4 +35,10 @@ class Wiring {
   final ProfileCreator creator;
 
   final ProfileSession session;
+
+  /// Closes the connection and the stream of changes behind it.
+  ///
+  /// A test builds one of these per case, so the session does not live as long
+  /// as the app does and the controller has to be closed by hand.
+  Future<void> dispose() => databases.dispose();
 }

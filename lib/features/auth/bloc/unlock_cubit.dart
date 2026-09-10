@@ -7,8 +7,8 @@ import '../../../core/profiles/profile.dart';
 import '../../../core/profiles/profile_session.dart';
 import 'unlock_state.dart';
 
-/// How often the countdown of a resting keypad is drawn again.
-const restTick = Duration(seconds: 1);
+/// How often the countdown of a waiting keypad is drawn again.
+const pinDelayTick = Duration(seconds: 1);
 
 /// The keypad: six digits in, and a Profile open or a reason why not.
 class UnlockCubit extends Cubit<UnlockState> {
@@ -63,8 +63,8 @@ class UnlockCubit extends Cubit<UnlockState> {
           ),
         );
         await _arrive();
-      case Resting(:final remaining):
-        _rest(remaining);
+      case PinDelayed(:final remaining):
+        _delay(remaining);
       case Failed(:final reason):
         emit(
           state.copyWith(
@@ -78,35 +78,35 @@ class UnlockCubit extends Cubit<UnlockState> {
 
   /// Marks the keypad ready for digits, and rests it when the count says so.
   ///
-  /// The rest starts here and not at a stored deadline, so it costs the same
+  /// The delay starts here and not at a stored deadline, so it costs the same
   /// wait after a fresh start of the app as it does after a wrong PIN.
   Future<void> _arrive() async {
     session.arriveAtKeypad();
-    final rest = await session.restLeftFor(state.profile.id);
-    if (rest > Duration.zero) _rest(rest);
+    final delay = await session.delayLeftFor(state.profile.id);
+    if (delay > Duration.zero) _delay(delay);
   }
 
-  void _rest(Duration remaining) {
-    emit(state.copyWith(step: UnlockStep.resting, typed: '', rest: remaining));
+  void _delay(Duration remaining) {
+    emit(state.copyWith(step: UnlockStep.delayed, typed: '', delay: remaining));
     _countdown?.cancel();
-    _countdown = Timer.periodic(restTick, (timer) {
-      final left = state.rest - restTick;
+    _countdown = Timer.periodic(pinDelayTick, (timer) {
+      final left = state.delay - pinDelayTick;
       if (left > Duration.zero) {
-        emit(state.copyWith(rest: left));
+        emit(state.copyWith(delay: left));
 
         return;
       }
 
       timer.cancel();
-      emit(state.copyWith(step: UnlockStep.typing, rest: Duration.zero));
+      emit(state.copyWith(step: UnlockStep.typing, delay: Duration.zero));
     });
   }
 
-  String _reasonFor(UnlockFailure reason) => switch (reason) {
-    UnlockFailure.dataKeyMissing =>
+  String _reasonFor(UnlockFailureReason reason) => switch (reason) {
+    UnlockFailureReason.dataKeyMissing =>
       'This Profile cannot be opened on this phone.',
-    UnlockFailure.fileWillNotOpen => 'This Profile cannot be opened.',
-    UnlockFailure.migrationFailed =>
+    UnlockFailureReason.fileWillNotOpen => 'This Profile cannot be opened.',
+    UnlockFailureReason.migrationFailed =>
       'The app could not update what it has stored.',
   };
 }

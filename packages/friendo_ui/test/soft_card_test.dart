@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:friendo_ui/friendo_ui.dart';
+import 'package:friendo_ui/friendo_ui.dart' show Soft, SoftCard;
 
 /// Build a SoftCard under a theme carrying [soft], or under no tokens at all.
 Widget _app({Soft? soft}) => MaterialApp(

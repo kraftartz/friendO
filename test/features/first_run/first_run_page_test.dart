@@ -12,7 +12,7 @@ import 'package:friendo/core/profiles/profile_session.dart';
 import 'package:friendo/features/first_run/bloc/first_run_cubit.dart';
 import 'package:friendo/features/first_run/bloc/first_run_state.dart';
 import 'package:friendo/features/first_run/view/first_run_page.dart';
-import 'package:friendo_ui/friendo_ui.dart';
+import 'package:friendo_ui/friendo_ui.dart' show PinKeypad, Soft;
 import 'package:hashlib/hashlib.dart';
 
 /// What the screens must show, and nothing that the cubit tests already hold.

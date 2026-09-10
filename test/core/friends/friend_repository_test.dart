@@ -6,6 +6,7 @@ import 'package:friendo/core/db/database_session.dart';
 import 'package:friendo/core/friends/friend_repository.dart';
 import 'package:friendo_domain/friendo_domain.dart';
 
+import '../../support/fixed_clock.dart';
 import '../../support/wiring.dart';
 
 void main() {
@@ -28,9 +29,20 @@ void main() {
   });
 
   tearDown(() async {
-    await wiring.databases.close();
+    await wiring.dispose();
     directory.deleteSync(recursive: true);
   });
+
+  /// The instant the store says a Meeting row was written.
+  ///
+  /// The domain does not carry it, so a test that cares has to read the row.
+  Future<int> bornAt(String meetingId) async {
+    final row = await (wiring.databases.database.select(
+      wiring.databases.database.meetings,
+    )..where((row) => row.id.equals(meetingId))).getSingle();
+
+    return row.createdAt;
+  }
 
   Meeting aMeeting(String id, int day) =>
       Meeting(id: id, happenedOn: CivilDate(2026, 9, day));
@@ -209,5 +221,25 @@ void main() {
       expect(seen.last.single.name, 'Michał');
       await watching.cancel();
     });
+  });
+
+  test('a second save leaves the first Meeting born when it was', () async {
+    // ADR-0021 gives created_at one job: a stable tiebreak between two
+    // Meetings on one Civil Date. A whole save that stamped it again would
+    // make it the time of the last write, which breaks no tie.
+    final clock = FixedClock(DateTime.utc(2026, 9, 10, 9));
+    final friends = FriendRepository(wiring.databases, clock: clock);
+
+    await friends.save(aFriend());
+    final born = await bornAt('m1');
+
+    clock.advance(const Duration(hours: 3));
+    final second = aMeeting('m2', 4);
+    await friends.save(
+      (await friends.load('f1'))!.logMeeting(second, now: today),
+    );
+
+    expect(await bornAt('m1'), born);
+    expect(await bornAt('m2'), clock.now().millisecondsSinceEpoch);
   });
 }

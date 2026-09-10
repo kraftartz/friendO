@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:friendo_domain/friendo_domain.dart';
-import 'package:friendo_ui/friendo_ui.dart';
+import 'package:friendo_ui/friendo_ui.dart' show SoftCard;
 
 /// A placeholder for the Dial.
 ///

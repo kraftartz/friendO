@@ -1,7 +1,7 @@
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:friendo/core/security/auto_lock.dart';
-import 'package:friendo/core/time/clock.dart';
+import '../../support/fixed_clock.dart';
 
 void main() {
   final wentAway = DateTime.utc(2026, 9, 10, 12);
@@ -121,16 +121,4 @@ void main() {
       expect(locks, isEmpty);
     });
   });
-}
-
-/// A Clock that moves only when a test moves it.
-class FixedClock extends Clock {
-  FixedClock(this._now);
-
-  DateTime _now;
-
-  void advance(Duration step) => _now = _now.add(step);
-
-  @override
-  DateTime now() => _now;
 }

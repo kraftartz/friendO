@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:friendo_ui/friendo_ui.dart';
+import 'package:friendo_ui/friendo_ui.dart' show PinDots, PinKeypad;
 
 import '../../../core/profiles/pin.dart';
 import '../bloc/unlock_cubit.dart';
@@ -41,7 +41,7 @@ class UnlockPage extends StatelessWidget {
                   ),
                 switch (state.step) {
                   UnlockStep.working => const CircularProgressIndicator(),
-                  UnlockStep.resting => Text(restingWords(state.rest)),
+                  UnlockStep.delayed => Text(pinDelayWords(state.delay)),
                   UnlockStep.failed => const SizedBox.shrink(),
                   UnlockStep.typing || UnlockStep.open => Column(
                     children: [
@@ -63,12 +63,17 @@ class UnlockPage extends StatelessWidget {
   );
 }
 
-/// What the keypad says while it rests for [left].
-String restingWords(Duration left) {
-  final seconds = left.inSeconds;
-  if (seconds < 60) return 'Too many wrong PINs. Wait $seconds seconds.';
+/// What the keypad says while it waits out [left].
+///
+/// It rounds up, so that the words never tell the User to wait less than the
+/// keypad will make them wait.
+String pinDelayWords(Duration left) {
+  final seconds = (left.inMilliseconds + 999) ~/ 1000;
+  if (seconds < 60) {
+    return 'Too many wrong PINs. Wait ${_many(seconds, 'second')}.';
+  }
 
-  final minutes = left.inMinutes;
-
-  return 'Too many wrong PINs. Wait $minutes minutes.';
+  return 'Too many wrong PINs. Wait ${_many((seconds + 59) ~/ 60, 'minute')}.';
 }
+
+String _many(int count, String noun) => '$count $noun${count == 1 ? '' : 's'}';

@@ -6,7 +6,7 @@ import '../db/database_session.dart';
 import 'data_key_store.dart';
 import 'profile.dart';
 import 'profile_list.dart';
-import 'rest.dart';
+import 'pin.dart';
 
 /// What came of an attempt to unlock a Profile.
 sealed class UnlockOutcome extends Equatable {
@@ -31,9 +31,9 @@ class WrongPin extends UnlockOutcome {
   List<Object?> get props => [failedAttempts];
 }
 
-/// The keypad is resting after wrong PINs. [remaining] is what is left of it.
-class Resting extends UnlockOutcome {
-  const Resting(this.remaining);
+/// The keypad waits after wrong PINs. [remaining] is what is left of the delay.
+class PinDelayed extends UnlockOutcome {
+  const PinDelayed(this.remaining);
 
   final Duration remaining;
 
@@ -45,7 +45,7 @@ class Resting extends UnlockOutcome {
 class Failed extends UnlockOutcome {
   const Failed(this.reason);
 
-  final UnlockFailure reason;
+  final UnlockFailureReason reason;
 
   @override
   List<Object?> get props => [reason];
@@ -55,7 +55,7 @@ class Failed extends UnlockOutcome {
 ///
 /// The three are told apart because they need different words. A broken
 /// install that reads as "try again" cannot be put right by trying again.
-enum UnlockFailure { dataKeyMissing, fileWillNotOpen, migrationFailed }
+enum UnlockFailureReason { dataKeyMissing, fileWillNotOpen, migrationFailed }
 
 /// The walk from six digits to an open connection, and back again.
 ///
@@ -77,18 +77,29 @@ class ProfileSession {
 
   final Stopwatch _sinceArrival = Stopwatch();
 
-  /// Marks the moment the keypad appeared, which the rest is measured from.
+  /// Marks the moment the keypad appeared, which the delay is measured from.
   ///
   /// It measures with a timer that only counts forward while the app runs, so
   /// that moving the phone's clock buys nothing and closing the app costs the
-  /// whole rest again.
+  /// whole delay again.
   void arriveAtKeypad() => _sinceArrival
     ..reset()
     ..start();
 
-  /// What is left of the rest for this Profile, as it now stands.
-  Future<Duration> restLeftFor(String profileId) async =>
-      restLeft((await _rowOf(profileId)).failedAttempts, _sinceArrival.elapsed);
+  /// Marks the keypad gone, so the delay starts again on the next arrival.
+  ///
+  /// Without this the watch runs on across an open Profile. A later caller
+  /// that reads the delay without announcing a keypad would then measure from
+  /// an arrival the User left long ago, and find no delay left at all.
+  void leaveKeypad() => _sinceArrival
+    ..stop()
+    ..reset();
+
+  /// What is left of the delay for this Profile, as it now stands.
+  Future<Duration> delayLeftFor(String profileId) async => pinDelayLeft(
+    (await _rowOf(profileId)).failedAttempts,
+    _sinceArrival.elapsed,
+  );
 
   /// Checks the PIN, and opens the Profile when it is right.
   ///
@@ -97,10 +108,10 @@ class ProfileSession {
   Future<UnlockOutcome> unlock(String profileId, String pin) async {
     final profile = await _rowOf(profileId);
 
-    final resting = restLeft(profile.failedAttempts, _sinceArrival.elapsed);
-    if (resting > Duration.zero) return Resting(resting);
+    final waiting = pinDelayLeft(profile.failedAttempts, _sinceArrival.elapsed);
+    if (waiting > Duration.zero) return PinDelayed(waiting);
 
-    final digest = await hashPinApart(pin, profile.kdfParams);
+    final digest = await hashPinAsync(pin, profile.kdfParams);
     if (!samePinHash(digest, profile.pinHash)) {
       final attempts = profile.failedAttempts + 1;
       await _writeAttempts(profileId, attempts);
@@ -112,12 +123,20 @@ class ProfileSession {
     if (failure != null) return Failed(failure);
 
     await _writeAttempts(profileId, 0);
+    leaveKeypad();
 
     return const Unlocked();
   }
 
   /// Closes the Profile, and drops the key with the connection that held it.
-  Future<void> lock() => databases.close();
+  ///
+  /// The keypad is next, so the delay starts from the moment it appears rather
+  /// than from an arrival the User has long left behind.
+  Future<void> lock() {
+    leaveKeypad();
+
+    return databases.close();
+  }
 
   /// Unwraps the data key and opens the file. It takes no PIN.
   ///
@@ -126,16 +145,20 @@ class ProfileSession {
   /// watched the User choose the PIN twice.
   ///
   /// It answers null when the Profile is open, and why not when it is not.
-  Future<UnlockFailure?> openProfile(String profileId) async {
+  Future<UnlockFailureReason?> openProfile(String profileId) async {
     final dataKey = await dataKeys.read(profileId);
-    if (dataKey == null) return UnlockFailure.dataKeyMissing;
+    if (dataKey == null) return UnlockFailureReason.dataKeyMissing;
 
     try {
       await databases.open(profileId, dataKey);
     } on MigrationFailed {
-      return UnlockFailure.migrationFailed;
+      return UnlockFailureReason.migrationFailed;
+    } on StateError {
+      // An open over an open Profile is a defect, not a Profile that will not
+      // open. Telling the User to give up on their own data would hide it.
+      rethrow;
     } on Object {
-      return UnlockFailure.fileWillNotOpen;
+      return UnlockFailureReason.fileWillNotOpen;
     }
 
     return null;

@@ -98,6 +98,31 @@ void main() {
     await watching.cancel();
   });
 
+  test('a lock that lands while a watch starts is not an error', () async {
+    await add('Ola');
+
+    final seen = <List<String>>[];
+    final errors = <Object>[];
+    final watching = namesInOrder().listen(seen.add, onError: errors.add);
+
+    // No pumpEventQueue between the two. The lock lands while follow() is
+    // still suspended on its first await, which is the window every other
+    // test in this file closes before it locks.
+    await session.lock();
+    await pumpEventQueue();
+
+    // The escape this guards against does not arrive on the stream. It goes
+    // to the zone, where the test harness catches it and fails the test.
+    expect(errors, isEmpty);
+
+    // The stream is still worth having: the next unlock runs the query again.
+    await session.unlock(profileId, '123456');
+    await pumpEventQueue();
+
+    expect(seen.last, ['Ola']);
+    await watching.cancel();
+  });
+
   test('a row written while locked appears after the unlock', () async {
     final seen = <List<String>>[];
     final watching = namesInOrder().listen(seen.add);

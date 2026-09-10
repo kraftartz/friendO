@@ -85,7 +85,7 @@ class ProfileCreator {
     final profile = Profile(
       id: id,
       displayName: name,
-      pinHash: await hashPinApart(pin, kdfParams),
+      pinHash: await hashPinAsync(pin, kdfParams),
       kdfParams: kdfParams,
       failedAttempts: 0,
     );

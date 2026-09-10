@@ -344,6 +344,9 @@ class $MeetingsTable extends Meetings
     false,
     type: DriftSqlType.string,
     requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES friends (id)',
+    ),
   );
   static const VerificationMeta _happenedOnMeta = const VerificationMeta(
     'happenedOn',
@@ -567,7 +570,11 @@ class MeetingRow extends DataClass implements Insertable<MeetingRow> {
   final int happenedOn;
   final int? happenedAtMinute;
 
-  /// When the row was written, in milliseconds from the epoch.
+  /// When the row was first written, in milliseconds from the epoch.
+  ///
+  /// It breaks a tie between two Meetings on one Civil Date, so a whole save
+  /// carries the old instant forward rather than stamping a new one. See
+  /// ADR-0021.
   final int createdAt;
   final String? place;
 
@@ -926,6 +933,9 @@ class $NotesTable extends Notes with TableInfo<$NotesTable, NoteRow> {
     false,
     type: DriftSqlType.string,
     requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES friends (id)',
+    ),
   );
   static const VerificationMeta _labelMeta = const VerificationMeta('label');
   @override
@@ -1697,6 +1707,9 @@ class $FriendAffinitiesTable extends FriendAffinities
     false,
     type: DriftSqlType.string,
     requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES friends (id)',
+    ),
   );
   static const VerificationMeta _affinityIdMeta = const VerificationMeta(
     'affinityId',
@@ -1708,6 +1721,9 @@ class $FriendAffinitiesTable extends FriendAffinities
     false,
     type: DriftSqlType.string,
     requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES affinities (id)',
+    ),
   );
   @override
   List<GeneratedColumn> get $columns => [friendId, affinityId];
@@ -1926,6 +1942,9 @@ class $FactsTable extends Facts with TableInfo<$FactsTable, FactRow> {
     false,
     type: DriftSqlType.string,
     requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES friends (id)',
+    ),
   );
   static const VerificationMeta _labelMeta = const VerificationMeta('label');
   @override
@@ -2283,6 +2302,9 @@ class $MilestonesTable extends Milestones
     false,
     type: DriftSqlType.string,
     requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES friends (id)',
+    ),
   );
   static const VerificationMeta _labelMeta = const VerificationMeta('label');
   @override
@@ -2668,6 +2690,105 @@ typedef $$FriendsTableUpdateCompanionBuilder =
       Value<int> rowid,
     });
 
+final class $$FriendsTableReferences
+    extends BaseReferences<_$AppDatabase, $FriendsTable, FriendRow> {
+  $$FriendsTableReferences(super.$_db, super.$_table, super.$_typedResult);
+
+  static MultiTypedResultKey<$MeetingsTable, List<MeetingRow>>
+  _meetingsRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
+    db.meetings,
+    aliasName: 'friends__id__meetings__friend_id',
+  );
+
+  $$MeetingsTableProcessedTableManager get meetingsRefs {
+    final manager = $$MeetingsTableTableManager(
+      $_db,
+      $_db.meetings,
+    ).filter((f) => f.friendId.id.sqlEquals($_itemColumn<String>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(_meetingsRefsTable($_db));
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+
+  static MultiTypedResultKey<$NotesTable, List<NoteRow>> _notesRefsTable(
+    _$AppDatabase db,
+  ) => MultiTypedResultKey.fromTable(
+    db.notes,
+    aliasName: 'friends__id__notes__friend_id',
+  );
+
+  $$NotesTableProcessedTableManager get notesRefs {
+    final manager = $$NotesTableTableManager(
+      $_db,
+      $_db.notes,
+    ).filter((f) => f.friendId.id.sqlEquals($_itemColumn<String>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(_notesRefsTable($_db));
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+
+  static MultiTypedResultKey<$FriendAffinitiesTable, List<FriendAffinityRow>>
+  _friendAffinitiesRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
+    db.friendAffinities,
+    aliasName: 'friends__id__friend_affinities__friend_id',
+  );
+
+  $$FriendAffinitiesTableProcessedTableManager get friendAffinitiesRefs {
+    final manager = $$FriendAffinitiesTableTableManager(
+      $_db,
+      $_db.friendAffinities,
+    ).filter((f) => f.friendId.id.sqlEquals($_itemColumn<String>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(
+      _friendAffinitiesRefsTable($_db),
+    );
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+
+  static MultiTypedResultKey<$FactsTable, List<FactRow>> _factsRefsTable(
+    _$AppDatabase db,
+  ) => MultiTypedResultKey.fromTable(
+    db.facts,
+    aliasName: 'friends__id__facts__friend_id',
+  );
+
+  $$FactsTableProcessedTableManager get factsRefs {
+    final manager = $$FactsTableTableManager(
+      $_db,
+      $_db.facts,
+    ).filter((f) => f.friendId.id.sqlEquals($_itemColumn<String>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(_factsRefsTable($_db));
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+
+  static MultiTypedResultKey<$MilestonesTable, List<MilestoneRow>>
+  _milestonesRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
+    db.milestones,
+    aliasName: 'friends__id__milestones__friend_id',
+  );
+
+  $$MilestonesTableProcessedTableManager get milestonesRefs {
+    final manager = $$MilestonesTableTableManager(
+      $_db,
+      $_db.milestones,
+    ).filter((f) => f.friendId.id.sqlEquals($_itemColumn<String>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(_milestonesRefsTable($_db));
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+}
+
 class $$FriendsTableFilterComposer
     extends Composer<_$AppDatabase, $FriendsTable> {
   $$FriendsTableFilterComposer({
@@ -2696,6 +2817,131 @@ class $$FriendsTableFilterComposer
     column: $table.cadenceDays,
     builder: (column) => ColumnFilters(column),
   );
+
+  Expression<bool> meetingsRefs(
+    Expression<bool> Function($$MeetingsTableFilterComposer f) f,
+  ) {
+    final $$MeetingsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.meetings,
+      getReferencedColumn: (t) => t.friendId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$MeetingsTableFilterComposer(
+            $db: $db,
+            $table: $db.meetings,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<bool> notesRefs(
+    Expression<bool> Function($$NotesTableFilterComposer f) f,
+  ) {
+    final $$NotesTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.notes,
+      getReferencedColumn: (t) => t.friendId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$NotesTableFilterComposer(
+            $db: $db,
+            $table: $db.notes,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<bool> friendAffinitiesRefs(
+    Expression<bool> Function($$FriendAffinitiesTableFilterComposer f) f,
+  ) {
+    final $$FriendAffinitiesTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.friendAffinities,
+      getReferencedColumn: (t) => t.friendId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$FriendAffinitiesTableFilterComposer(
+            $db: $db,
+            $table: $db.friendAffinities,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<bool> factsRefs(
+    Expression<bool> Function($$FactsTableFilterComposer f) f,
+  ) {
+    final $$FactsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.facts,
+      getReferencedColumn: (t) => t.friendId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$FactsTableFilterComposer(
+            $db: $db,
+            $table: $db.facts,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<bool> milestonesRefs(
+    Expression<bool> Function($$MilestonesTableFilterComposer f) f,
+  ) {
+    final $$MilestonesTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.milestones,
+      getReferencedColumn: (t) => t.friendId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$MilestonesTableFilterComposer(
+            $db: $db,
+            $table: $db.milestones,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
 }
 
 class $$FriendsTableOrderingComposer
@@ -2752,6 +2998,131 @@ class $$FriendsTableAnnotationComposer
     column: $table.cadenceDays,
     builder: (column) => column,
   );
+
+  Expression<T> meetingsRefs<T extends Object>(
+    Expression<T> Function($$MeetingsTableAnnotationComposer a) f,
+  ) {
+    final $$MeetingsTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.meetings,
+      getReferencedColumn: (t) => t.friendId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$MeetingsTableAnnotationComposer(
+            $db: $db,
+            $table: $db.meetings,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<T> notesRefs<T extends Object>(
+    Expression<T> Function($$NotesTableAnnotationComposer a) f,
+  ) {
+    final $$NotesTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.notes,
+      getReferencedColumn: (t) => t.friendId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$NotesTableAnnotationComposer(
+            $db: $db,
+            $table: $db.notes,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<T> friendAffinitiesRefs<T extends Object>(
+    Expression<T> Function($$FriendAffinitiesTableAnnotationComposer a) f,
+  ) {
+    final $$FriendAffinitiesTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.friendAffinities,
+      getReferencedColumn: (t) => t.friendId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$FriendAffinitiesTableAnnotationComposer(
+            $db: $db,
+            $table: $db.friendAffinities,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<T> factsRefs<T extends Object>(
+    Expression<T> Function($$FactsTableAnnotationComposer a) f,
+  ) {
+    final $$FactsTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.facts,
+      getReferencedColumn: (t) => t.friendId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$FactsTableAnnotationComposer(
+            $db: $db,
+            $table: $db.facts,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<T> milestonesRefs<T extends Object>(
+    Expression<T> Function($$MilestonesTableAnnotationComposer a) f,
+  ) {
+    final $$MilestonesTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.milestones,
+      getReferencedColumn: (t) => t.friendId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$MilestonesTableAnnotationComposer(
+            $db: $db,
+            $table: $db.milestones,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
 }
 
 class $$FriendsTableTableManager
@@ -2765,9 +3136,15 @@ class $$FriendsTableTableManager
           $$FriendsTableAnnotationComposer,
           $$FriendsTableCreateCompanionBuilder,
           $$FriendsTableUpdateCompanionBuilder,
-          (FriendRow, BaseReferences<_$AppDatabase, $FriendsTable, FriendRow>),
+          (FriendRow, $$FriendsTableReferences),
           FriendRow,
-          PrefetchHooks Function()
+          PrefetchHooks Function({
+            bool meetingsRefs,
+            bool notesRefs,
+            bool friendAffinitiesRefs,
+            bool factsRefs,
+            bool milestonesRefs,
+          })
         > {
   $$FriendsTableTableManager(_$AppDatabase db, $FriendsTable table)
     : super(
@@ -2809,9 +3186,134 @@ class $$FriendsTableTableManager
                 rowid: rowid,
               ),
           withReferenceMapper: (p0) => p0
-              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .map(
+                (e) => (
+                  e.readTable(table),
+                  $$FriendsTableReferences(db, table, e),
+                ),
+              )
               .toList(),
-          prefetchHooksCallback: null,
+          prefetchHooksCallback:
+              ({
+                meetingsRefs = false,
+                notesRefs = false,
+                friendAffinitiesRefs = false,
+                factsRefs = false,
+                milestonesRefs = false,
+              }) {
+                return PrefetchHooks(
+                  db: db,
+                  explicitlyWatchedTables: [
+                    if (meetingsRefs) db.meetings,
+                    if (notesRefs) db.notes,
+                    if (friendAffinitiesRefs) db.friendAffinities,
+                    if (factsRefs) db.facts,
+                    if (milestonesRefs) db.milestones,
+                  ],
+                  addJoins: null,
+                  getPrefetchedDataCallback: (items) async {
+                    return [
+                      if (meetingsRefs)
+                        await $_getPrefetchedData<
+                          FriendRow,
+                          $FriendsTable,
+                          MeetingRow
+                        >(
+                          currentTable: table,
+                          referencedTable: $$FriendsTableReferences
+                              ._meetingsRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$FriendsTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).meetingsRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.friendId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
+                      if (notesRefs)
+                        await $_getPrefetchedData<
+                          FriendRow,
+                          $FriendsTable,
+                          NoteRow
+                        >(
+                          currentTable: table,
+                          referencedTable: $$FriendsTableReferences
+                              ._notesRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$FriendsTableReferences(db, table, p0).notesRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.friendId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
+                      if (friendAffinitiesRefs)
+                        await $_getPrefetchedData<
+                          FriendRow,
+                          $FriendsTable,
+                          FriendAffinityRow
+                        >(
+                          currentTable: table,
+                          referencedTable: $$FriendsTableReferences
+                              ._friendAffinitiesRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$FriendsTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).friendAffinitiesRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.friendId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
+                      if (factsRefs)
+                        await $_getPrefetchedData<
+                          FriendRow,
+                          $FriendsTable,
+                          FactRow
+                        >(
+                          currentTable: table,
+                          referencedTable: $$FriendsTableReferences
+                              ._factsRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$FriendsTableReferences(db, table, p0).factsRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.friendId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
+                      if (milestonesRefs)
+                        await $_getPrefetchedData<
+                          FriendRow,
+                          $FriendsTable,
+                          MilestoneRow
+                        >(
+                          currentTable: table,
+                          referencedTable: $$FriendsTableReferences
+                              ._milestonesRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$FriendsTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).milestonesRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.friendId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
+                    ];
+                  },
+                );
+              },
         ),
       );
 }
@@ -2826,9 +3328,15 @@ typedef $$FriendsTableProcessedTableManager =
       $$FriendsTableAnnotationComposer,
       $$FriendsTableCreateCompanionBuilder,
       $$FriendsTableUpdateCompanionBuilder,
-      (FriendRow, BaseReferences<_$AppDatabase, $FriendsTable, FriendRow>),
+      (FriendRow, $$FriendsTableReferences),
       FriendRow,
-      PrefetchHooks Function()
+      PrefetchHooks Function({
+        bool meetingsRefs,
+        bool notesRefs,
+        bool friendAffinitiesRefs,
+        bool factsRefs,
+        bool milestonesRefs,
+      })
     >;
 typedef $$MeetingsTableCreateCompanionBuilder =
     MeetingsCompanion Function({
@@ -2857,6 +3365,28 @@ typedef $$MeetingsTableUpdateCompanionBuilder =
       Value<int> rowid,
     });
 
+final class $$MeetingsTableReferences
+    extends BaseReferences<_$AppDatabase, $MeetingsTable, MeetingRow> {
+  $$MeetingsTableReferences(super.$_db, super.$_table, super.$_typedResult);
+
+  static $FriendsTable _friendIdTable(_$AppDatabase db) =>
+      db.friends.createAlias('meetings__friend_id__friends__id');
+
+  $$FriendsTableProcessedTableManager get friendId {
+    final $_column = $_itemColumn<String>('friend_id')!;
+
+    final manager = $$FriendsTableTableManager(
+      $_db,
+      $_db.friends,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_friendIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+}
+
 class $$MeetingsTableFilterComposer
     extends Composer<_$AppDatabase, $MeetingsTable> {
   $$MeetingsTableFilterComposer({
@@ -2868,11 +3398,6 @@ class $$MeetingsTableFilterComposer
   });
   ColumnFilters<String> get id => $composableBuilder(
     column: $table.id,
-    builder: (column) => ColumnFilters(column),
-  );
-
-  ColumnFilters<String> get friendId => $composableBuilder(
-    column: $table.friendId,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -2910,6 +3435,29 @@ class $$MeetingsTableFilterComposer
     column: $table.recap,
     builder: (column) => ColumnFilters(column),
   );
+
+  $$FriendsTableFilterComposer get friendId {
+    final $$FriendsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.friendId,
+      referencedTable: $db.friends,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$FriendsTableFilterComposer(
+            $db: $db,
+            $table: $db.friends,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
 }
 
 class $$MeetingsTableOrderingComposer
@@ -2923,11 +3471,6 @@ class $$MeetingsTableOrderingComposer
   });
   ColumnOrderings<String> get id => $composableBuilder(
     column: $table.id,
-    builder: (column) => ColumnOrderings(column),
-  );
-
-  ColumnOrderings<String> get friendId => $composableBuilder(
-    column: $table.friendId,
     builder: (column) => ColumnOrderings(column),
   );
 
@@ -2965,6 +3508,29 @@ class $$MeetingsTableOrderingComposer
     column: $table.recap,
     builder: (column) => ColumnOrderings(column),
   );
+
+  $$FriendsTableOrderingComposer get friendId {
+    final $$FriendsTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.friendId,
+      referencedTable: $db.friends,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$FriendsTableOrderingComposer(
+            $db: $db,
+            $table: $db.friends,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
 }
 
 class $$MeetingsTableAnnotationComposer
@@ -2978,9 +3544,6 @@ class $$MeetingsTableAnnotationComposer
   });
   GeneratedColumn<String> get id =>
       $composableBuilder(column: $table.id, builder: (column) => column);
-
-  GeneratedColumn<String> get friendId =>
-      $composableBuilder(column: $table.friendId, builder: (column) => column);
 
   GeneratedColumn<int> get happenedOn => $composableBuilder(
     column: $table.happenedOn,
@@ -3008,6 +3571,29 @@ class $$MeetingsTableAnnotationComposer
 
   GeneratedColumn<String> get recap =>
       $composableBuilder(column: $table.recap, builder: (column) => column);
+
+  $$FriendsTableAnnotationComposer get friendId {
+    final $$FriendsTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.friendId,
+      referencedTable: $db.friends,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$FriendsTableAnnotationComposer(
+            $db: $db,
+            $table: $db.friends,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
 }
 
 class $$MeetingsTableTableManager
@@ -3021,12 +3607,9 @@ class $$MeetingsTableTableManager
           $$MeetingsTableAnnotationComposer,
           $$MeetingsTableCreateCompanionBuilder,
           $$MeetingsTableUpdateCompanionBuilder,
-          (
-            MeetingRow,
-            BaseReferences<_$AppDatabase, $MeetingsTable, MeetingRow>,
-          ),
+          (MeetingRow, $$MeetingsTableReferences),
           MeetingRow,
-          PrefetchHooks Function()
+          PrefetchHooks Function({bool friendId})
         > {
   $$MeetingsTableTableManager(_$AppDatabase db, $MeetingsTable table)
     : super(
@@ -3088,9 +3671,54 @@ class $$MeetingsTableTableManager
                 rowid: rowid,
               ),
           withReferenceMapper: (p0) => p0
-              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .map(
+                (e) => (
+                  e.readTable(table),
+                  $$MeetingsTableReferences(db, table, e),
+                ),
+              )
               .toList(),
-          prefetchHooksCallback: null,
+          prefetchHooksCallback: ({friendId = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [],
+              addJoins:
+                  <
+                    T extends TableManagerState<
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic
+                    >
+                  >(state) {
+                    if (friendId) {
+                      state =
+                          state.withJoin(
+                                currentTable: table,
+                                currentColumn: table.friendId,
+                                referencedTable: $$MeetingsTableReferences
+                                    ._friendIdTable(db),
+                                referencedColumn: $$MeetingsTableReferences
+                                    ._friendIdTable(db)
+                                    .id,
+                              )
+                              as T;
+                    }
+
+                    return state;
+                  },
+              getPrefetchedDataCallback: (items) async {
+                return [];
+              },
+            );
+          },
         ),
       );
 }
@@ -3105,9 +3733,9 @@ typedef $$MeetingsTableProcessedTableManager =
       $$MeetingsTableAnnotationComposer,
       $$MeetingsTableCreateCompanionBuilder,
       $$MeetingsTableUpdateCompanionBuilder,
-      (MeetingRow, BaseReferences<_$AppDatabase, $MeetingsTable, MeetingRow>),
+      (MeetingRow, $$MeetingsTableReferences),
       MeetingRow,
-      PrefetchHooks Function()
+      PrefetchHooks Function({bool friendId})
     >;
 typedef $$NotesTableCreateCompanionBuilder =
     NotesCompanion Function({
@@ -3132,6 +3760,28 @@ typedef $$NotesTableUpdateCompanionBuilder =
       Value<int> rowid,
     });
 
+final class $$NotesTableReferences
+    extends BaseReferences<_$AppDatabase, $NotesTable, NoteRow> {
+  $$NotesTableReferences(super.$_db, super.$_table, super.$_typedResult);
+
+  static $FriendsTable _friendIdTable(_$AppDatabase db) =>
+      db.friends.createAlias('notes__friend_id__friends__id');
+
+  $$FriendsTableProcessedTableManager get friendId {
+    final $_column = $_itemColumn<String>('friend_id')!;
+
+    final manager = $$FriendsTableTableManager(
+      $_db,
+      $_db.friends,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_friendIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+}
+
 class $$NotesTableFilterComposer extends Composer<_$AppDatabase, $NotesTable> {
   $$NotesTableFilterComposer({
     required super.$db,
@@ -3142,11 +3792,6 @@ class $$NotesTableFilterComposer extends Composer<_$AppDatabase, $NotesTable> {
   });
   ColumnFilters<String> get id => $composableBuilder(
     column: $table.id,
-    builder: (column) => ColumnFilters(column),
-  );
-
-  ColumnFilters<String> get friendId => $composableBuilder(
-    column: $table.friendId,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -3174,6 +3819,29 @@ class $$NotesTableFilterComposer extends Composer<_$AppDatabase, $NotesTable> {
     column: $table.resolvedOn,
     builder: (column) => ColumnFilters(column),
   );
+
+  $$FriendsTableFilterComposer get friendId {
+    final $$FriendsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.friendId,
+      referencedTable: $db.friends,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$FriendsTableFilterComposer(
+            $db: $db,
+            $table: $db.friends,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
 }
 
 class $$NotesTableOrderingComposer
@@ -3187,11 +3855,6 @@ class $$NotesTableOrderingComposer
   });
   ColumnOrderings<String> get id => $composableBuilder(
     column: $table.id,
-    builder: (column) => ColumnOrderings(column),
-  );
-
-  ColumnOrderings<String> get friendId => $composableBuilder(
-    column: $table.friendId,
     builder: (column) => ColumnOrderings(column),
   );
 
@@ -3219,6 +3882,29 @@ class $$NotesTableOrderingComposer
     column: $table.resolvedOn,
     builder: (column) => ColumnOrderings(column),
   );
+
+  $$FriendsTableOrderingComposer get friendId {
+    final $$FriendsTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.friendId,
+      referencedTable: $db.friends,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$FriendsTableOrderingComposer(
+            $db: $db,
+            $table: $db.friends,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
 }
 
 class $$NotesTableAnnotationComposer
@@ -3232,9 +3918,6 @@ class $$NotesTableAnnotationComposer
   });
   GeneratedColumn<String> get id =>
       $composableBuilder(column: $table.id, builder: (column) => column);
-
-  GeneratedColumn<String> get friendId =>
-      $composableBuilder(column: $table.friendId, builder: (column) => column);
 
   GeneratedColumn<String> get label =>
       $composableBuilder(column: $table.label, builder: (column) => column);
@@ -3254,6 +3937,29 @@ class $$NotesTableAnnotationComposer
     column: $table.resolvedOn,
     builder: (column) => column,
   );
+
+  $$FriendsTableAnnotationComposer get friendId {
+    final $$FriendsTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.friendId,
+      referencedTable: $db.friends,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$FriendsTableAnnotationComposer(
+            $db: $db,
+            $table: $db.friends,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
 }
 
 class $$NotesTableTableManager
@@ -3267,9 +3973,9 @@ class $$NotesTableTableManager
           $$NotesTableAnnotationComposer,
           $$NotesTableCreateCompanionBuilder,
           $$NotesTableUpdateCompanionBuilder,
-          (NoteRow, BaseReferences<_$AppDatabase, $NotesTable, NoteRow>),
+          (NoteRow, $$NotesTableReferences),
           NoteRow,
-          PrefetchHooks Function()
+          PrefetchHooks Function({bool friendId})
         > {
   $$NotesTableTableManager(_$AppDatabase db, $NotesTable table)
     : super(
@@ -3323,9 +4029,52 @@ class $$NotesTableTableManager
                 rowid: rowid,
               ),
           withReferenceMapper: (p0) => p0
-              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .map(
+                (e) =>
+                    (e.readTable(table), $$NotesTableReferences(db, table, e)),
+              )
               .toList(),
-          prefetchHooksCallback: null,
+          prefetchHooksCallback: ({friendId = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [],
+              addJoins:
+                  <
+                    T extends TableManagerState<
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic
+                    >
+                  >(state) {
+                    if (friendId) {
+                      state =
+                          state.withJoin(
+                                currentTable: table,
+                                currentColumn: table.friendId,
+                                referencedTable: $$NotesTableReferences
+                                    ._friendIdTable(db),
+                                referencedColumn: $$NotesTableReferences
+                                    ._friendIdTable(db)
+                                    .id,
+                              )
+                              as T;
+                    }
+
+                    return state;
+                  },
+              getPrefetchedDataCallback: (items) async {
+                return [];
+              },
+            );
+          },
         ),
       );
 }
@@ -3340,9 +4089,9 @@ typedef $$NotesTableProcessedTableManager =
       $$NotesTableAnnotationComposer,
       $$NotesTableCreateCompanionBuilder,
       $$NotesTableUpdateCompanionBuilder,
-      (NoteRow, BaseReferences<_$AppDatabase, $NotesTable, NoteRow>),
+      (NoteRow, $$NotesTableReferences),
       NoteRow,
-      PrefetchHooks Function()
+      PrefetchHooks Function({bool friendId})
     >;
 typedef $$AffinitiesTableCreateCompanionBuilder =
     AffinitiesCompanion Function({
@@ -3360,6 +4109,31 @@ typedef $$AffinitiesTableUpdateCompanionBuilder =
       Value<bool> isSeed,
       Value<int> rowid,
     });
+
+final class $$AffinitiesTableReferences
+    extends BaseReferences<_$AppDatabase, $AffinitiesTable, AffinityRow> {
+  $$AffinitiesTableReferences(super.$_db, super.$_table, super.$_typedResult);
+
+  static MultiTypedResultKey<$FriendAffinitiesTable, List<FriendAffinityRow>>
+  _friendAffinitiesRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
+    db.friendAffinities,
+    aliasName: 'affinities__id__friend_affinities__affinity_id',
+  );
+
+  $$FriendAffinitiesTableProcessedTableManager get friendAffinitiesRefs {
+    final manager = $$FriendAffinitiesTableTableManager(
+      $_db,
+      $_db.friendAffinities,
+    ).filter((f) => f.affinityId.id.sqlEquals($_itemColumn<String>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(
+      _friendAffinitiesRefsTable($_db),
+    );
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+}
 
 class $$AffinitiesTableFilterComposer
     extends Composer<_$AppDatabase, $AffinitiesTable> {
@@ -3389,6 +4163,31 @@ class $$AffinitiesTableFilterComposer
     column: $table.isSeed,
     builder: (column) => ColumnFilters(column),
   );
+
+  Expression<bool> friendAffinitiesRefs(
+    Expression<bool> Function($$FriendAffinitiesTableFilterComposer f) f,
+  ) {
+    final $$FriendAffinitiesTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.friendAffinities,
+      getReferencedColumn: (t) => t.affinityId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$FriendAffinitiesTableFilterComposer(
+            $db: $db,
+            $table: $db.friendAffinities,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
 }
 
 class $$AffinitiesTableOrderingComposer
@@ -3443,6 +4242,31 @@ class $$AffinitiesTableAnnotationComposer
 
   GeneratedColumn<bool> get isSeed =>
       $composableBuilder(column: $table.isSeed, builder: (column) => column);
+
+  Expression<T> friendAffinitiesRefs<T extends Object>(
+    Expression<T> Function($$FriendAffinitiesTableAnnotationComposer a) f,
+  ) {
+    final $$FriendAffinitiesTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.friendAffinities,
+      getReferencedColumn: (t) => t.affinityId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$FriendAffinitiesTableAnnotationComposer(
+            $db: $db,
+            $table: $db.friendAffinities,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
 }
 
 class $$AffinitiesTableTableManager
@@ -3456,12 +4280,9 @@ class $$AffinitiesTableTableManager
           $$AffinitiesTableAnnotationComposer,
           $$AffinitiesTableCreateCompanionBuilder,
           $$AffinitiesTableUpdateCompanionBuilder,
-          (
-            AffinityRow,
-            BaseReferences<_$AppDatabase, $AffinitiesTable, AffinityRow>,
-          ),
+          (AffinityRow, $$AffinitiesTableReferences),
           AffinityRow,
-          PrefetchHooks Function()
+          PrefetchHooks Function({bool friendAffinitiesRefs})
         > {
   $$AffinitiesTableTableManager(_$AppDatabase db, $AffinitiesTable table)
     : super(
@@ -3503,9 +4324,45 @@ class $$AffinitiesTableTableManager
                 rowid: rowid,
               ),
           withReferenceMapper: (p0) => p0
-              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .map(
+                (e) => (
+                  e.readTable(table),
+                  $$AffinitiesTableReferences(db, table, e),
+                ),
+              )
               .toList(),
-          prefetchHooksCallback: null,
+          prefetchHooksCallback: ({friendAffinitiesRefs = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [
+                if (friendAffinitiesRefs) db.friendAffinities,
+              ],
+              addJoins: null,
+              getPrefetchedDataCallback: (items) async {
+                return [
+                  if (friendAffinitiesRefs)
+                    await $_getPrefetchedData<
+                      AffinityRow,
+                      $AffinitiesTable,
+                      FriendAffinityRow
+                    >(
+                      currentTable: table,
+                      referencedTable: $$AffinitiesTableReferences
+                          ._friendAffinitiesRefsTable(db),
+                      managerFromTypedResult: (p0) =>
+                          $$AffinitiesTableReferences(
+                            db,
+                            table,
+                            p0,
+                          ).friendAffinitiesRefs,
+                      referencedItemsForCurrentItem: (item, referencedItems) =>
+                          referencedItems.where((e) => e.affinityId == item.id),
+                      typedResults: items,
+                    ),
+                ];
+              },
+            );
+          },
         ),
       );
 }
@@ -3520,12 +4377,9 @@ typedef $$AffinitiesTableProcessedTableManager =
       $$AffinitiesTableAnnotationComposer,
       $$AffinitiesTableCreateCompanionBuilder,
       $$AffinitiesTableUpdateCompanionBuilder,
-      (
-        AffinityRow,
-        BaseReferences<_$AppDatabase, $AffinitiesTable, AffinityRow>,
-      ),
+      (AffinityRow, $$AffinitiesTableReferences),
       AffinityRow,
-      PrefetchHooks Function()
+      PrefetchHooks Function({bool friendAffinitiesRefs})
     >;
 typedef $$FriendAffinitiesTableCreateCompanionBuilder =
     FriendAffinitiesCompanion Function({
@@ -3540,6 +4394,54 @@ typedef $$FriendAffinitiesTableUpdateCompanionBuilder =
       Value<int> rowid,
     });
 
+final class $$FriendAffinitiesTableReferences
+    extends
+        BaseReferences<
+          _$AppDatabase,
+          $FriendAffinitiesTable,
+          FriendAffinityRow
+        > {
+  $$FriendAffinitiesTableReferences(
+    super.$_db,
+    super.$_table,
+    super.$_typedResult,
+  );
+
+  static $FriendsTable _friendIdTable(_$AppDatabase db) =>
+      db.friends.createAlias('friend_affinities__friend_id__friends__id');
+
+  $$FriendsTableProcessedTableManager get friendId {
+    final $_column = $_itemColumn<String>('friend_id')!;
+
+    final manager = $$FriendsTableTableManager(
+      $_db,
+      $_db.friends,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_friendIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+
+  static $AffinitiesTable _affinityIdTable(_$AppDatabase db) => db.affinities
+      .createAlias('friend_affinities__affinity_id__affinities__id');
+
+  $$AffinitiesTableProcessedTableManager get affinityId {
+    final $_column = $_itemColumn<String>('affinity_id')!;
+
+    final manager = $$AffinitiesTableTableManager(
+      $_db,
+      $_db.affinities,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_affinityIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+}
+
 class $$FriendAffinitiesTableFilterComposer
     extends Composer<_$AppDatabase, $FriendAffinitiesTable> {
   $$FriendAffinitiesTableFilterComposer({
@@ -3549,15 +4451,51 @@ class $$FriendAffinitiesTableFilterComposer
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
-  ColumnFilters<String> get friendId => $composableBuilder(
-    column: $table.friendId,
-    builder: (column) => ColumnFilters(column),
-  );
+  $$FriendsTableFilterComposer get friendId {
+    final $$FriendsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.friendId,
+      referencedTable: $db.friends,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$FriendsTableFilterComposer(
+            $db: $db,
+            $table: $db.friends,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
 
-  ColumnFilters<String> get affinityId => $composableBuilder(
-    column: $table.affinityId,
-    builder: (column) => ColumnFilters(column),
-  );
+  $$AffinitiesTableFilterComposer get affinityId {
+    final $$AffinitiesTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.affinityId,
+      referencedTable: $db.affinities,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$AffinitiesTableFilterComposer(
+            $db: $db,
+            $table: $db.affinities,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
 }
 
 class $$FriendAffinitiesTableOrderingComposer
@@ -3569,15 +4507,51 @@ class $$FriendAffinitiesTableOrderingComposer
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
-  ColumnOrderings<String> get friendId => $composableBuilder(
-    column: $table.friendId,
-    builder: (column) => ColumnOrderings(column),
-  );
+  $$FriendsTableOrderingComposer get friendId {
+    final $$FriendsTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.friendId,
+      referencedTable: $db.friends,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$FriendsTableOrderingComposer(
+            $db: $db,
+            $table: $db.friends,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
 
-  ColumnOrderings<String> get affinityId => $composableBuilder(
-    column: $table.affinityId,
-    builder: (column) => ColumnOrderings(column),
-  );
+  $$AffinitiesTableOrderingComposer get affinityId {
+    final $$AffinitiesTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.affinityId,
+      referencedTable: $db.affinities,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$AffinitiesTableOrderingComposer(
+            $db: $db,
+            $table: $db.affinities,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
 }
 
 class $$FriendAffinitiesTableAnnotationComposer
@@ -3589,13 +4563,51 @@ class $$FriendAffinitiesTableAnnotationComposer
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
-  GeneratedColumn<String> get friendId =>
-      $composableBuilder(column: $table.friendId, builder: (column) => column);
+  $$FriendsTableAnnotationComposer get friendId {
+    final $$FriendsTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.friendId,
+      referencedTable: $db.friends,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$FriendsTableAnnotationComposer(
+            $db: $db,
+            $table: $db.friends,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
 
-  GeneratedColumn<String> get affinityId => $composableBuilder(
-    column: $table.affinityId,
-    builder: (column) => column,
-  );
+  $$AffinitiesTableAnnotationComposer get affinityId {
+    final $$AffinitiesTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.affinityId,
+      referencedTable: $db.affinities,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$AffinitiesTableAnnotationComposer(
+            $db: $db,
+            $table: $db.affinities,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
 }
 
 class $$FriendAffinitiesTableTableManager
@@ -3609,16 +4621,9 @@ class $$FriendAffinitiesTableTableManager
           $$FriendAffinitiesTableAnnotationComposer,
           $$FriendAffinitiesTableCreateCompanionBuilder,
           $$FriendAffinitiesTableUpdateCompanionBuilder,
-          (
-            FriendAffinityRow,
-            BaseReferences<
-              _$AppDatabase,
-              $FriendAffinitiesTable,
-              FriendAffinityRow
-            >,
-          ),
+          (FriendAffinityRow, $$FriendAffinitiesTableReferences),
           FriendAffinityRow,
-          PrefetchHooks Function()
+          PrefetchHooks Function({bool friendId, bool affinityId})
         > {
   $$FriendAffinitiesTableTableManager(
     _$AppDatabase db,
@@ -3654,9 +4659,71 @@ class $$FriendAffinitiesTableTableManager
                 rowid: rowid,
               ),
           withReferenceMapper: (p0) => p0
-              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .map(
+                (e) => (
+                  e.readTable(table),
+                  $$FriendAffinitiesTableReferences(db, table, e),
+                ),
+              )
               .toList(),
-          prefetchHooksCallback: null,
+          prefetchHooksCallback: ({friendId = false, affinityId = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [],
+              addJoins:
+                  <
+                    T extends TableManagerState<
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic
+                    >
+                  >(state) {
+                    if (friendId) {
+                      state =
+                          state.withJoin(
+                                currentTable: table,
+                                currentColumn: table.friendId,
+                                referencedTable:
+                                    $$FriendAffinitiesTableReferences
+                                        ._friendIdTable(db),
+                                referencedColumn:
+                                    $$FriendAffinitiesTableReferences
+                                        ._friendIdTable(db)
+                                        .id,
+                              )
+                              as T;
+                    }
+                    if (affinityId) {
+                      state =
+                          state.withJoin(
+                                currentTable: table,
+                                currentColumn: table.affinityId,
+                                referencedTable:
+                                    $$FriendAffinitiesTableReferences
+                                        ._affinityIdTable(db),
+                                referencedColumn:
+                                    $$FriendAffinitiesTableReferences
+                                        ._affinityIdTable(db)
+                                        .id,
+                              )
+                              as T;
+                    }
+
+                    return state;
+                  },
+              getPrefetchedDataCallback: (items) async {
+                return [];
+              },
+            );
+          },
         ),
       );
 }
@@ -3671,16 +4738,9 @@ typedef $$FriendAffinitiesTableProcessedTableManager =
       $$FriendAffinitiesTableAnnotationComposer,
       $$FriendAffinitiesTableCreateCompanionBuilder,
       $$FriendAffinitiesTableUpdateCompanionBuilder,
-      (
-        FriendAffinityRow,
-        BaseReferences<
-          _$AppDatabase,
-          $FriendAffinitiesTable,
-          FriendAffinityRow
-        >,
-      ),
+      (FriendAffinityRow, $$FriendAffinitiesTableReferences),
       FriendAffinityRow,
-      PrefetchHooks Function()
+      PrefetchHooks Function({bool friendId, bool affinityId})
     >;
 typedef $$FactsTableCreateCompanionBuilder =
     FactsCompanion Function({
@@ -3701,6 +4761,28 @@ typedef $$FactsTableUpdateCompanionBuilder =
       Value<int> rowid,
     });
 
+final class $$FactsTableReferences
+    extends BaseReferences<_$AppDatabase, $FactsTable, FactRow> {
+  $$FactsTableReferences(super.$_db, super.$_table, super.$_typedResult);
+
+  static $FriendsTable _friendIdTable(_$AppDatabase db) =>
+      db.friends.createAlias('facts__friend_id__friends__id');
+
+  $$FriendsTableProcessedTableManager get friendId {
+    final $_column = $_itemColumn<String>('friend_id')!;
+
+    final manager = $$FriendsTableTableManager(
+      $_db,
+      $_db.friends,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_friendIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+}
+
 class $$FactsTableFilterComposer extends Composer<_$AppDatabase, $FactsTable> {
   $$FactsTableFilterComposer({
     required super.$db,
@@ -3711,11 +4793,6 @@ class $$FactsTableFilterComposer extends Composer<_$AppDatabase, $FactsTable> {
   });
   ColumnFilters<String> get id => $composableBuilder(
     column: $table.id,
-    builder: (column) => ColumnFilters(column),
-  );
-
-  ColumnFilters<String> get friendId => $composableBuilder(
-    column: $table.friendId,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -3733,6 +4810,29 @@ class $$FactsTableFilterComposer extends Composer<_$AppDatabase, $FactsTable> {
     column: $table.ordinal,
     builder: (column) => ColumnFilters(column),
   );
+
+  $$FriendsTableFilterComposer get friendId {
+    final $$FriendsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.friendId,
+      referencedTable: $db.friends,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$FriendsTableFilterComposer(
+            $db: $db,
+            $table: $db.friends,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
 }
 
 class $$FactsTableOrderingComposer
@@ -3746,11 +4846,6 @@ class $$FactsTableOrderingComposer
   });
   ColumnOrderings<String> get id => $composableBuilder(
     column: $table.id,
-    builder: (column) => ColumnOrderings(column),
-  );
-
-  ColumnOrderings<String> get friendId => $composableBuilder(
-    column: $table.friendId,
     builder: (column) => ColumnOrderings(column),
   );
 
@@ -3768,6 +4863,29 @@ class $$FactsTableOrderingComposer
     column: $table.ordinal,
     builder: (column) => ColumnOrderings(column),
   );
+
+  $$FriendsTableOrderingComposer get friendId {
+    final $$FriendsTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.friendId,
+      referencedTable: $db.friends,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$FriendsTableOrderingComposer(
+            $db: $db,
+            $table: $db.friends,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
 }
 
 class $$FactsTableAnnotationComposer
@@ -3782,9 +4900,6 @@ class $$FactsTableAnnotationComposer
   GeneratedColumn<String> get id =>
       $composableBuilder(column: $table.id, builder: (column) => column);
 
-  GeneratedColumn<String> get friendId =>
-      $composableBuilder(column: $table.friendId, builder: (column) => column);
-
   GeneratedColumn<String> get label =>
       $composableBuilder(column: $table.label, builder: (column) => column);
 
@@ -3793,6 +4908,29 @@ class $$FactsTableAnnotationComposer
 
   GeneratedColumn<int> get ordinal =>
       $composableBuilder(column: $table.ordinal, builder: (column) => column);
+
+  $$FriendsTableAnnotationComposer get friendId {
+    final $$FriendsTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.friendId,
+      referencedTable: $db.friends,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$FriendsTableAnnotationComposer(
+            $db: $db,
+            $table: $db.friends,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
 }
 
 class $$FactsTableTableManager
@@ -3806,9 +4944,9 @@ class $$FactsTableTableManager
           $$FactsTableAnnotationComposer,
           $$FactsTableCreateCompanionBuilder,
           $$FactsTableUpdateCompanionBuilder,
-          (FactRow, BaseReferences<_$AppDatabase, $FactsTable, FactRow>),
+          (FactRow, $$FactsTableReferences),
           FactRow,
-          PrefetchHooks Function()
+          PrefetchHooks Function({bool friendId})
         > {
   $$FactsTableTableManager(_$AppDatabase db, $FactsTable table)
     : super(
@@ -3854,9 +4992,52 @@ class $$FactsTableTableManager
                 rowid: rowid,
               ),
           withReferenceMapper: (p0) => p0
-              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .map(
+                (e) =>
+                    (e.readTable(table), $$FactsTableReferences(db, table, e)),
+              )
               .toList(),
-          prefetchHooksCallback: null,
+          prefetchHooksCallback: ({friendId = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [],
+              addJoins:
+                  <
+                    T extends TableManagerState<
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic
+                    >
+                  >(state) {
+                    if (friendId) {
+                      state =
+                          state.withJoin(
+                                currentTable: table,
+                                currentColumn: table.friendId,
+                                referencedTable: $$FactsTableReferences
+                                    ._friendIdTable(db),
+                                referencedColumn: $$FactsTableReferences
+                                    ._friendIdTable(db)
+                                    .id,
+                              )
+                              as T;
+                    }
+
+                    return state;
+                  },
+              getPrefetchedDataCallback: (items) async {
+                return [];
+              },
+            );
+          },
         ),
       );
 }
@@ -3871,9 +5052,9 @@ typedef $$FactsTableProcessedTableManager =
       $$FactsTableAnnotationComposer,
       $$FactsTableCreateCompanionBuilder,
       $$FactsTableUpdateCompanionBuilder,
-      (FactRow, BaseReferences<_$AppDatabase, $FactsTable, FactRow>),
+      (FactRow, $$FactsTableReferences),
       FactRow,
-      PrefetchHooks Function()
+      PrefetchHooks Function({bool friendId})
     >;
 typedef $$MilestonesTableCreateCompanionBuilder =
     MilestonesCompanion Function({
@@ -3894,6 +5075,28 @@ typedef $$MilestonesTableUpdateCompanionBuilder =
       Value<int> rowid,
     });
 
+final class $$MilestonesTableReferences
+    extends BaseReferences<_$AppDatabase, $MilestonesTable, MilestoneRow> {
+  $$MilestonesTableReferences(super.$_db, super.$_table, super.$_typedResult);
+
+  static $FriendsTable _friendIdTable(_$AppDatabase db) =>
+      db.friends.createAlias('milestones__friend_id__friends__id');
+
+  $$FriendsTableProcessedTableManager get friendId {
+    final $_column = $_itemColumn<String>('friend_id')!;
+
+    final manager = $$FriendsTableTableManager(
+      $_db,
+      $_db.friends,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_friendIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+}
+
 class $$MilestonesTableFilterComposer
     extends Composer<_$AppDatabase, $MilestonesTable> {
   $$MilestonesTableFilterComposer({
@@ -3905,11 +5108,6 @@ class $$MilestonesTableFilterComposer
   });
   ColumnFilters<String> get id => $composableBuilder(
     column: $table.id,
-    builder: (column) => ColumnFilters(column),
-  );
-
-  ColumnFilters<String> get friendId => $composableBuilder(
-    column: $table.friendId,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -3927,6 +5125,29 @@ class $$MilestonesTableFilterComposer
     column: $table.repeatsYearly,
     builder: (column) => ColumnFilters(column),
   );
+
+  $$FriendsTableFilterComposer get friendId {
+    final $$FriendsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.friendId,
+      referencedTable: $db.friends,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$FriendsTableFilterComposer(
+            $db: $db,
+            $table: $db.friends,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
 }
 
 class $$MilestonesTableOrderingComposer
@@ -3940,11 +5161,6 @@ class $$MilestonesTableOrderingComposer
   });
   ColumnOrderings<String> get id => $composableBuilder(
     column: $table.id,
-    builder: (column) => ColumnOrderings(column),
-  );
-
-  ColumnOrderings<String> get friendId => $composableBuilder(
-    column: $table.friendId,
     builder: (column) => ColumnOrderings(column),
   );
 
@@ -3962,6 +5178,29 @@ class $$MilestonesTableOrderingComposer
     column: $table.repeatsYearly,
     builder: (column) => ColumnOrderings(column),
   );
+
+  $$FriendsTableOrderingComposer get friendId {
+    final $$FriendsTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.friendId,
+      referencedTable: $db.friends,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$FriendsTableOrderingComposer(
+            $db: $db,
+            $table: $db.friends,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
 }
 
 class $$MilestonesTableAnnotationComposer
@@ -3976,9 +5215,6 @@ class $$MilestonesTableAnnotationComposer
   GeneratedColumn<String> get id =>
       $composableBuilder(column: $table.id, builder: (column) => column);
 
-  GeneratedColumn<String> get friendId =>
-      $composableBuilder(column: $table.friendId, builder: (column) => column);
-
   GeneratedColumn<String> get label =>
       $composableBuilder(column: $table.label, builder: (column) => column);
 
@@ -3989,6 +5225,29 @@ class $$MilestonesTableAnnotationComposer
     column: $table.repeatsYearly,
     builder: (column) => column,
   );
+
+  $$FriendsTableAnnotationComposer get friendId {
+    final $$FriendsTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.friendId,
+      referencedTable: $db.friends,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$FriendsTableAnnotationComposer(
+            $db: $db,
+            $table: $db.friends,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
 }
 
 class $$MilestonesTableTableManager
@@ -4002,12 +5261,9 @@ class $$MilestonesTableTableManager
           $$MilestonesTableAnnotationComposer,
           $$MilestonesTableCreateCompanionBuilder,
           $$MilestonesTableUpdateCompanionBuilder,
-          (
-            MilestoneRow,
-            BaseReferences<_$AppDatabase, $MilestonesTable, MilestoneRow>,
-          ),
+          (MilestoneRow, $$MilestonesTableReferences),
           MilestoneRow,
-          PrefetchHooks Function()
+          PrefetchHooks Function({bool friendId})
         > {
   $$MilestonesTableTableManager(_$AppDatabase db, $MilestonesTable table)
     : super(
@@ -4053,9 +5309,54 @@ class $$MilestonesTableTableManager
                 rowid: rowid,
               ),
           withReferenceMapper: (p0) => p0
-              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .map(
+                (e) => (
+                  e.readTable(table),
+                  $$MilestonesTableReferences(db, table, e),
+                ),
+              )
               .toList(),
-          prefetchHooksCallback: null,
+          prefetchHooksCallback: ({friendId = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [],
+              addJoins:
+                  <
+                    T extends TableManagerState<
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic
+                    >
+                  >(state) {
+                    if (friendId) {
+                      state =
+                          state.withJoin(
+                                currentTable: table,
+                                currentColumn: table.friendId,
+                                referencedTable: $$MilestonesTableReferences
+                                    ._friendIdTable(db),
+                                referencedColumn: $$MilestonesTableReferences
+                                    ._friendIdTable(db)
+                                    .id,
+                              )
+                              as T;
+                    }
+
+                    return state;
+                  },
+              getPrefetchedDataCallback: (items) async {
+                return [];
+              },
+            );
+          },
         ),
       );
 }
@@ -4070,12 +5371,9 @@ typedef $$MilestonesTableProcessedTableManager =
       $$MilestonesTableAnnotationComposer,
       $$MilestonesTableCreateCompanionBuilder,
       $$MilestonesTableUpdateCompanionBuilder,
-      (
-        MilestoneRow,
-        BaseReferences<_$AppDatabase, $MilestonesTable, MilestoneRow>,
-      ),
+      (MilestoneRow, $$MilestonesTableReferences),
       MilestoneRow,
-      PrefetchHooks Function()
+      PrefetchHooks Function({bool friendId})
     >;
 
 class $AppDatabaseManager {

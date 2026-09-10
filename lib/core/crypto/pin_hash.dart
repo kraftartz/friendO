@@ -102,7 +102,7 @@ Uint8List hashPin(String pin, KdfParams params) {
 ///
 /// The work is hundreds of milliseconds on a mid-range phone, which is a
 /// dropped frame for every one of them if it runs beside the keypad.
-Future<Uint8List> hashPinApart(String pin, KdfParams params) =>
+Future<Uint8List> hashPinAsync(String pin, KdfParams params) =>
     Isolate.run(() => hashPin(pin, params));
 
 /// Answers whether two PIN digests are the same, in constant time.

@@ -10,6 +10,7 @@ import 'package:friendo/core/profiles/profile.dart';
 import 'package:friendo/core/profiles/profile_creator.dart';
 import 'package:friendo/core/profiles/profile_list.dart';
 import 'package:friendo/core/profiles/profile_session.dart';
+import 'package:friendo/core/profiles/pin.dart';
 import 'package:hashlib/hashlib.dart';
 
 void main() {
@@ -141,7 +142,7 @@ void main() {
 
       expect(
         await session.unlock(profile.id, '123456'),
-        const Failed(UnlockFailure.dataKeyMissing),
+        const Failed(UnlockFailureReason.dataKeyMissing),
       );
     });
 
@@ -160,7 +161,7 @@ void main() {
 
       expect(
         await session.unlock(profile.id, '123456'),
-        const Failed(UnlockFailure.fileWillNotOpen),
+        const Failed(UnlockFailureReason.fileWillNotOpen),
       );
       expect(await attemptsOf(profile.id), 0);
     });
@@ -180,7 +181,7 @@ void main() {
 
       expect(
         await session.unlock(profile.id, '123456'),
-        const Failed(UnlockFailure.migrationFailed),
+        const Failed(UnlockFailureReason.migrationFailed),
       );
       expect(await attemptsOf(profile.id), 0);
     });
@@ -228,13 +229,13 @@ void main() {
     });
   });
 
-  group('the rest after wrong PINs', () {
-    Matcher restingFor(Duration rest) => isA<Resting>().having(
+  group('the delay after wrong PINs', () {
+    Matcher waitingFor(Duration delay) => isA<PinDelayed>().having(
       (outcome) => outcome.remaining,
       'remaining',
       allOf(
-        greaterThan(rest - const Duration(seconds: 1)),
-        lessThanOrEqualTo(rest),
+        greaterThan(delay - const Duration(seconds: 1)),
+        lessThanOrEqualTo(delay),
       ),
     );
 
@@ -255,6 +256,21 @@ void main() {
       expect(await attemptsOf(profile.id), 0);
     });
 
+    test('starts again once the Profile locks', () async {
+      final profile = await aProfile();
+      await missTimes(profile.id, 5);
+
+      // Real time on the keypad counts against the delay.
+      await Future<void>.delayed(const Duration(milliseconds: 1200));
+      expect(await session.delayLeftFor(profile.id), lessThan(firstPinDelay));
+
+      await session.lock();
+
+      // The keypad is gone, so the next arrival pays the whole delay. Without
+      // this the watch would run on and a later read would find none left.
+      expect(await session.delayLeftFor(profile.id), firstPinDelay);
+    });
+
     test('refuses the next arrival for 30 seconds after the fifth', () async {
       final profile = await aProfile();
 
@@ -263,7 +279,7 @@ void main() {
 
       expect(
         await session.unlock(profile.id, '123456'),
-        restingFor(const Duration(seconds: 30)),
+        waitingFor(const Duration(seconds: 30)),
       );
       expect(await databases.state.first, DatabaseState.locked);
     });
@@ -302,11 +318,11 @@ void main() {
 
       expect(
         await session.unlock(profile.id, '123456'),
-        restingFor(const Duration(seconds: 30)),
+        waitingFor(const Duration(seconds: 30)),
       );
     });
 
-    test('rests one Profile and not the other', () async {
+    test('delays one Profile and not the other', () async {
       final mine = await aProfile('Michal', '123456');
       final theirs = await aProfile('Ola', '654321');
 
@@ -330,7 +346,7 @@ void main() {
 
       expect(
         await started.unlock(profile.id, '123456'),
-        restingFor(const Duration(seconds: 30)),
+        waitingFor(const Duration(seconds: 30)),
       );
     });
 
@@ -341,11 +357,11 @@ void main() {
       session.arriveAtKeypad();
 
       expect(
-        await session.restLeftFor(profile.id),
+        await session.delayLeftFor(profile.id),
         lessThanOrEqualTo(const Duration(seconds: 30)),
       );
       expect(
-        await session.restLeftFor(profile.id),
+        await session.delayLeftFor(profile.id),
         greaterThan(const Duration(seconds: 29)),
       );
     });
@@ -355,7 +371,7 @@ void main() {
 
       session.arriveAtKeypad();
 
-      expect(await session.restLeftFor(profile.id), Duration.zero);
+      expect(await session.delayLeftFor(profile.id), Duration.zero);
     });
   });
 

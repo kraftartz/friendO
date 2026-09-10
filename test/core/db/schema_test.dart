@@ -82,6 +82,33 @@ void main() {
     expect(int.parse(await pragma('user_version')), database.schemaVersion);
   });
 
+  test('a child row cannot name a Friend that is not there', () async {
+    final database = await session.open('a', _key(1));
+
+    // The repository clears children itself, so this constraint is not the
+    // mechanism. It is the guard for the day a second door is written.
+    expect(
+      database.customStatement(
+        'insert into meetings (id, friend_id, happened_on, created_at) '
+        "values ('m1', 'nobody', 1, 1)",
+      ),
+      throwsA(
+        isA<Object>().having(
+          (error) => error.toString(),
+          'toString',
+          contains('FOREIGN KEY'),
+        ),
+      ),
+    );
+  });
+
+  test('the pragma that makes a foreign key bite is on', () async {
+    final database = await session.open('a', _key(1));
+    final row = await database.customSelect('pragma foreign_keys').getSingle();
+
+    expect(row.data.values.single, 1);
+  });
+
   test('the Folded Text sits beside the text it folds', () async {
     await session.open('9f2c', _key(1));
 

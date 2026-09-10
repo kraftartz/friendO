@@ -10,6 +10,7 @@ import 'package:friendo/core/profiles/profile_list.dart';
 import 'package:friendo/core/profiles/profile_session.dart';
 import 'package:friendo/features/auth/bloc/unlock_cubit.dart';
 import 'package:friendo/features/auth/bloc/unlock_state.dart';
+import 'package:friendo/features/auth/view/unlock_page.dart';
 import 'package:hashlib/hashlib.dart';
 
 void main() {
@@ -123,8 +124,8 @@ void main() {
     await cubit.close();
   });
 
-  group('while it rests', () {
-    Future<UnlockCubit> restingKeypad() async {
+  group('while it waits', () {
+    Future<UnlockCubit> delayedKeypad() async {
       for (var attempt = 0; attempt < 5; attempt++) {
         session.arriveAtKeypad();
         await session.unlock(profile.id, '000000');
@@ -133,23 +134,41 @@ void main() {
       return keypad();
     }
 
-    test('reports what is left of the rest', () async {
-      final cubit = await restingKeypad();
+    test('reports what is left of the delay', () async {
+      final cubit = await delayedKeypad();
 
-      expect(cubit.state.step, UnlockStep.resting);
-      expect(cubit.state.rest, greaterThan(const Duration(seconds: 28)));
+      expect(cubit.state.step, UnlockStep.delayed);
+      expect(cubit.state.delay, greaterThan(const Duration(seconds: 28)));
       await cubit.close();
     });
 
     test('refuses a digit', () async {
-      final cubit = await restingKeypad();
+      final cubit = await delayedKeypad();
 
       await type(cubit, '123456');
 
       expect(cubit.state.typed, isEmpty);
-      expect(cubit.state.step, UnlockStep.resting);
+      expect(cubit.state.step, UnlockStep.delayed);
       expect(await databases.state.first, DatabaseState.locked);
       await cubit.close();
+    });
+  });
+
+  group('the words the keypad says', () {
+    test('never tell the User to wait less than they must', () {
+      expect(
+        pinDelayWords(const Duration(milliseconds: 1500)),
+        endsWith('2 seconds.'),
+      );
+      expect(
+        pinDelayWords(const Duration(seconds: 61)),
+        endsWith('2 minutes.'),
+      );
+    });
+
+    test('count one thing in the singular', () {
+      expect(pinDelayWords(const Duration(seconds: 1)), endsWith('1 second.'));
+      expect(pinDelayWords(const Duration(seconds: 60)), endsWith('1 minute.'));
     });
   });
 }
