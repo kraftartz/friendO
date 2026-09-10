@@ -40,7 +40,7 @@ class Meetings extends Table {
   TextColumn get place => text().nullable()();
 
   /// How long the Meeting was, in minutes.
-  IntColumn get minutes => integer().nullable()();
+  IntColumn get lengthInMinutes => integer().nullable()();
 
   /// How the Meeting felt, in the User's own words.
   TextColumn get feeling => text().nullable()();
@@ -124,7 +124,10 @@ class Facts extends Table {
   TextColumn get value => text()();
 
   /// Where the Fact sits in the Friend's own order, from zero.
-  IntColumn get position => integer()();
+  ///
+  /// The Friend holds the Facts in order and the aggregate carries no such
+  /// number, so this column exists to give that order back on the next read.
+  IntColumn get ordinal => integer()();
 
   @override
   Set<Column> get primaryKey => {id};

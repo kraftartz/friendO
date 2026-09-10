@@ -3,12 +3,12 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../core/db/database_session.dart';
 import '../core/profiles/profile.dart';
 import '../core/profiles/profile_creator.dart';
 import '../core/profiles/profile_session.dart';
 import '../core/security/auto_lock.dart';
 import '../core/security/screen_cover.dart';
-import '../core/db/database_session.dart';
 import '../features/auth/bloc/unlock_cubit.dart';
 import '../features/auth/bloc/unlock_state.dart';
 import '../features/auth/view/damaged_list_page.dart';

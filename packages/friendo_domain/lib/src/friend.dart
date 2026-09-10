@@ -27,7 +27,7 @@ final class Meeting extends Equatable implements Comparable<Meeting> {
     int? happenedAtMinute,
     String? place,
     int? lengthInMinutes,
-    String? vibe,
+    String? feeling,
     String? recap,
   }) {
     if (happenedAtMinute != null &&
@@ -51,7 +51,7 @@ final class Meeting extends Equatable implements Comparable<Meeting> {
       happenedAtMinute: happenedAtMinute,
       place: place,
       lengthInMinutes: lengthInMinutes,
-      vibe: vibe,
+      feeling: feeling,
       recap: recap,
     );
   }
@@ -62,7 +62,7 @@ final class Meeting extends Equatable implements Comparable<Meeting> {
     required this.happenedAtMinute,
     required this.place,
     required this.lengthInMinutes,
-    required this.vibe,
+    required this.feeling,
     required this.recap,
   });
 
@@ -71,7 +71,7 @@ final class Meeting extends Equatable implements Comparable<Meeting> {
   final int? happenedAtMinute;
   final String? place;
   final int? lengthInMinutes;
-  final String? vibe;
+  final String? feeling;
   final String? recap;
 
   /// Orders the newest Meeting first. The id breaks a tie, so two Meetings on
@@ -89,7 +89,7 @@ final class Meeting extends Equatable implements Comparable<Meeting> {
     happenedAtMinute,
     place,
     lengthInMinutes,
-    vibe,
+    feeling,
     recap,
   ];
 }
@@ -158,33 +158,29 @@ final class Note extends Equatable {
 ///
 /// The User writes both halves and chooses the [label]. The label is text to
 /// show, and never a thing to filter by.
+///
+/// A Fact carries no order of its own. The Friend holds the Facts in the
+/// order the User put them in, and one order in one place cannot fall out of
+/// step with itself.
 final class Fact extends Equatable {
   factory Fact({
     required String id,
     required String label,
     required String value,
-    int position = 0,
   }) => Fact._(
     id: _required(id, 'id'),
     label: _required(label, 'label'),
     value: _required(value, 'value'),
-    position: position,
   );
 
-  const Fact._({
-    required this.id,
-    required this.label,
-    required this.value,
-    required this.position,
-  });
+  const Fact._({required this.id, required this.label, required this.value});
 
   final String id;
   final String label;
   final String value;
-  final int position;
 
   @override
-  List<Object?> get props => [id, label, value, position];
+  List<Object?> get props => [id, label, value];
 }
 
 /// Something a Friend is into, taken from a shared set.

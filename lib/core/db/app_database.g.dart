@@ -387,12 +387,12 @@ class $MeetingsTable extends Meetings
     type: DriftSqlType.string,
     requiredDuringInsert: false,
   );
-  static const VerificationMeta _minutesMeta = const VerificationMeta(
-    'minutes',
+  static const VerificationMeta _lengthInMinutesMeta = const VerificationMeta(
+    'lengthInMinutes',
   );
   @override
-  late final GeneratedColumn<int> minutes = GeneratedColumn<int>(
-    'minutes',
+  late final GeneratedColumn<int> lengthInMinutes = GeneratedColumn<int>(
+    'length_in_minutes',
     aliasedName,
     true,
     type: DriftSqlType.int,
@@ -426,7 +426,7 @@ class $MeetingsTable extends Meetings
     happenedAtMinute,
     createdAt,
     place,
-    minutes,
+    lengthInMinutes,
     feeling,
     recap,
   ];
@@ -486,10 +486,13 @@ class $MeetingsTable extends Meetings
         place.isAcceptableOrUnknown(data['place']!, _placeMeta),
       );
     }
-    if (data.containsKey('minutes')) {
+    if (data.containsKey('length_in_minutes')) {
       context.handle(
-        _minutesMeta,
-        minutes.isAcceptableOrUnknown(data['minutes']!, _minutesMeta),
+        _lengthInMinutesMeta,
+        lengthInMinutes.isAcceptableOrUnknown(
+          data['length_in_minutes']!,
+          _lengthInMinutesMeta,
+        ),
       );
     }
     if (data.containsKey('feeling')) {
@@ -537,9 +540,9 @@ class $MeetingsTable extends Meetings
         DriftSqlType.string,
         data['${effectivePrefix}place'],
       ),
-      minutes: attachedDatabase.typeMapping.read(
+      lengthInMinutes: attachedDatabase.typeMapping.read(
         DriftSqlType.int,
-        data['${effectivePrefix}minutes'],
+        data['${effectivePrefix}length_in_minutes'],
       ),
       feeling: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
@@ -569,7 +572,7 @@ class MeetingRow extends DataClass implements Insertable<MeetingRow> {
   final String? place;
 
   /// How long the Meeting was, in minutes.
-  final int? minutes;
+  final int? lengthInMinutes;
 
   /// How the Meeting felt, in the User's own words.
   final String? feeling;
@@ -581,7 +584,7 @@ class MeetingRow extends DataClass implements Insertable<MeetingRow> {
     this.happenedAtMinute,
     required this.createdAt,
     this.place,
-    this.minutes,
+    this.lengthInMinutes,
     this.feeling,
     this.recap,
   });
@@ -598,8 +601,8 @@ class MeetingRow extends DataClass implements Insertable<MeetingRow> {
     if (!nullToAbsent || place != null) {
       map['place'] = Variable<String>(place);
     }
-    if (!nullToAbsent || minutes != null) {
-      map['minutes'] = Variable<int>(minutes);
+    if (!nullToAbsent || lengthInMinutes != null) {
+      map['length_in_minutes'] = Variable<int>(lengthInMinutes);
     }
     if (!nullToAbsent || feeling != null) {
       map['feeling'] = Variable<String>(feeling);
@@ -622,9 +625,9 @@ class MeetingRow extends DataClass implements Insertable<MeetingRow> {
       place: place == null && nullToAbsent
           ? const Value.absent()
           : Value(place),
-      minutes: minutes == null && nullToAbsent
+      lengthInMinutes: lengthInMinutes == null && nullToAbsent
           ? const Value.absent()
-          : Value(minutes),
+          : Value(lengthInMinutes),
       feeling: feeling == null && nullToAbsent
           ? const Value.absent()
           : Value(feeling),
@@ -646,7 +649,7 @@ class MeetingRow extends DataClass implements Insertable<MeetingRow> {
       happenedAtMinute: serializer.fromJson<int?>(json['happenedAtMinute']),
       createdAt: serializer.fromJson<int>(json['createdAt']),
       place: serializer.fromJson<String?>(json['place']),
-      minutes: serializer.fromJson<int?>(json['minutes']),
+      lengthInMinutes: serializer.fromJson<int?>(json['lengthInMinutes']),
       feeling: serializer.fromJson<String?>(json['feeling']),
       recap: serializer.fromJson<String?>(json['recap']),
     );
@@ -661,7 +664,7 @@ class MeetingRow extends DataClass implements Insertable<MeetingRow> {
       'happenedAtMinute': serializer.toJson<int?>(happenedAtMinute),
       'createdAt': serializer.toJson<int>(createdAt),
       'place': serializer.toJson<String?>(place),
-      'minutes': serializer.toJson<int?>(minutes),
+      'lengthInMinutes': serializer.toJson<int?>(lengthInMinutes),
       'feeling': serializer.toJson<String?>(feeling),
       'recap': serializer.toJson<String?>(recap),
     };
@@ -674,7 +677,7 @@ class MeetingRow extends DataClass implements Insertable<MeetingRow> {
     Value<int?> happenedAtMinute = const Value.absent(),
     int? createdAt,
     Value<String?> place = const Value.absent(),
-    Value<int?> minutes = const Value.absent(),
+    Value<int?> lengthInMinutes = const Value.absent(),
     Value<String?> feeling = const Value.absent(),
     Value<String?> recap = const Value.absent(),
   }) => MeetingRow(
@@ -686,7 +689,9 @@ class MeetingRow extends DataClass implements Insertable<MeetingRow> {
         : this.happenedAtMinute,
     createdAt: createdAt ?? this.createdAt,
     place: place.present ? place.value : this.place,
-    minutes: minutes.present ? minutes.value : this.minutes,
+    lengthInMinutes: lengthInMinutes.present
+        ? lengthInMinutes.value
+        : this.lengthInMinutes,
     feeling: feeling.present ? feeling.value : this.feeling,
     recap: recap.present ? recap.value : this.recap,
   );
@@ -702,7 +707,9 @@ class MeetingRow extends DataClass implements Insertable<MeetingRow> {
           : this.happenedAtMinute,
       createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
       place: data.place.present ? data.place.value : this.place,
-      minutes: data.minutes.present ? data.minutes.value : this.minutes,
+      lengthInMinutes: data.lengthInMinutes.present
+          ? data.lengthInMinutes.value
+          : this.lengthInMinutes,
       feeling: data.feeling.present ? data.feeling.value : this.feeling,
       recap: data.recap.present ? data.recap.value : this.recap,
     );
@@ -717,7 +724,7 @@ class MeetingRow extends DataClass implements Insertable<MeetingRow> {
           ..write('happenedAtMinute: $happenedAtMinute, ')
           ..write('createdAt: $createdAt, ')
           ..write('place: $place, ')
-          ..write('minutes: $minutes, ')
+          ..write('lengthInMinutes: $lengthInMinutes, ')
           ..write('feeling: $feeling, ')
           ..write('recap: $recap')
           ..write(')'))
@@ -732,7 +739,7 @@ class MeetingRow extends DataClass implements Insertable<MeetingRow> {
     happenedAtMinute,
     createdAt,
     place,
-    minutes,
+    lengthInMinutes,
     feeling,
     recap,
   );
@@ -746,7 +753,7 @@ class MeetingRow extends DataClass implements Insertable<MeetingRow> {
           other.happenedAtMinute == this.happenedAtMinute &&
           other.createdAt == this.createdAt &&
           other.place == this.place &&
-          other.minutes == this.minutes &&
+          other.lengthInMinutes == this.lengthInMinutes &&
           other.feeling == this.feeling &&
           other.recap == this.recap);
 }
@@ -758,7 +765,7 @@ class MeetingsCompanion extends UpdateCompanion<MeetingRow> {
   final Value<int?> happenedAtMinute;
   final Value<int> createdAt;
   final Value<String?> place;
-  final Value<int?> minutes;
+  final Value<int?> lengthInMinutes;
   final Value<String?> feeling;
   final Value<String?> recap;
   final Value<int> rowid;
@@ -769,7 +776,7 @@ class MeetingsCompanion extends UpdateCompanion<MeetingRow> {
     this.happenedAtMinute = const Value.absent(),
     this.createdAt = const Value.absent(),
     this.place = const Value.absent(),
-    this.minutes = const Value.absent(),
+    this.lengthInMinutes = const Value.absent(),
     this.feeling = const Value.absent(),
     this.recap = const Value.absent(),
     this.rowid = const Value.absent(),
@@ -781,7 +788,7 @@ class MeetingsCompanion extends UpdateCompanion<MeetingRow> {
     this.happenedAtMinute = const Value.absent(),
     required int createdAt,
     this.place = const Value.absent(),
-    this.minutes = const Value.absent(),
+    this.lengthInMinutes = const Value.absent(),
     this.feeling = const Value.absent(),
     this.recap = const Value.absent(),
     this.rowid = const Value.absent(),
@@ -796,7 +803,7 @@ class MeetingsCompanion extends UpdateCompanion<MeetingRow> {
     Expression<int>? happenedAtMinute,
     Expression<int>? createdAt,
     Expression<String>? place,
-    Expression<int>? minutes,
+    Expression<int>? lengthInMinutes,
     Expression<String>? feeling,
     Expression<String>? recap,
     Expression<int>? rowid,
@@ -808,7 +815,7 @@ class MeetingsCompanion extends UpdateCompanion<MeetingRow> {
       if (happenedAtMinute != null) 'happened_at_minute': happenedAtMinute,
       if (createdAt != null) 'created_at': createdAt,
       if (place != null) 'place': place,
-      if (minutes != null) 'minutes': minutes,
+      if (lengthInMinutes != null) 'length_in_minutes': lengthInMinutes,
       if (feeling != null) 'feeling': feeling,
       if (recap != null) 'recap': recap,
       if (rowid != null) 'rowid': rowid,
@@ -822,7 +829,7 @@ class MeetingsCompanion extends UpdateCompanion<MeetingRow> {
     Value<int?>? happenedAtMinute,
     Value<int>? createdAt,
     Value<String?>? place,
-    Value<int?>? minutes,
+    Value<int?>? lengthInMinutes,
     Value<String?>? feeling,
     Value<String?>? recap,
     Value<int>? rowid,
@@ -834,7 +841,7 @@ class MeetingsCompanion extends UpdateCompanion<MeetingRow> {
       happenedAtMinute: happenedAtMinute ?? this.happenedAtMinute,
       createdAt: createdAt ?? this.createdAt,
       place: place ?? this.place,
-      minutes: minutes ?? this.minutes,
+      lengthInMinutes: lengthInMinutes ?? this.lengthInMinutes,
       feeling: feeling ?? this.feeling,
       recap: recap ?? this.recap,
       rowid: rowid ?? this.rowid,
@@ -862,8 +869,8 @@ class MeetingsCompanion extends UpdateCompanion<MeetingRow> {
     if (place.present) {
       map['place'] = Variable<String>(place.value);
     }
-    if (minutes.present) {
-      map['minutes'] = Variable<int>(minutes.value);
+    if (lengthInMinutes.present) {
+      map['length_in_minutes'] = Variable<int>(lengthInMinutes.value);
     }
     if (feeling.present) {
       map['feeling'] = Variable<String>(feeling.value);
@@ -886,7 +893,7 @@ class MeetingsCompanion extends UpdateCompanion<MeetingRow> {
           ..write('happenedAtMinute: $happenedAtMinute, ')
           ..write('createdAt: $createdAt, ')
           ..write('place: $place, ')
-          ..write('minutes: $minutes, ')
+          ..write('lengthInMinutes: $lengthInMinutes, ')
           ..write('feeling: $feeling, ')
           ..write('recap: $recap, ')
           ..write('rowid: $rowid')
@@ -1938,19 +1945,19 @@ class $FactsTable extends Facts with TableInfo<$FactsTable, FactRow> {
     type: DriftSqlType.string,
     requiredDuringInsert: true,
   );
-  static const VerificationMeta _positionMeta = const VerificationMeta(
-    'position',
+  static const VerificationMeta _ordinalMeta = const VerificationMeta(
+    'ordinal',
   );
   @override
-  late final GeneratedColumn<int> position = GeneratedColumn<int>(
-    'position',
+  late final GeneratedColumn<int> ordinal = GeneratedColumn<int>(
+    'ordinal',
     aliasedName,
     false,
     type: DriftSqlType.int,
     requiredDuringInsert: true,
   );
   @override
-  List<GeneratedColumn> get $columns => [id, friendId, label, value, position];
+  List<GeneratedColumn> get $columns => [id, friendId, label, value, ordinal];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
@@ -1992,13 +1999,13 @@ class $FactsTable extends Facts with TableInfo<$FactsTable, FactRow> {
     } else if (isInserting) {
       context.missing(_valueMeta);
     }
-    if (data.containsKey('position')) {
+    if (data.containsKey('ordinal')) {
       context.handle(
-        _positionMeta,
-        position.isAcceptableOrUnknown(data['position']!, _positionMeta),
+        _ordinalMeta,
+        ordinal.isAcceptableOrUnknown(data['ordinal']!, _ordinalMeta),
       );
     } else if (isInserting) {
-      context.missing(_positionMeta);
+      context.missing(_ordinalMeta);
     }
     return context;
   }
@@ -2025,9 +2032,9 @@ class $FactsTable extends Facts with TableInfo<$FactsTable, FactRow> {
         DriftSqlType.string,
         data['${effectivePrefix}value'],
       )!,
-      position: attachedDatabase.typeMapping.read(
+      ordinal: attachedDatabase.typeMapping.read(
         DriftSqlType.int,
-        data['${effectivePrefix}position'],
+        data['${effectivePrefix}ordinal'],
       )!,
     );
   }
@@ -2045,13 +2052,16 @@ class FactRow extends DataClass implements Insertable<FactRow> {
   final String value;
 
   /// Where the Fact sits in the Friend's own order, from zero.
-  final int position;
+  ///
+  /// The Friend holds the Facts in order and the aggregate carries no such
+  /// number, so this column exists to give that order back on the next read.
+  final int ordinal;
   const FactRow({
     required this.id,
     required this.friendId,
     required this.label,
     required this.value,
-    required this.position,
+    required this.ordinal,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -2060,7 +2070,7 @@ class FactRow extends DataClass implements Insertable<FactRow> {
     map['friend_id'] = Variable<String>(friendId);
     map['label'] = Variable<String>(label);
     map['value'] = Variable<String>(value);
-    map['position'] = Variable<int>(position);
+    map['ordinal'] = Variable<int>(ordinal);
     return map;
   }
 
@@ -2070,7 +2080,7 @@ class FactRow extends DataClass implements Insertable<FactRow> {
       friendId: Value(friendId),
       label: Value(label),
       value: Value(value),
-      position: Value(position),
+      ordinal: Value(ordinal),
     );
   }
 
@@ -2084,7 +2094,7 @@ class FactRow extends DataClass implements Insertable<FactRow> {
       friendId: serializer.fromJson<String>(json['friendId']),
       label: serializer.fromJson<String>(json['label']),
       value: serializer.fromJson<String>(json['value']),
-      position: serializer.fromJson<int>(json['position']),
+      ordinal: serializer.fromJson<int>(json['ordinal']),
     );
   }
   @override
@@ -2095,7 +2105,7 @@ class FactRow extends DataClass implements Insertable<FactRow> {
       'friendId': serializer.toJson<String>(friendId),
       'label': serializer.toJson<String>(label),
       'value': serializer.toJson<String>(value),
-      'position': serializer.toJson<int>(position),
+      'ordinal': serializer.toJson<int>(ordinal),
     };
   }
 
@@ -2104,13 +2114,13 @@ class FactRow extends DataClass implements Insertable<FactRow> {
     String? friendId,
     String? label,
     String? value,
-    int? position,
+    int? ordinal,
   }) => FactRow(
     id: id ?? this.id,
     friendId: friendId ?? this.friendId,
     label: label ?? this.label,
     value: value ?? this.value,
-    position: position ?? this.position,
+    ordinal: ordinal ?? this.ordinal,
   );
   FactRow copyWithCompanion(FactsCompanion data) {
     return FactRow(
@@ -2118,7 +2128,7 @@ class FactRow extends DataClass implements Insertable<FactRow> {
       friendId: data.friendId.present ? data.friendId.value : this.friendId,
       label: data.label.present ? data.label.value : this.label,
       value: data.value.present ? data.value.value : this.value,
-      position: data.position.present ? data.position.value : this.position,
+      ordinal: data.ordinal.present ? data.ordinal.value : this.ordinal,
     );
   }
 
@@ -2129,13 +2139,13 @@ class FactRow extends DataClass implements Insertable<FactRow> {
           ..write('friendId: $friendId, ')
           ..write('label: $label, ')
           ..write('value: $value, ')
-          ..write('position: $position')
+          ..write('ordinal: $ordinal')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode => Object.hash(id, friendId, label, value, position);
+  int get hashCode => Object.hash(id, friendId, label, value, ordinal);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -2144,7 +2154,7 @@ class FactRow extends DataClass implements Insertable<FactRow> {
           other.friendId == this.friendId &&
           other.label == this.label &&
           other.value == this.value &&
-          other.position == this.position);
+          other.ordinal == this.ordinal);
 }
 
 class FactsCompanion extends UpdateCompanion<FactRow> {
@@ -2152,14 +2162,14 @@ class FactsCompanion extends UpdateCompanion<FactRow> {
   final Value<String> friendId;
   final Value<String> label;
   final Value<String> value;
-  final Value<int> position;
+  final Value<int> ordinal;
   final Value<int> rowid;
   const FactsCompanion({
     this.id = const Value.absent(),
     this.friendId = const Value.absent(),
     this.label = const Value.absent(),
     this.value = const Value.absent(),
-    this.position = const Value.absent(),
+    this.ordinal = const Value.absent(),
     this.rowid = const Value.absent(),
   });
   FactsCompanion.insert({
@@ -2167,19 +2177,19 @@ class FactsCompanion extends UpdateCompanion<FactRow> {
     required String friendId,
     required String label,
     required String value,
-    required int position,
+    required int ordinal,
     this.rowid = const Value.absent(),
   }) : id = Value(id),
        friendId = Value(friendId),
        label = Value(label),
        value = Value(value),
-       position = Value(position);
+       ordinal = Value(ordinal);
   static Insertable<FactRow> custom({
     Expression<String>? id,
     Expression<String>? friendId,
     Expression<String>? label,
     Expression<String>? value,
-    Expression<int>? position,
+    Expression<int>? ordinal,
     Expression<int>? rowid,
   }) {
     return RawValuesInsertable({
@@ -2187,7 +2197,7 @@ class FactsCompanion extends UpdateCompanion<FactRow> {
       if (friendId != null) 'friend_id': friendId,
       if (label != null) 'label': label,
       if (value != null) 'value': value,
-      if (position != null) 'position': position,
+      if (ordinal != null) 'ordinal': ordinal,
       if (rowid != null) 'rowid': rowid,
     });
   }
@@ -2197,7 +2207,7 @@ class FactsCompanion extends UpdateCompanion<FactRow> {
     Value<String>? friendId,
     Value<String>? label,
     Value<String>? value,
-    Value<int>? position,
+    Value<int>? ordinal,
     Value<int>? rowid,
   }) {
     return FactsCompanion(
@@ -2205,7 +2215,7 @@ class FactsCompanion extends UpdateCompanion<FactRow> {
       friendId: friendId ?? this.friendId,
       label: label ?? this.label,
       value: value ?? this.value,
-      position: position ?? this.position,
+      ordinal: ordinal ?? this.ordinal,
       rowid: rowid ?? this.rowid,
     );
   }
@@ -2225,8 +2235,8 @@ class FactsCompanion extends UpdateCompanion<FactRow> {
     if (value.present) {
       map['value'] = Variable<String>(value.value);
     }
-    if (position.present) {
-      map['position'] = Variable<int>(position.value);
+    if (ordinal.present) {
+      map['ordinal'] = Variable<int>(ordinal.value);
     }
     if (rowid.present) {
       map['rowid'] = Variable<int>(rowid.value);
@@ -2241,7 +2251,7 @@ class FactsCompanion extends UpdateCompanion<FactRow> {
           ..write('friendId: $friendId, ')
           ..write('label: $label, ')
           ..write('value: $value, ')
-          ..write('position: $position, ')
+          ..write('ordinal: $ordinal, ')
           ..write('rowid: $rowid')
           ..write(')'))
         .toString();
@@ -2828,7 +2838,7 @@ typedef $$MeetingsTableCreateCompanionBuilder =
       Value<int?> happenedAtMinute,
       required int createdAt,
       Value<String?> place,
-      Value<int?> minutes,
+      Value<int?> lengthInMinutes,
       Value<String?> feeling,
       Value<String?> recap,
       Value<int> rowid,
@@ -2841,7 +2851,7 @@ typedef $$MeetingsTableUpdateCompanionBuilder =
       Value<int?> happenedAtMinute,
       Value<int> createdAt,
       Value<String?> place,
-      Value<int?> minutes,
+      Value<int?> lengthInMinutes,
       Value<String?> feeling,
       Value<String?> recap,
       Value<int> rowid,
@@ -2886,8 +2896,8 @@ class $$MeetingsTableFilterComposer
     builder: (column) => ColumnFilters(column),
   );
 
-  ColumnFilters<int> get minutes => $composableBuilder(
-    column: $table.minutes,
+  ColumnFilters<int> get lengthInMinutes => $composableBuilder(
+    column: $table.lengthInMinutes,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -2941,8 +2951,8 @@ class $$MeetingsTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
-  ColumnOrderings<int> get minutes => $composableBuilder(
-    column: $table.minutes,
+  ColumnOrderings<int> get lengthInMinutes => $composableBuilder(
+    column: $table.lengthInMinutes,
     builder: (column) => ColumnOrderings(column),
   );
 
@@ -2988,8 +2998,10 @@ class $$MeetingsTableAnnotationComposer
   GeneratedColumn<String> get place =>
       $composableBuilder(column: $table.place, builder: (column) => column);
 
-  GeneratedColumn<int> get minutes =>
-      $composableBuilder(column: $table.minutes, builder: (column) => column);
+  GeneratedColumn<int> get lengthInMinutes => $composableBuilder(
+    column: $table.lengthInMinutes,
+    builder: (column) => column,
+  );
 
   GeneratedColumn<String> get feeling =>
       $composableBuilder(column: $table.feeling, builder: (column) => column);
@@ -3035,7 +3047,7 @@ class $$MeetingsTableTableManager
                 Value<int?> happenedAtMinute = const Value.absent(),
                 Value<int> createdAt = const Value.absent(),
                 Value<String?> place = const Value.absent(),
-                Value<int?> minutes = const Value.absent(),
+                Value<int?> lengthInMinutes = const Value.absent(),
                 Value<String?> feeling = const Value.absent(),
                 Value<String?> recap = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
@@ -3046,7 +3058,7 @@ class $$MeetingsTableTableManager
                 happenedAtMinute: happenedAtMinute,
                 createdAt: createdAt,
                 place: place,
-                minutes: minutes,
+                lengthInMinutes: lengthInMinutes,
                 feeling: feeling,
                 recap: recap,
                 rowid: rowid,
@@ -3059,7 +3071,7 @@ class $$MeetingsTableTableManager
                 Value<int?> happenedAtMinute = const Value.absent(),
                 required int createdAt,
                 Value<String?> place = const Value.absent(),
-                Value<int?> minutes = const Value.absent(),
+                Value<int?> lengthInMinutes = const Value.absent(),
                 Value<String?> feeling = const Value.absent(),
                 Value<String?> recap = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
@@ -3070,7 +3082,7 @@ class $$MeetingsTableTableManager
                 happenedAtMinute: happenedAtMinute,
                 createdAt: createdAt,
                 place: place,
-                minutes: minutes,
+                lengthInMinutes: lengthInMinutes,
                 feeling: feeling,
                 recap: recap,
                 rowid: rowid,
@@ -3676,7 +3688,7 @@ typedef $$FactsTableCreateCompanionBuilder =
       required String friendId,
       required String label,
       required String value,
-      required int position,
+      required int ordinal,
       Value<int> rowid,
     });
 typedef $$FactsTableUpdateCompanionBuilder =
@@ -3685,7 +3697,7 @@ typedef $$FactsTableUpdateCompanionBuilder =
       Value<String> friendId,
       Value<String> label,
       Value<String> value,
-      Value<int> position,
+      Value<int> ordinal,
       Value<int> rowid,
     });
 
@@ -3717,8 +3729,8 @@ class $$FactsTableFilterComposer extends Composer<_$AppDatabase, $FactsTable> {
     builder: (column) => ColumnFilters(column),
   );
 
-  ColumnFilters<int> get position => $composableBuilder(
-    column: $table.position,
+  ColumnFilters<int> get ordinal => $composableBuilder(
+    column: $table.ordinal,
     builder: (column) => ColumnFilters(column),
   );
 }
@@ -3752,8 +3764,8 @@ class $$FactsTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
-  ColumnOrderings<int> get position => $composableBuilder(
-    column: $table.position,
+  ColumnOrderings<int> get ordinal => $composableBuilder(
+    column: $table.ordinal,
     builder: (column) => ColumnOrderings(column),
   );
 }
@@ -3779,8 +3791,8 @@ class $$FactsTableAnnotationComposer
   GeneratedColumn<String> get value =>
       $composableBuilder(column: $table.value, builder: (column) => column);
 
-  GeneratedColumn<int> get position =>
-      $composableBuilder(column: $table.position, builder: (column) => column);
+  GeneratedColumn<int> get ordinal =>
+      $composableBuilder(column: $table.ordinal, builder: (column) => column);
 }
 
 class $$FactsTableTableManager
@@ -3815,14 +3827,14 @@ class $$FactsTableTableManager
                 Value<String> friendId = const Value.absent(),
                 Value<String> label = const Value.absent(),
                 Value<String> value = const Value.absent(),
-                Value<int> position = const Value.absent(),
+                Value<int> ordinal = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => FactsCompanion(
                 id: id,
                 friendId: friendId,
                 label: label,
                 value: value,
-                position: position,
+                ordinal: ordinal,
                 rowid: rowid,
               ),
           createCompanionCallback:
@@ -3831,14 +3843,14 @@ class $$FactsTableTableManager
                 required String friendId,
                 required String label,
                 required String value,
-                required int position,
+                required int ordinal,
                 Value<int> rowid = const Value.absent(),
               }) => FactsCompanion.insert(
                 id: id,
                 friendId: friendId,
                 label: label,
                 value: value,
-                position: position,
+                ordinal: ordinal,
                 rowid: rowid,
               ),
           withReferenceMapper: (p0) => p0

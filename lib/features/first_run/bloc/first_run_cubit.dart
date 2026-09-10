@@ -7,8 +7,6 @@ import '../../../core/profiles/profile_creator.dart';
 import '../../../core/profiles/profile_session.dart';
 import 'first_run_state.dart';
 
-/// The number of digits in a PIN. The last one submits it, so no confirm
-/// button is needed here or at any later unlock.
 /// Walks First Run from an empty phone to a Profile that opens.
 ///
 /// The Profile is made the moment the two PINs match, and before the

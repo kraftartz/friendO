@@ -5,19 +5,18 @@ import 'package:friendo_domain/friendo_domain.dart';
 import '../db/app_database.dart';
 import '../db/database_session.dart';
 import '../text/folded_text.dart';
+import '../time/clock.dart';
 
-/// A Friend's name beside their Placing, for a screen that only draws.
+/// A Friend reduced to a name beside a Placing.
 ///
-/// A screen that draws a list needs no Meeting, no Note and no Fact, so it
-/// reads this instead of the whole Friend.
+/// It holds no Meeting, no Note and no Fact, so a caller that only draws
+/// never loads the whole aggregate to reach a name.
 class FriendPlacing extends Equatable {
   const FriendPlacing({required this.name, required this.placing});
 
   final String name;
 
   final Placing placing;
-
-  String get friendId => placing.friendId;
 
   @override
   List<Object?> get props => [name, placing];
@@ -29,9 +28,11 @@ class FriendPlacing extends Equatable {
 /// handle survives a lock. A call that arrives while the Profile is locked
 /// throws [DatabaseLockedError], and no caller needs a try around a query.
 class FriendRepository {
-  const FriendRepository(this.databases);
+  const FriendRepository(this.databases, {this.clock = const Clock()});
 
   final DatabaseSession databases;
+
+  final Clock clock;
 
   /// Reads the whole Friend, or null when this Profile holds no such Friend.
   Future<Friend?> load(String friendId) async {
@@ -88,10 +89,10 @@ class FriendRepository {
                 friendId: friend.id,
                 happenedOn: meeting.happenedOn.epochDay,
                 happenedAtMinute: Value(meeting.happenedAtMinute),
-                createdAt: DateTime.now().millisecondsSinceEpoch,
+                createdAt: clock.now().millisecondsSinceEpoch,
                 place: Value(meeting.place),
-                minutes: Value(meeting.lengthInMinutes),
-                feeling: Value(meeting.vibe),
+                lengthInMinutes: Value(meeting.lengthInMinutes),
+                feeling: Value(meeting.feeling),
                 recap: Value(meeting.recap),
               ),
             );
@@ -113,7 +114,8 @@ class FriendRepository {
             );
       }
 
-      for (final fact in friend.facts) {
+      for (var ordinal = 0; ordinal < friend.facts.length; ordinal++) {
+        final fact = friend.facts[ordinal];
         await database
             .into(database.facts)
             .insert(
@@ -122,7 +124,7 @@ class FriendRepository {
                 friendId: friend.id,
                 label: fact.label,
                 value: fact.value,
-                position: friend.facts.indexOf(fact),
+                ordinal: ordinal,
               ),
             );
       }
@@ -249,8 +251,8 @@ class FriendRepository {
             happenedOn: CivilDate.fromEpochDay(row.happenedOn),
             happenedAtMinute: row.happenedAtMinute,
             place: row.place,
-            lengthInMinutes: row.minutes,
-            vibe: row.feeling,
+            lengthInMinutes: row.lengthInMinutes,
+            feeling: row.feeling,
             recap: row.recap,
           ),
         )
@@ -281,7 +283,7 @@ class FriendRepository {
     final rows =
         await (database.select(database.facts)
               ..where((row) => row.friendId.equals(friendId))
-              ..orderBy([(row) => OrderingTerm(expression: row.position)]))
+              ..orderBy([(row) => OrderingTerm(expression: row.ordinal)]))
             .get();
 
     return rows

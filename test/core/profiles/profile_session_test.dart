@@ -12,8 +12,6 @@ import 'package:friendo/core/profiles/profile_list.dart';
 import 'package:friendo/core/profiles/profile_session.dart';
 import 'package:hashlib/hashlib.dart';
 
-import '../../support/unmigratable_database.dart';
-
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
@@ -169,14 +167,19 @@ void main() {
 
     test('reports a schema that will not move forward', () async {
       final profile = await aProfile();
-      final stuck = ProfileSession(
-        profiles: profiles,
-        databases: UnmigratableDatabase(directory),
-        dataKeys: dataKeys,
+      await databases.open(profile.id, (await dataKeys.read(profile.id))!);
+      // A schema this app must move forward, with an object of another kind
+      // standing where one of the tables has to go.
+      await databases.database.customStatement('drop table meetings');
+      await databases.database.customStatement('create table junk (a)');
+      await databases.database.customStatement(
+        'create index meetings on junk (a)',
       );
+      await databases.database.customStatement('pragma user_version = 1');
+      await databases.close();
 
       expect(
-        await stuck.unlock(profile.id, '123456'),
+        await session.unlock(profile.id, '123456'),
         const Failed(UnlockFailure.migrationFailed),
       );
       expect(await attemptsOf(profile.id), 0);

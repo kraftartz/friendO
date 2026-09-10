@@ -2,6 +2,7 @@ import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:flutter_test/flutter_test.dart';
+import 'package:friendo/core/db/app_database.dart';
 import 'package:friendo/core/db/database_session.dart';
 
 Uint8List _key(int fill) => Uint8List.fromList(List.filled(32, fill));
@@ -54,6 +55,20 @@ void main() {
     }
     await session.database.customStatement('pragma user_version = 1');
   }
+
+  test('a schema step that will not run says which failure it was', () async {
+    await session.open('9f2c', _key(1));
+    await takeItBackToVersionOne();
+    // An object of another kind, under the name a table needs.
+    await session.database.customStatement('create table junk (a)');
+    await session.database.customStatement('create index friends on junk (a)');
+    await session.close();
+
+    await expectLater(
+      session.open('9f2c', _key(1)),
+      throwsA(isA<MigrationFailed>()),
+    );
+  });
 
   test('a new file holds every table', () async {
     await session.open('9f2c', _key(1));

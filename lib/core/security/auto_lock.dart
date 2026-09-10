@@ -37,7 +37,7 @@ class AutoLock with WidgetsBindingObserver {
     this.timeout = defaultLockTimeout,
   });
 
-  /// The one way the app locks. The settings entry calls the same thing.
+  /// What this runs when it decides to lock. It is the one way to lock.
   final Future<void> Function() lock;
 
   final Clock clock;
