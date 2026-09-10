@@ -26,12 +26,22 @@ jobs:
           flutter-version: 3.41.7
           cache: true
 
-      # flutter_secure_storage compiles against Android SDK 37, and the runner
-      # image does not ship it. Install it here rather than leaving it to
-      # Gradle's auto-download, which needs accepted licences and fails with a
-      # stack trace instead of a clear message.
-      - name: Install Android SDK 37
-        run: sdkmanager "platforms;android-37"
+      # flutter_secure_storage compiles against Android SDK platform 37, which
+      # android/app/build.gradle.kts pins as compileSdk. Install it here rather
+      # than leaving it to Gradle's auto-download, which needs accepted
+      # licences and fails with a stack trace instead of a clear message.
+      #
+      # The package id carries the minor version. There is no
+      # `platforms;android-37`, and sdkmanager fails on an id it cannot find.
+      #
+      # The action, rather than a bare `sdkmanager` call: the runner image
+      # ships the SDK and the command line tools but leaves their bin directory
+      # off PATH, so `sdkmanager` is not a command. The action puts it on PATH
+      # and accepts the licences an install needs, which keeps this step
+      # working when the image moves its directories.
+      - uses: android-actions/setup-android@v4
+        with:
+          packages: "platform-tools platforms;android-37.0"
 
       - name: Fetch dependencies
         run: ./tool/get.sh
