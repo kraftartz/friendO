@@ -67,11 +67,11 @@ class ReminderScheduler {
   void start() {
     _roster ??= friends.watchDialFriends().listen((rows) {
       _held = rows;
-      topUp();
+      topUp().ignore();
     });
     _options ??= settings.watch().listen((options) {
       _wanted = options;
-      topUp();
+      topUp().ignore();
     });
   }
 
@@ -84,9 +84,13 @@ class ReminderScheduler {
     // One run at a time. Two overlapping runs would read the same pending set
     // and both write the difference, which cancels a reminder that the other
     // has already scheduled.
-    _working = _working.then((_) => _makeItAgree());
+    final run = _working.then((_) => _makeItAgree());
 
-    return _working;
+    // The queue holds no error. A run that fails is one lost update, and the
+    // next call starts clean; an error kept here would fail every later call.
+    _working = run.catchError((Object _) {});
+
+    return run;
   }
 
   /// Stop following, and leave the pending reminders where they are.

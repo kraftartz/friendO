@@ -291,6 +291,23 @@ void main() {
     });
   });
 
+  group('a run that fails', () {
+    test('loses that run only, and the next one schedules', () async {
+      await writeFriend('anna', daysAgo: 0);
+      await settings.change(remindersOn: true);
+      final scheduler = await aRunningScheduler();
+      await sink.cancel('anna');
+
+      sink.failsNextSchedule = true;
+      await expectLater(scheduler.topUp(), throwsStateError);
+      expect(sink.friendIds, isEmpty);
+
+      await scheduler.topUp();
+
+      expect(sink.friendIds, {'anna'});
+    });
+  });
+
   group('a lock', () {
     test('cancels nothing, because reminders belong to the Profile', () async {
       await writeFriend('anna', daysAgo: 0);

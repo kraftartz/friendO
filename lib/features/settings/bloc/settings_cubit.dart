@@ -229,6 +229,8 @@ class SettingsCubit extends Cubit<SettingsReading> with WidgetsBindingObserver {
       return;
     }
 
+    if (isClosed) return;
+
     emit(const SettingsReading.locked());
   }
 }

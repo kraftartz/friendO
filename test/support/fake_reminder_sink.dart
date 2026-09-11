@@ -15,6 +15,10 @@ class FakeReminderSink implements ReminderSink {
   /// How many reminders were written before [prepare] was called.
   int writesBeforePrepare = 0;
 
+  /// When true, the next [schedule] throws and writes nothing. It turns
+  /// itself off, so the call after that one behaves.
+  bool failsNextSchedule = false;
+
   /// The reminders the sink is holding, nearest first.
   List<Reminder> get held =>
       [..._held.values]..sort((a, b) => a.fireAt.compareTo(b.fireAt));
@@ -35,6 +39,10 @@ class FakeReminderSink implements ReminderSink {
 
   @override
   Future<void> schedule(Reminder reminder) async {
+    if (failsNextSchedule) {
+      failsNextSchedule = false;
+      throw StateError('the platform refused this reminder');
+    }
     if (prepares == 0) writesBeforePrepare++;
     _held[reminder.friendId] = reminder;
   }
