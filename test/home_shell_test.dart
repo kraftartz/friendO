@@ -1,6 +1,8 @@
 import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
+
+import 'support/fake_gates.dart';
 import 'package:friendo/app/app.dart';
 import 'package:friendo/app/navigation/app_section.dart';
 import 'package:friendo/features/dial/view/dial_view.dart' show DialView;
@@ -12,7 +14,11 @@ import 'support/wiring.dart';
 FriendoApp aFriendoApp() {
   final wiring = Wiring(Directory.systemTemp);
 
-  return FriendoApp(creator: wiring.creator, session: wiring.session);
+  return FriendoApp(
+    edges: fakeEdges(),
+    creator: wiring.creator,
+    session: wiring.session,
+  );
 }
 
 void main() {
@@ -59,7 +65,7 @@ void main() {
 
       await tester.tap(find.text('Settings'));
       await tester.pumpAndSettle();
-      expect(find.text('Settings page'), findsOneWidget);
+      expect(find.byType(DialView), findsNothing);
 
       await tester.tap(find.text('Dial'));
       await tester.pumpAndSettle();

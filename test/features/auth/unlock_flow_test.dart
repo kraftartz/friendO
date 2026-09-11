@@ -2,6 +2,8 @@ import 'dart:io';
 
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_test/flutter_test.dart';
+
+import '../../support/fake_gates.dart';
 import 'package:friendo/app/app.dart';
 import 'package:friendo/app/boot.dart';
 import 'package:friendo/core/profiles/profile.dart';
@@ -44,6 +46,7 @@ void main() {
   Future<void> start(WidgetTester tester, FirstScreen screen) =>
       tester.pumpWidget(
         FriendoApp(
+          edges: fakeEdges(),
           creator: wiring.creator,
           session: wiring.session,
           firstScreen: screen,

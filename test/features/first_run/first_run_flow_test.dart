@@ -3,6 +3,8 @@ import 'dart:io';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_test/flutter_test.dart';
+
+import '../../support/fake_gates.dart';
 import 'package:friendo/app/app.dart';
 import 'package:friendo/app/boot.dart';
 import 'package:friendo/features/first_run/bloc/first_run_cubit.dart';
@@ -33,6 +35,7 @@ void main() {
   ) async {
     await tester.pumpWidget(
       FriendoApp(
+        edges: fakeEdges(),
         creator: wiring.creator,
         session: wiring.session,
         firstScreen: const StartFirstRun(),
@@ -44,7 +47,11 @@ void main() {
 
   testWidgets('a phone with a Profile starts on the Dial', (tester) async {
     await tester.pumpWidget(
-      FriendoApp(creator: wiring.creator, session: wiring.session),
+      FriendoApp(
+        edges: fakeEdges(),
+        creator: wiring.creator,
+        session: wiring.session,
+      ),
     );
 
     expect(find.byType(FirstRunPage), findsNothing);
@@ -54,6 +61,7 @@ void main() {
   testWidgets('the cost screen leads to the Dial', (tester) async {
     await tester.pumpWidget(
       FriendoApp(
+        edges: fakeEdges(),
         creator: wiring.creator,
         session: wiring.session,
         firstScreen: const StartFirstRun(),

@@ -2,7 +2,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:friendo/core/time/civil_date_change.dart'
     show CivilDateChange, untilNextMidnight;
 
-import '../../support/running_clock.dart';
+import '../../support/fixed_clock.dart';
 
 /// How long to wait when the thing under test is an absence.
 ///
@@ -26,6 +26,11 @@ Future<void> until(bool Function() answer) async {
 }
 
 /// A tenth of a second before the local Civil Date changes.
+///
+/// The wait the timer is set for is that tenth of a second, and the Civil Date
+/// moves only when a test moves the Clock. A Clock that ran with the machine
+/// would decide both, and a loaded machine would then answer a question the
+/// test meant to answer itself.
 DateTime justBeforeMidnight() => DateTime(2026, 9, 10, 23, 59, 59, 900);
 
 void main() {
@@ -70,14 +75,22 @@ void main() {
   });
 
   group('CivilDateChange', () {
+    /// A change over a Clock the test moves, and the Clock beside it.
+    (CivilDateChange, FixedClock) aChange() {
+      final clock = FixedClock(justBeforeMidnight());
+
+      return (CivilDateChange(clock: clock), clock);
+    }
+
     test('announces once when the local Civil Date changes, and does not '
         'tick', () async {
-      final change = CivilDateChange(clock: RunningClock(justBeforeMidnight()));
+      final (change, clock) = aChange();
       addTearDown(change.dispose);
 
       final announcements = <void>[];
       final listening = change.changes.listen(announcements.add);
       addTearDown(listening.cancel);
+      clock.advance(const Duration(milliseconds: 200));
 
       await until(() => announcements.isNotEmpty);
       // Long enough after the first announcement for a second to have shown
@@ -88,12 +101,13 @@ void main() {
     });
 
     test('waits for the midnight after the one it announced', () async {
-      final change = CivilDateChange(clock: RunningClock(justBeforeMidnight()));
+      final (change, clock) = aChange();
       addTearDown(change.dispose);
 
       final announcements = <void>[];
       final listening = change.changes.listen(announcements.add);
       addTearDown(listening.cancel);
+      clock.advance(const Duration(milliseconds: 200));
 
       await until(() => announcements.isNotEmpty);
 
@@ -101,7 +115,7 @@ void main() {
     });
 
     test('announces to every screen that is listening', () async {
-      final change = CivilDateChange(clock: RunningClock(justBeforeMidnight()));
+      final (change, clock) = aChange();
       addTearDown(change.dispose);
 
       final dial = <void>[];
@@ -110,6 +124,7 @@ void main() {
       final onList = change.changes.listen(list.add);
       addTearDown(onDial.cancel);
       addTearDown(onList.cancel);
+      clock.advance(const Duration(milliseconds: 200));
 
       await until(() => dial.isNotEmpty && list.isNotEmpty);
 
@@ -118,11 +133,12 @@ void main() {
     });
 
     test('stops the timer when the last listener goes', () async {
-      final change = CivilDateChange(clock: RunningClock(justBeforeMidnight()));
+      final (change, clock) = aChange();
       addTearDown(change.dispose);
 
       final announcements = <void>[];
       await change.changes.listen(announcements.add).cancel();
+      clock.advance(const Duration(milliseconds: 200));
 
       await Future<void>.delayed(settle);
 
@@ -131,7 +147,7 @@ void main() {
     });
 
     test('keeps waiting while one of two screens goes', () async {
-      final change = CivilDateChange(clock: RunningClock(justBeforeMidnight()));
+      final (change, clock) = aChange();
       addTearDown(change.dispose);
 
       final staying = <void>[];
@@ -139,6 +155,7 @@ void main() {
       final onList = change.changes.listen(staying.add);
       addTearDown(onList.cancel);
       await onDial.cancel();
+      clock.advance(const Duration(milliseconds: 200));
 
       await until(() => staying.isNotEmpty);
 
@@ -146,7 +163,7 @@ void main() {
     });
 
     test('waits again when a screen listens once more', () async {
-      final change = CivilDateChange(clock: RunningClock(justBeforeMidnight()));
+      final (change, clock) = aChange();
       addTearDown(change.dispose);
 
       await change.changes.listen((_) {}).cancel();
@@ -155,6 +172,7 @@ void main() {
       final announcements = <void>[];
       final listening = change.changes.listen(announcements.add);
       addTearDown(listening.cancel);
+      clock.advance(const Duration(milliseconds: 200));
 
       expect(change.isWaiting, isTrue);
       await until(() => announcements.isNotEmpty);
@@ -162,11 +180,12 @@ void main() {
     });
 
     test('stops the timer when it is disposed', () async {
-      final change = CivilDateChange(clock: RunningClock(justBeforeMidnight()));
+      final (change, clock) = aChange();
 
       final announcements = <void>[];
       change.changes.listen(announcements.add);
       await change.dispose();
+      clock.advance(const Duration(milliseconds: 200));
 
       await Future<void>.delayed(settle);
 
