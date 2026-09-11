@@ -1,56 +1,88 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 
-import '../../features/dial/view/dial_page.dart';
+import '../../core/db/database_session.dart';
+import '../../core/friends/friend_repository.dart';
+import '../../core/profiles/profile_list.dart';
+import '../../core/profiles/profile_session.dart';
+import '../../core/settings/settings_store.dart';
+import '../../core/time/civil_date_change.dart';
+import '../../features/dial/bloc/dial_cubit.dart';
 import '../../features/friends/bloc/friends_cubit.dart';
-import '../../features/friends/view/friends_page.dart';
-import '../../features/settings/view/settings_page.dart';
+import '../../features/settings/bloc/settings_cubit.dart';
+import '../platform_edges.dart';
 import 'app_section.dart';
-import 'navigation_cubit.dart';
 
 /// The frame around every section: a page above, a navigation bar below.
 ///
-/// This widget imports three features, which is why it lives in `app/`. A
-/// feature must never import another feature. Joining them is the app layer's
-/// job.
+/// The router hands it the branch that is on show. The bar reports a tap and
+/// routes nothing itself, which is the same shape every screen in this app
+/// has: it produces a request, and the router reads it.
 ///
-/// The pages sit in an [IndexedStack], so a page keeps its state and its scroll
-/// position while the user is somewhere else.
+/// The blocs a section reads are made here and keyed by the Profile, so
+/// switching gives every one of them a fresh start rather than a state built
+/// from somebody else's rows.
 class HomeShell extends StatelessWidget {
-  /// Create the shell.
-  const HomeShell({super.key});
+  /// Draw the shell around [shell], for the Profile under [profileId].
+  const HomeShell({
+    required this.shell,
+    required this.profileId,
+    required this.wantsProfile,
+    super.key,
+  });
 
-  /// The page for each section.
-  ///
-  /// This list is indexed by [AppSection.index], so its order must match the
-  /// order of the enum values.
+  /// The branch the router is showing, and the way to change it.
+  final StatefulNavigationShell shell;
+
+  /// The Profile that is open. The blocs are keyed by it.
+  final String? profileId;
+
+  /// Told which Profile the User wants once this one closes.
+  final void Function(String profileId) wantsProfile;
+
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<NavigationCubit, AppSection>(
-      builder: (context, section) => Scaffold(
-        body: SafeArea(
-          child: IndexedStack(
-            index: section.index,
-            children: [
-              // Wiring one feature to another is this layer's job. The Dial
-              // raises the request and routes none of it itself.
-              DialPage(
-                onAddFriend: () =>
-                    context.read<NavigationCubit>().select(AppSection.friends),
-                onShowOrbit: (orbit) {
-                  context.read<FriendsCubit>().showOrbit(orbit);
-                  context.read<NavigationCubit>().select(AppSection.friends);
-                },
-              ),
-              const FriendsPage(),
-              const SettingsPage(),
-            ],
+    final databases = context.read<DatabaseSession>();
+    final friends = context.read<FriendRepository>();
+    final dayChange = context.read<CivilDateChange>();
+
+    return MultiBlocProvider(
+      key: ValueKey<String?>(profileId),
+      providers: [
+        BlocProvider(
+          create: (_) => FriendsCubit(
+            friends: friends,
+            databases: databases,
+            dayChange: dayChange,
           ),
         ),
+        BlocProvider(
+          create: (_) => DialCubit(
+            friends: friends,
+            databases: databases,
+            dayChange: dayChange,
+          ),
+        ),
+        BlocProvider(
+          create: (_) => SettingsCubit(
+            profileId: profileId,
+            wantsProfile: wantsProfile,
+            settings: context.read<SettingsStore>(),
+            profiles: context.read<ProfileList>(),
+            session: context.read<ProfileSession>(),
+            databases: databases,
+            notifications: context.read<PlatformEdges>().notifications,
+            biometrics: context.read<PlatformEdges>().biometrics,
+            screens: context.read<PlatformEdges>().screens,
+          ),
+        ),
+      ],
+      child: Scaffold(
+        body: SafeArea(child: shell),
         bottomNavigationBar: NavigationBar(
-          selectedIndex: section.index,
-          onDestinationSelected: (index) =>
-              context.read<NavigationCubit>().select(AppSection.values[index]),
+          selectedIndex: shell.currentIndex,
+          onDestinationSelected: shell.goBranch,
           destinations: [
             for (final section in AppSection.values)
               NavigationDestination(

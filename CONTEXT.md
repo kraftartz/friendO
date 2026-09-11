@@ -52,6 +52,9 @@ _Avoid_: date, day, timestamp, datetime
 **Cadence**:
 How often you want to see a Friend, held as a length of time.
 _Avoid_: cycle, interval, frequency, tempo, period, rhythm, schedule
+The banned `schedule` is the word for a Cadence. The reminder schedule keeps the word, because it
+is a different thing: the set of reminders the phone is holding, which `core/reminders/` owns. See
+[ADR-0012](docs/adr/0012-opt-in-local-notifications.md).
 
 **Meeting**:
 A recorded occasion when you saw a Friend, on a Civil Date up to today. The newest one starts that

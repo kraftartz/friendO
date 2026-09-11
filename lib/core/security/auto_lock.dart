@@ -42,7 +42,12 @@ class AutoLock with WidgetsBindingObserver {
 
   final Clock clock;
 
-  final Duration timeout;
+  /// How long the app may be away before it locks.
+  ///
+  /// It is read at the moment the app comes back, so a change written while
+  /// the app is away is in force for that return. The value is a setting the
+  /// User owns (ADR-0011), and this object neither reads nor stores it.
+  Duration timeout;
 
   DateTime? _wentAway;
 

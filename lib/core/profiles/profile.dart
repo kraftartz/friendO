@@ -15,6 +15,7 @@ class Profile extends Equatable {
     required this.pinHash,
     required this.kdfParams,
     required this.failedAttempts,
+    this.usesBiometricUnlock = false,
   });
 
   /// 128 random bits, as 32 lowercase hexadecimal characters.
@@ -35,13 +36,36 @@ class Profile extends Equatable {
   /// The count of wrong PINs since the last correct one.
   final int failedAttempts;
 
-  Profile withFailedAttempts(int count) => Profile(
+  /// Whether this Profile offers a fingerprint beside its PIN.
+  ///
+  /// It is the one setting in the plaintext file. The PIN screen has to know
+  /// whether to offer a fingerprint for the Profile the User just picked, and
+  /// at that moment no database is open. It is not a credential and it opens
+  /// nothing. See ADR-0036 and ADR-0011.
+  final bool usesBiometricUnlock;
+
+  /// Copy the Profile, changing the fields given.
+  Profile changing({
+    String? displayName,
+    int? failedAttempts,
+    bool? usesBiometricUnlock,
+  }) => Profile(
     id: id,
-    displayName: displayName,
+    displayName: displayName ?? this.displayName,
     pinHash: pinHash,
     kdfParams: kdfParams,
-    failedAttempts: count,
+    failedAttempts: failedAttempts ?? this.failedAttempts,
+    usesBiometricUnlock: usesBiometricUnlock ?? this.usesBiometricUnlock,
   );
+
+  /// Copy the Profile with a different display name.
+  Profile named(String displayName) => changing(displayName: displayName);
+
+  /// Copy the Profile with the fingerprint offered or withdrawn.
+  Profile withBiometricUnlock(bool uses) => changing(usesBiometricUnlock: uses);
+
+  /// Copy the Profile with a different count of wrong PINs.
+  Profile withFailedAttempts(int count) => changing(failedAttempts: count);
 
   @override
   List<Object?> get props => [
@@ -50,5 +74,6 @@ class Profile extends Equatable {
     pinHash,
     kdfParams,
     failedAttempts,
+    usesBiometricUnlock,
   ];
 }

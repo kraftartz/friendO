@@ -37,10 +37,17 @@ dependencies:
   diacritic: ^0.1.6
   drift: ^2.34.4
   flutter_local_notifications: ^22.3.0
+
+  # Named here because core/reminders/ imports it directly. ADR-0012 needs the
+  # zone database set up before a reminder is scheduled, or a daylight-saving
+  # change moves the fire time.
+  timezone: ^0.11.1
   flutter_secure_storage: ^11.0.0
   path: ^1.9.1
   path_provider: ^2.1.6
   sqlite3: ^3.5.2
+  local_auth: ^3.0.2
+  go_router: ^17.5.0
 
 dev_dependencies:
   flutter_test:

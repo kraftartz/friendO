@@ -89,7 +89,13 @@ class FirstRunCubit extends Cubit<FirstRunState> {
       // still reaches the cost screen: it exists, and making a second one
       // would be worse than asking for the PIN at the next start.
       await _session.openProfile(profile.id);
-      emit(FirstRunState(step: FirstRunStep.cost, name: name));
+      emit(
+        FirstRunState(
+          step: FirstRunStep.cost,
+          name: name,
+          profileId: profile.id,
+        ),
+      );
     } on Object {
       emit(
         FirstRunState(

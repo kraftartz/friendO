@@ -408,6 +408,37 @@ final class Friend extends Equatable {
   /// two Meeting routes above, that leaves no method in this library that can
   /// return a Friend with no Meeting. The rule is unreachable rather than
   /// guarded. See ADR-0022.
+  /// Whether a Meeting may be taken off this Friend.
+  ///
+  /// ADR-0016 makes `lastMet` the newest Meeting date, so a Friend with no
+  /// Meeting cannot be placed at all. A screen reads this and draws the delete
+  /// as unavailable. It never works the rule out for itself.
+  bool get canDropMeeting => meetings.length > 1;
+
+  /// Take the Meeting under [meetingId] off this Friend.
+  ///
+  /// No return of this method holds no Meeting: the last one cannot be
+  /// dropped, and the Friend that would result is refused before it is built.
+  /// Dropping the newest one falls back to the one before it, and every
+  /// reading follows, because nothing was stored.
+  Friend dropMeeting(String meetingId) {
+    if (!meetings.any((held) => held.id == meetingId)) {
+      throw ArgumentError.value(
+        meetingId,
+        'meetingId',
+        'this Friend holds no Meeting under it',
+      );
+    }
+    if (!canDropMeeting) {
+      throw StateError('A Friend keeps their last Meeting.');
+    }
+
+    return _withMeetings([
+      for (final held in meetings)
+        if (held.id != meetingId) held,
+    ]);
+  }
+
   Friend copyWith({
     String? name,
     Cadence? cadence,

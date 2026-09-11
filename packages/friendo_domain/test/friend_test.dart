@@ -353,4 +353,53 @@ void main() {
       expect(started().copyWith(cadence: Cadence.ofDays(7)), isNot(started()));
     });
   });
+
+  group('dropping a Meeting', () {
+    Friend twoMeetings() => Friend.hydrate(
+      id: 'f1',
+      name: 'Anna',
+      cadence: Cadence.ofDays(30),
+      meetings: [
+        Meeting(id: 'older', happenedOn: CivilDate(2026, 1, 1)),
+        Meeting(id: 'newest', happenedOn: CivilDate(2026, 6, 1)),
+      ],
+    );
+
+    test('falls back to the Meeting before the newest one', () {
+      final left = twoMeetings().dropMeeting('newest');
+
+      expect(left.meetings.map((meeting) => meeting.id), ['older']);
+      expect(left.lastMet, CivilDate(2026, 1, 1));
+    });
+
+    test('leaves lastMet alone when an older Meeting goes', () {
+      final left = twoMeetings().dropMeeting('older');
+
+      expect(left.lastMet, CivilDate(2026, 6, 1));
+    });
+
+    test('keeps a Friend of one Meeting whole', () {
+      final friend = Friend.started(
+        id: 'f1',
+        name: 'Anna',
+        cadence: Cadence.ofDays(30),
+        firstMeeting: Meeting(id: 'only', happenedOn: CivilDate(2026, 6, 1)),
+        now: DateTime(2026, 6, 2),
+      );
+
+      expect(friend.canDropMeeting, isFalse);
+      expect(() => friend.dropMeeting('only'), throwsStateError);
+    });
+
+    test('says a Friend of two Meetings may lose one', () {
+      expect(twoMeetings().canDropMeeting, isTrue);
+    });
+
+    test('refuses a Meeting this Friend does not hold', () {
+      expect(
+        () => twoMeetings().dropMeeting('somebody elses'),
+        throwsArgumentError,
+      );
+    });
+  });
 }

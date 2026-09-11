@@ -3,6 +3,7 @@ import 'package:path_provider/path_provider.dart';
 
 import 'app/app.dart';
 import 'app/boot.dart';
+import 'app/platform_edges.dart';
 import 'core/db/database_session.dart';
 import 'core/profiles/data_key_store.dart';
 import 'core/profiles/profile_creator.dart';
@@ -19,6 +20,7 @@ Future<void> main() async {
 
   runApp(
     FriendoApp(
+      edges: PlatformEdges.ofThisPhone(),
       firstScreen: await readFirstScreen(profiles),
       creator: ProfileCreator(
         profiles: profiles,

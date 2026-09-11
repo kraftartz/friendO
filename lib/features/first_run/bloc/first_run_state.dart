@@ -32,6 +32,7 @@ class FirstRunState extends Equatable {
     this.pin = '',
     this.confirmation = '',
     this.message,
+    this.profileId,
   });
 
   final FirstRunStep step;
@@ -49,20 +50,36 @@ class FirstRunState extends Equatable {
   /// What went wrong, for the User to read. It is null while nothing has.
   final String? message;
 
+  /// The Profile that was made, from the moment it exists.
+  ///
+  /// The app layer needs it to know which Profile is open, and reading it back
+  /// out of the file would be a second answer to a question this object
+  /// already holds.
+  final String? profileId;
+
   FirstRunState copyWith({
     FirstRunStep? step,
     String? name,
     String? pin,
     String? confirmation,
     String? message,
+    String? profileId,
   }) => FirstRunState(
     step: step ?? this.step,
     name: name ?? this.name,
     pin: pin ?? this.pin,
     confirmation: confirmation ?? this.confirmation,
     message: message,
+    profileId: profileId ?? this.profileId,
   );
 
   @override
-  List<Object?> get props => [step, name, pin, confirmation, message];
+  List<Object?> get props => [
+    step,
+    name,
+    pin,
+    confirmation,
+    message,
+    profileId,
+  ];
 }

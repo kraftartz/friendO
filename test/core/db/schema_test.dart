@@ -15,6 +15,7 @@ const _tables = [
   'friend_affinities',
   'facts',
   'milestones',
+  'settings',
 ];
 
 void main() {
@@ -163,5 +164,17 @@ void main() {
       expect(await pragma('plaintext_header_size'), '0');
       expect(await pragma('mc_legacy_wal'), '0');
     });
+  });
+
+  test('a version 2 file gains the settings table', () async {
+    await session.open('9f2c', _key(1));
+    await session.database.customStatement('drop table settings');
+    await session.database.customStatement('pragma user_version = 2');
+    await session.close();
+
+    final database = await session.open('9f2c', _key(1));
+
+    expect(await tablesInTheFile(), contains('settings'));
+    expect(int.parse(await pragma('user_version')), database.schemaVersion);
   });
 }

@@ -3,10 +3,19 @@ import 'package:equatable/equatable.dart';
 /// A span of Cadence days, closed at the start and open at the end when
 /// [last] is null.
 final class DayRange extends Equatable {
-  const DayRange({required this.first, this.last});
+  const DayRange({required this.first, required this.recommended, this.last});
 
   /// The shortest Cadence the range holds, in days.
   final int first;
+
+  /// The Cadence in whole days this range puts forward when no one has named
+  /// one.
+  ///
+  /// It sits inside the range rather than on an edge, because an edge is one
+  /// day from the neighbouring range and reads as a boundary and not as a
+  /// suggestion. It moves with the boundaries, in this one file, which is what
+  /// ADR-0008 promises.
+  final int recommended;
 
   /// The longest Cadence the range holds, in days. Null when the range runs
   /// on with no end.
@@ -19,7 +28,7 @@ final class DayRange extends Equatable {
   }
 
   @override
-  List<Object?> get props => [first, last];
+  List<Object?> get props => [first, last, recommended];
 
   @override
   String toString() =>
@@ -36,14 +45,17 @@ final class DayRange extends Equatable {
 /// change that touches no stored data, which holds only while no second copy
 /// of a boundary exists, in SQL or anywhere else.
 enum Orbit {
-  inner(DayRange(first: 1, last: 14)),
-  middle(DayRange(first: 15, last: 60)),
-  outer(DayRange(first: 61));
+  inner(DayRange(first: 1, last: 14, recommended: 7)),
+  middle(DayRange(first: 15, last: 60, recommended: 30)),
+  outer(DayRange(first: 61, recommended: 90));
 
   const Orbit(this.cadenceDays);
 
   /// The Cadences, in days, that put a Friend on this Orbit.
   final DayRange cadenceDays;
+
+  /// The Cadence this Orbit puts forward.
+  Cadence get recommendedCadence => Cadence.ofDays(cadenceDays.recommended);
 
   /// The Orbit whose range holds [days].
   static Orbit of(int days) =>

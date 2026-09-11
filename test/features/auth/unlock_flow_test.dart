@@ -2,6 +2,8 @@ import 'dart:io';
 
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_test/flutter_test.dart';
+
+import '../../support/fake_gates.dart';
 import 'package:friendo/app/app.dart';
 import 'package:friendo/app/boot.dart';
 import 'package:friendo/core/profiles/profile.dart';
@@ -44,11 +46,26 @@ void main() {
   Future<void> start(WidgetTester tester, FirstScreen screen) =>
       tester.pumpWidget(
         FriendoApp(
+          edges: fakeEdges(),
           creator: wiring.creator,
           session: wiring.session,
           firstScreen: screen,
         ),
       );
+
+  /// Pumps until [finder] finds nothing, letting real work run between.
+  ///
+  /// A redirect takes a frame, and the work that triggers it takes a file.
+  Future<void> waitUntilGone(WidgetTester tester, Finder finder) async {
+    for (var pumps = 0; pumps < 50 && finder.evaluate().isNotEmpty; pumps++) {
+      await tester.runAsync(
+        () => Future<void>.delayed(const Duration(milliseconds: 10)),
+      );
+      // With a duration, because a route transition is an animation and a
+      // pump of no length advances no time.
+      await tester.pump(const Duration(milliseconds: 32));
+    }
+  }
 
   /// Pumps until [finder] finds something, letting real work run between.
   ///
@@ -59,7 +76,9 @@ void main() {
       await tester.runAsync(
         () => Future<void>.delayed(const Duration(milliseconds: 10)),
       );
-      await tester.pump();
+      // With a duration, because a route transition is an animation and a
+      // pump of no length advances no time.
+      await tester.pump(const Duration(milliseconds: 32));
     }
   }
 
@@ -94,6 +113,7 @@ void main() {
     await start(tester, AskForPin(profile));
 
     await typeThePin(tester, '123456');
+    await waitUntilGone(tester, find.byType(UnlockPage));
 
     expect(find.byType(UnlockPage), findsNothing);
     expect(find.text('Dial'), findsOneWidget);
@@ -110,9 +130,11 @@ void main() {
     final profile = await aProfile(tester, 'Michal', '123456');
     await start(tester, AskForPin(profile));
     await typeThePin(tester, '123456');
+    await waitUntilGone(tester, find.byType(UnlockPage));
 
     await tester.runAsync(wiring.session.lock);
     await waitFor(tester, find.byType(UnlockPage));
+    await waitUntilGone(tester, find.text('Dial'));
 
     expect(find.text('Dial'), findsNothing);
     expect(find.byType(UnlockPage), findsOneWidget);

@@ -61,5 +61,21 @@ void main() {
       expect(Orbit.of(60), Orbit.middle);
       expect(Orbit.of(61), Orbit.outer);
     });
+    test('puts forward a Cadence that its own range holds', () {
+      for (final orbit in Orbit.values) {
+        expect(
+          orbit.cadenceDays.holds(orbit.cadenceDays.recommended),
+          isTrue,
+          reason: '$orbit recommends a Cadence outside its own range',
+        );
+        expect(orbit.recommendedCadence.orbit, orbit);
+      }
+    });
+
+    test('the three recommendations differ', () {
+      final days = {for (final orbit in Orbit.values) orbit.recommendedCadence};
+
+      expect(days, hasLength(Orbit.values.length));
+    });
   });
 }
