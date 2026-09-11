@@ -236,7 +236,7 @@ class _FriendoAppState extends State<FriendoApp> {
       ),
       BlocProvider(
         create: (_) => SettingsCubit(
-          profileId: _profileId ?? '',
+          profileId: _profileId,
           settings: _settings,
           profiles: widget.session.profiles,
           session: widget.session,

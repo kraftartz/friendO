@@ -10,25 +10,12 @@ import 'package:friendo/core/text/folded_text.dart' show foldedText;
 import 'package:friendo/core/time/clock.dart' show Clock;
 import 'package:friendo/features/friends/bloc/add_friend_state.dart'
     show AddFriendDraft;
+import 'package:friendo/features/friends/bloc/refusal_words.dart'
+    show refusalWords, somethingIsNotFilledIn;
 import 'package:friendo/features/friends/cadence/cadence_choice.dart'
     show CadenceChoice, cadenceOfText, cadenceRefusal;
 import 'package:friendo_domain/friendo_domain.dart'
     show Affinity, CivilDate, Fact, Friend, Meeting, Milestone, Note, NoteLabel;
-
-/// The sentence for each refusal the aggregate can raise on a new Friend.
-///
-/// The aggregate owns the rules and this names the field to fix, so a User
-/// reads which half of the form is wrong rather than that something is.
-String refusalWords(ArgumentError error) => switch (error.name) {
-  'name' => 'A Friend needs a name.',
-  'meeting.happenedOn' =>
-    'A Meeting happens on today or an earlier day. Pick a day that has '
-        'already come.',
-  'body' => 'A Topic, an Update or a Note needs some text.',
-  'label' => 'A Fact and a Milestone each need a label.',
-  'value' => 'A Fact needs a value.',
-  _ => 'Something in the form is not filled in yet.',
-};
 
 /// Add a Friend: one form, held in memory, written in one call.
 ///
@@ -255,7 +242,11 @@ class AddFriendCubit extends Cubit<AddFriendDraft> {
         milestones: draft.milestones,
       );
     } on ArgumentError catch (error) {
-      emit(state.changing(refusal: refusalWords(error)));
+      emit(
+        state.changing(
+          refusal: refusalWords(error, whenUnknown: somethingIsNotFilledIn),
+        ),
+      );
 
       return null;
     }

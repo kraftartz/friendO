@@ -44,34 +44,28 @@ class Profile extends Equatable {
   /// nothing. See ADR-0036 and ADR-0011.
   final bool usesBiometricUnlock;
 
-  /// Copy the Profile with a different display name.
-  Profile named(String displayName) => Profile(
+  /// Copy the Profile, changing the fields given.
+  Profile changing({
+    String? displayName,
+    int? failedAttempts,
+    bool? usesBiometricUnlock,
+  }) => Profile(
     id: id,
-    displayName: displayName,
+    displayName: displayName ?? this.displayName,
     pinHash: pinHash,
     kdfParams: kdfParams,
-    failedAttempts: failedAttempts,
-    usesBiometricUnlock: usesBiometricUnlock,
+    failedAttempts: failedAttempts ?? this.failedAttempts,
+    usesBiometricUnlock: usesBiometricUnlock ?? this.usesBiometricUnlock,
   );
+
+  /// Copy the Profile with a different display name.
+  Profile named(String displayName) => changing(displayName: displayName);
 
   /// Copy the Profile with the fingerprint offered or withdrawn.
-  Profile withBiometricUnlock(bool uses) => Profile(
-    id: id,
-    displayName: displayName,
-    pinHash: pinHash,
-    kdfParams: kdfParams,
-    failedAttempts: failedAttempts,
-    usesBiometricUnlock: uses,
-  );
+  Profile withBiometricUnlock(bool uses) => changing(usesBiometricUnlock: uses);
 
-  Profile withFailedAttempts(int count) => Profile(
-    id: id,
-    displayName: displayName,
-    pinHash: pinHash,
-    kdfParams: kdfParams,
-    failedAttempts: count,
-    usesBiometricUnlock: usesBiometricUnlock,
-  );
+  /// Copy the Profile with a different count of wrong PINs.
+  Profile withFailedAttempts(int count) => changing(failedAttempts: count);
 
   @override
   List<Object?> get props => [

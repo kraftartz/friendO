@@ -10,24 +10,14 @@ import 'package:friendo/core/friends/friend_repository.dart'
 import 'package:friendo/core/ids/new_id.dart' show newId;
 import 'package:friendo/core/time/civil_date_change.dart' show CivilDateChange;
 import 'package:friendo/core/time/clock.dart' show Clock;
+import 'package:friendo/features/friends/bloc/refusal_words.dart'
+    show refusalWords, thatChangeWasRefused;
 import 'package:friendo/features/friends/bloc/notepad_state.dart'
     show NotepadReading;
 import 'package:friendo/features/friends/cadence/cadence_choice.dart'
     show CadenceChoice, cadenceOfText, cadenceRefusal;
 import 'package:friendo_domain/friendo_domain.dart'
     show CivilDate, Fact, Friend, Meeting, Milestone, Note, NoteLabel;
-
-/// The sentence for each refusal the aggregate raises on this screen.
-String notepadRefusalWords(ArgumentError error) => switch (error.name) {
-  'meeting.happenedOn' =>
-    'A Meeting happens on today or an earlier day. Pick a day that has '
-        'already come.',
-  'body' => 'A Topic, an Update or a Note needs some text.',
-  'label' => 'A Fact and a Milestone each need a label.',
-  'value' => 'A Fact needs a value.',
-  'name' => 'A Friend needs a name.',
-  _ => 'That change was refused.',
-};
 
 /// The Friend Notepad: one Friend, loaded whole and saved whole.
 ///
@@ -325,7 +315,11 @@ class NotepadCubit extends Cubit<NotepadReading> with WidgetsBindingObserver {
     try {
       changed = change(friend);
     } on ArgumentError catch (error) {
-      emit(state.changing(refusal: notepadRefusalWords(error)));
+      emit(
+        state.changing(
+          refusal: refusalWords(error, whenUnknown: thatChangeWasRefused),
+        ),
+      );
 
       return;
     }

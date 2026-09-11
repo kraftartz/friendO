@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:drift/drift.dart' show Variable;
 import 'package:flutter/widgets.dart' show AppLifecycleState;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -64,6 +65,24 @@ void main() {
   });
 
   CivilDate day(int daysAgo) => CivilDate.from(today).addDays(-daysAgo);
+
+  /// The rows [table] holds for one Friend, read past the repository.
+  ///
+  /// A delete is only readable as what is no longer there, and the repository
+  /// answers about a Friend it can no longer find rather than about the rows.
+  Future<List<Map<String, Object?>>> rowsFor(
+    String table,
+    String friendId,
+  ) async {
+    final rows = await wiring.databases.database
+        .customSelect(
+          'select * from $table where friend_id = ?',
+          variables: [Variable<String>(friendId)],
+        )
+        .get();
+
+    return [for (final row in rows) row.data];
+  }
 
   Future<void> writeFriend(
     String id, {
@@ -477,6 +496,23 @@ void main() {
         expect(await friends.load('f1'), isNull);
         expect(notepad.state.friend, isNull);
         expect(notepad.state.isLocked, isFalse);
+
+        // The Friend row going is not proof that the rows under it went: a
+        // load answers null the moment the root is gone. Count what is left.
+        for (final table in [
+          'meetings',
+          'notes',
+          'facts',
+          'milestones',
+          'friend_affinities',
+        ]) {
+          expect(
+            await rowsFor(table, 'f1'),
+            isEmpty,
+            reason: '$table still holds a row for the deleted Friend',
+          );
+        }
+        expect(await rowsFor('meetings', 'f2'), hasLength(1));
 
         final labels = await friends.affinities();
         expect(labels.map((affinity) => affinity.label), ['Climbing']);

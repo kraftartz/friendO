@@ -38,8 +38,11 @@ class SettingsCubit extends Cubit<SettingsReading> with WidgetsBindingObserver {
     _whileOpen = databases.state.listen(_onDatabaseState);
   }
 
-  /// The Profile this screen is about.
-  final String profileId;
+  /// The Profile this screen is about, or null while none is open.
+  ///
+  /// The app layer learns it from the unlock or from First Run, and neither
+  /// has answered before the first Profile opens.
+  final String? profileId;
 
   /// The Profile's own options.
   final SettingsStore settings;
@@ -66,6 +69,8 @@ class SettingsCubit extends Cubit<SettingsReading> with WidgetsBindingObserver {
 
   /// Read the settings and the Profile list again.
   Future<void> readAgain() async {
+    final profileId = this.profileId;
+    if (profileId == null) return;
     if (databases.stateNow != DatabaseState.open) return;
 
     try {
@@ -130,6 +135,8 @@ class SettingsCubit extends Cubit<SettingsReading> with WidgetsBindingObserver {
   /// enrolled fingerprint learns it here rather than at the lock screen. The
   /// PIN never goes away.
   Future<void> useBiometricUnlock({required bool uses}) async {
+    final profileId = this.profileId;
+    if (profileId == null) return;
     if (uses && !await biometrics.confirm(profileName: state.profileName)) {
       if (!isClosed) await readAgain();
 
@@ -145,8 +152,9 @@ class SettingsCubit extends Cubit<SettingsReading> with WidgetsBindingObserver {
 
   /// Rename this Profile. The write is the atomic one `ProfileList` makes.
   Future<void> rename(String displayName) async {
+    final profileId = this.profileId;
     final wanted = displayName.trim();
-    if (wanted.isEmpty) return;
+    if (profileId == null || wanted.isEmpty) return;
 
     await profiles.changeOne(profileId, (profile) => profile.named(wanted));
     await readAgain();
