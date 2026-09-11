@@ -25,14 +25,42 @@ void main() {
     wiring = Wiring(directory);
   });
 
-  tearDown(() async {
-    await wiring.dispose();
-    directory.deleteSync(recursive: true);
-  });
+  tearDown(() => directory.deleteSync(recursive: true));
+
+  /// Closes the connection through the tester.
+  ///
+  /// A real file closed in a plain tearDown makes no progress inside the fake
+  /// clock a widget test runs in, and the test hangs rather than failing.
+  void closeLater(WidgetTester tester) =>
+      addTearDown(() => tester.runAsync(wiring.dispose));
+
+  /// Pumps until [finder] finds something, letting real work run between.
+  ///
+  /// The app takes its own reading of the Profile list, which is a file, and
+  /// a redirect onto the answer is a route transition.
+  Future<void> waitFor(WidgetTester tester, Finder finder) async {
+    for (var pumps = 0; pumps < 60 && finder.evaluate().isEmpty; pumps++) {
+      await tester.runAsync(
+        () => Future<void>.delayed(const Duration(milliseconds: 10)),
+      );
+      await tester.pump(const Duration(milliseconds: 32));
+    }
+  }
+
+  /// Pumps until [finder] finds nothing, letting real work run between.
+  Future<void> waitUntilGone(WidgetTester tester, Finder finder) async {
+    for (var pumps = 0; pumps < 60 && finder.evaluate().isNotEmpty; pumps++) {
+      await tester.runAsync(
+        () => Future<void>.delayed(const Duration(milliseconds: 10)),
+      );
+      await tester.pump(const Duration(milliseconds: 32));
+    }
+  }
 
   testWidgets('a phone with no Profile starts on the creation screen', (
     tester,
   ) async {
+    closeLater(tester);
     await tester.pumpWidget(
       FriendoApp(
         edges: fakeEdges(),
@@ -45,7 +73,15 @@ void main() {
     expect(find.byType(FirstRunPage), findsOneWidget);
   });
 
-  testWidgets('a phone with a Profile starts on the Dial', (tester) async {
+  testWidgets('a phone whose Profile is open starts on the Dial', (
+    tester,
+  ) async {
+    closeLater(tester);
+    await tester.runAsync(() async {
+      final profile = await wiring.creator.createProfile('Michal', '123456');
+      await wiring.session.openProfile(profile.id);
+    });
+
     await tester.pumpWidget(
       FriendoApp(
         edges: fakeEdges(),
@@ -53,12 +89,15 @@ void main() {
         session: wiring.session,
       ),
     );
+    await waitFor(tester, find.text('Dial'));
 
     expect(find.byType(FirstRunPage), findsNothing);
     expect(find.text('Dial'), findsOneWidget);
   });
 
   testWidgets('the cost screen leads to the Dial', (tester) async {
+    closeLater(tester);
+    closeLater(tester);
     await tester.pumpWidget(
       FriendoApp(
         edges: fakeEdges(),
@@ -84,7 +123,8 @@ void main() {
     });
     await tester.pump();
     await tester.tap(find.text('Continue'));
-    await tester.pumpAndSettle();
+    await waitFor(tester, find.text('Dial'));
+    await waitUntilGone(tester, find.byType(FirstRunPage));
 
     expect(find.byType(FirstRunPage), findsNothing);
     expect(find.text('Dial'), findsOneWidget);

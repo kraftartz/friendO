@@ -44,6 +44,7 @@ inside a group are not continuous. Read the group you are working in.
 | [0025](0025-one-owner-for-the-database-connection.md) | One owner for the database connection | Accepted |
 | [0027](0027-domain-value-objects-and-equality.md) | Wrap the domain's values in types, and get equality from `equatable` | Accepted |
 | [0035](0035-one-feature-holds-both-friend-screens.md) | One feature holds both Friend screens | Accepted, corrects an illustration in [0022](0022-one-repository-per-aggregate.md) |
+| [0037](0037-go-router-owns-every-screen.md) | `go_router` owns every screen, and the lock is one redirect | Accepted |
 
 ### Privacy and the network boundary
 

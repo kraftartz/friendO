@@ -1,86 +1,88 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../core/db/database_session.dart';
 import '../../core/friends/friend_repository.dart';
+import '../../core/profiles/profile_list.dart';
+import '../../core/profiles/profile_session.dart';
+import '../../core/settings/settings_store.dart';
 import '../../core/time/civil_date_change.dart';
-import '../../core/time/clock.dart';
-import '../../features/dial/view/dial_page.dart';
-import '../../features/friends/bloc/add_friend_cubit.dart';
-import '../../features/friends/bloc/add_friend_state.dart';
+import '../../features/dial/bloc/dial_cubit.dart';
 import '../../features/friends/bloc/friends_cubit.dart';
-import '../../features/friends/bloc/notepad_cubit.dart';
-import '../../features/friends/bloc/notepad_state.dart';
-import '../../features/friends/view/add_friend_page.dart';
-import '../../features/friends/view/friends_page.dart';
-import '../../features/friends/view/notepad_page.dart';
-import '../../features/settings/view/settings_page.dart';
+import '../../features/settings/bloc/settings_cubit.dart';
+import '../platform_edges.dart';
 import 'app_section.dart';
-import 'navigation_cubit.dart';
 
 /// The frame around every section: a page above, a navigation bar below.
 ///
-/// This widget imports three features, which is why it lives in `app/`. A
-/// feature must never import another feature. Joining them is the app layer's
-/// job.
+/// The router hands it the branch that is on show. The bar reports a tap and
+/// routes nothing itself, which is the same shape every screen in this app
+/// has: it produces a request, and the router reads it.
 ///
-/// The pages sit in an [IndexedStack], so a page keeps its state and its scroll
-/// position while the user is somewhere else.
+/// The blocs a section reads are made here and keyed by the Profile, so
+/// switching gives every one of them a fresh start rather than a state built
+/// from somebody else's rows.
 class HomeShell extends StatelessWidget {
-  /// Create the shell over the collaborators the two pushed screens need.
+  /// Draw the shell around [shell], for the Profile under [profileId].
   const HomeShell({
-    required this.friends,
-    required this.databases,
-    required this.dayChange,
-    this.clock = const Clock(),
+    required this.shell,
+    required this.profileId,
+    required this.wantsProfile,
     super.key,
   });
 
-  /// The one reader and writer of the Friend tables.
-  final FriendRepository friends;
+  /// The branch the router is showing, and the way to change it.
+  final StatefulNavigationShell shell;
 
-  /// The owner of the open connection.
-  final DatabaseSession databases;
+  /// The Profile that is open. The blocs are keyed by it.
+  final String? profileId;
 
-  /// The announcement that the local Civil Date has turned.
-  final CivilDateChange dayChange;
+  /// Told which Profile the User wants once this one closes.
+  final void Function(String profileId) wantsProfile;
 
-  /// Where every `now` comes from.
-  final Clock clock;
-
-  /// The page for each section.
-  ///
-  /// This list is indexed by [AppSection.index], so its order must match the
-  /// order of the enum values.
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<NavigationCubit, AppSection>(
-      builder: (context, section) => Scaffold(
-        body: SafeArea(
-          child: IndexedStack(
-            index: section.index,
-            children: [
-              // Wiring one feature to another is this layer's job. The Dial
-              // raises the request and routes none of it itself.
-              DialPage(
-                onAddFriend: () => _addAFriend(context),
-                onShowOrbit: (orbit) {
-                  context.read<FriendsCubit>().showOrbit(orbit);
-                  context.read<NavigationCubit>().select(AppSection.friends);
-                },
-              ),
-              FriendsPage(
-                onAddFriend: () => _addAFriend(context),
-                onOpenFriend: (friendId) => _openFriend(context, friendId),
-              ),
-              const SettingsPage(),
-            ],
+    final databases = context.read<DatabaseSession>();
+    final friends = context.read<FriendRepository>();
+    final dayChange = context.read<CivilDateChange>();
+
+    return MultiBlocProvider(
+      key: ValueKey<String?>(profileId),
+      providers: [
+        BlocProvider(
+          create: (_) => FriendsCubit(
+            friends: friends,
+            databases: databases,
+            dayChange: dayChange,
           ),
         ),
+        BlocProvider(
+          create: (_) => DialCubit(
+            friends: friends,
+            databases: databases,
+            dayChange: dayChange,
+          ),
+        ),
+        BlocProvider(
+          create: (_) => SettingsCubit(
+            profileId: profileId,
+            wantsProfile: wantsProfile,
+            settings: context.read<SettingsStore>(),
+            profiles: context.read<ProfileList>(),
+            session: context.read<ProfileSession>(),
+            databases: databases,
+            notifications: context.read<PlatformEdges>().notifications,
+            biometrics: context.read<PlatformEdges>().biometrics,
+            screens: context.read<PlatformEdges>().screens,
+          ),
+        ),
+      ],
+      child: Scaffold(
+        body: SafeArea(child: shell),
         bottomNavigationBar: NavigationBar(
-          selectedIndex: section.index,
-          onDestinationSelected: (index) =>
-              context.read<NavigationCubit>().select(AppSection.values[index]),
+          selectedIndex: shell.currentIndex,
+          onDestinationSelected: shell.goBranch,
           destinations: [
             for (final section in AppSection.values)
               NavigationDestination(
@@ -92,54 +94,4 @@ class HomeShell extends StatelessWidget {
       ),
     );
   }
-
-  /// Open the form that writes a Friend.
-  ///
-  /// The route is pushed over the whole shell, so the cubit it needs is made
-  /// here rather than found above: a pushed route is built by the Navigator,
-  /// which sits over every provider the shell was given.
-  void _addAFriend(BuildContext context) => Navigator.of(context).push(
-    MaterialPageRoute<void>(
-      builder: (_) => BlocProvider(
-        create: (_) => AddFriendCubit(
-          friends: friends,
-          databases: databases,
-          clock: clock,
-        ),
-        child: Builder(
-          builder: (context) => BlocListener<AddFriendCubit, AddFriendDraft>(
-            // A lock takes this screen off the stack. It would otherwise
-            // rest over the keypad, drawn blank and holding the User
-            // away from the one control that gets them back.
-            listenWhen: (was, now) => now.isLocked && !was.isLocked,
-            listener: (context, _) => Navigator.of(context).pop(),
-            child: AddFriendPage(onDone: () => Navigator.of(context).pop()),
-          ),
-        ),
-      ),
-    ),
-  );
-
-  /// Open one Friend, top to bottom.
-  void _openFriend(BuildContext context, String friendId) =>
-      Navigator.of(context).push(
-        MaterialPageRoute<void>(
-          builder: (_) => BlocProvider(
-            create: (_) => NotepadCubit(
-              friendId: friendId,
-              friends: friends,
-              databases: databases,
-              dayChange: dayChange,
-              clock: clock,
-            ),
-            child: Builder(
-              builder: (context) => BlocListener<NotepadCubit, NotepadReading>(
-                listenWhen: (was, now) => now.isLocked && !was.isLocked,
-                listener: (context, _) => Navigator.of(context).pop(),
-                child: NotepadPage(onGone: () => Navigator.of(context).pop()),
-              ),
-            ),
-          ),
-        ),
-      );
 }

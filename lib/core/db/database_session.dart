@@ -42,11 +42,19 @@ class DatabaseSession {
 
   AppDatabase? _database;
 
+  String? _profileId;
+
   /// Where the connection stands at this moment.
   ///
   /// A caller that must decide now reads this. A caller that must follow the
   /// changes listens to [state]. Both read the one field.
   DatabaseState get stateNow => _state;
+
+  /// The Profile whose file is open, or null while none is.
+  ///
+  /// The owner of the connection is the one thing that always knows this, so
+  /// nothing else has to be told and nothing else can be told wrongly.
+  String? get openProfileId => _profileId;
 
   /// Where the connection stands, from now on.
   ///
@@ -94,6 +102,7 @@ class DatabaseSession {
       rethrow;
     }
     _database = database;
+    _profileId = profileId;
     _publish(DatabaseState.open);
 
     return database;
@@ -106,6 +115,7 @@ class DatabaseSession {
   Future<void> close() async {
     final open = _database;
     _database = null;
+    _profileId = null;
     await open?.close();
     _publish(DatabaseState.locked);
   }

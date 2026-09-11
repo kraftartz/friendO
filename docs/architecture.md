@@ -238,7 +238,11 @@ friendO/
 |   |   +-- backup/              Export and import
 |   |   +-- settings/            Reminder switch and app options
 |   |
-|   +-- app/                     Wiring only: routes, dependency setup, Soft.dark()
+|   +-- app/                     Wiring only: dependency setup, Soft.dark()
+|       +-- navigation/          One GoRouter. It owns the boot screens, the three
+|                                sections and everything pushed over them. A locked
+|                                Profile is one redirect, checked for every route,
+|                                so no screen has to remember it. See ADR-0037.
 |
 +-- docs/                        This file and the decision records
 ```

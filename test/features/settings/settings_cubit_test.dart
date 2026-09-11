@@ -5,7 +5,6 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:friendo/core/db/database_session.dart'
     show DatabaseLockedError, DatabaseState;
-import 'package:friendo/core/profiles/profile_session.dart' show Unlocked;
 import 'package:friendo/core/settings/profile_settings.dart'
     show autoLockChoices;
 import 'package:friendo/core/settings/settings_store.dart' show SettingsStore;
@@ -227,32 +226,40 @@ void main() {
       expect(now.kdfParams, was.kdfParams);
     });
 
-    test('closes the first connection before the second opens', () async {
-      await wiring.session.lock();
-      final second = await wiring.creator.createProfile('Kasia', '654321');
-      await wiring.session.lock();
-      await wiring.session.unlock(profileId, '123456');
-      final screen = await anOpenScreen();
-      expect(screen.state.otherProfiles.map((row) => row.id), [second.id]);
+    test(
+      'closes this Profile, and says which one the User wants next',
+      () async {
+        await wiring.session.lock();
+        final second = await wiring.creator.createProfile('Kasia', '654321');
+        await wiring.session.lock();
+        await wiring.session.unlock(profileId, '123456');
 
-      final seen = <DatabaseState>[];
-      final watching = wiring.databases.state.listen(seen.add);
-      addTearDown(watching.cancel);
-      await pumpEventQueue();
+        final wanted = <String>[];
+        final screen = SettingsCubit(
+          profileId: profileId,
+          settings: store,
+          profiles: wiring.profiles,
+          session: wiring.session,
+          databases: wiring.databases,
+          notifications: notifications,
+          biometrics: biometrics,
+          screens: screens,
+          wantsProfile: wanted.add,
+        );
+        addTearDown(screen.close);
+        await until(() => !screen.state.isLocked);
+        expect(screen.state.otherProfiles.map((row) => row.id), [second.id]);
 
-      final outcome = await screen.switchTo(second.id, '654321');
+        // Switching is a lock and then an unlock. This screen makes the first
+        // half and names the Profile the second half is for. The PIN is typed
+        // on the keypad, so the whole of it is proved where both halves happen:
+        // test/features/friends/friends_routing_test.dart.
+        await screen.leaveFor(second.id);
 
-      expect(outcome, const Unlocked());
-      expect(
-        seen,
-        containsAllInOrder([
-          DatabaseState.open,
-          DatabaseState.locked,
-          DatabaseState.opening,
-          DatabaseState.open,
-        ]),
-      );
-    });
+        expect(wanted, [second.id]);
+        expect(wiring.databases.stateNow, DatabaseState.locked);
+      },
+    );
   });
 
   group('the lock', () {

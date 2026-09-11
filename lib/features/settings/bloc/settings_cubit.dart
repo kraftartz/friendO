@@ -6,8 +6,7 @@ import 'package:flutter_bloc/flutter_bloc.dart' show Cubit;
 import 'package:friendo/core/db/database_session.dart'
     show DatabaseLockedError, DatabaseSession, DatabaseState;
 import 'package:friendo/core/profiles/profile_list.dart' show ProfileList;
-import 'package:friendo/core/profiles/profile_session.dart'
-    show ProfileSession, UnlockOutcome;
+import 'package:friendo/core/profiles/profile_session.dart' show ProfileSession;
 import 'package:friendo/core/reminders/notification_gate.dart'
     show NotificationGate;
 import 'package:friendo/core/security/biometric_gate.dart' show BiometricGate;
@@ -33,6 +32,7 @@ class SettingsCubit extends Cubit<SettingsReading> with WidgetsBindingObserver {
     required this.notifications,
     required this.biometrics,
     required this.screens,
+    this.wantsProfile,
   }) : super(const SettingsReading.locked()) {
     WidgetsBinding.instance.addObserver(this);
     _whileOpen = databases.state.listen(_onDatabaseState);
@@ -64,6 +64,9 @@ class SettingsCubit extends Cubit<SettingsReading> with WidgetsBindingObserver {
 
   /// The platform's screen privacy.
   final ScreenPrivacy screens;
+
+  /// Told which Profile the User wants once this one closes.
+  final void Function(String profileId)? wantsProfile;
 
   StreamSubscription<DatabaseState>? _whileOpen;
 
@@ -163,14 +166,16 @@ class SettingsCubit extends Cubit<SettingsReading> with WidgetsBindingObserver {
   /// Lock now. It is the same `lock()` the auto-lock calls.
   Future<void> lockNow() => session.lock();
 
-  /// Switch to another Profile.
+  /// Leave this Profile for [otherId].
   ///
-  /// It is `lock()` and then `unlock()`, which is not a second mechanism. The
-  /// first file is closed and its key is gone before the second opens.
-  Future<UnlockOutcome> switchTo(String otherId, String pin) async {
-    await session.lock();
+  /// Switching is a lock and then an unlock, which docs/spec/boot-and-data.md
+  /// already built and calls "not a second mechanism". This screen makes the
+  /// first half of that call and says which Profile the second half is for.
+  /// The PIN is typed on the keypad, which is the one place a PIN is typed.
+  Future<void> leaveFor(String otherId) async {
+    wantsProfile?.call(otherId);
 
-    return session.unlock(otherId, pin);
+    return session.lock();
   }
 
   /// Read the permission again, and follow it.

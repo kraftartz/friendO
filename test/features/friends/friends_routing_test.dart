@@ -47,7 +47,9 @@ void main() {
       await tester.runAsync(
         () => Future<void>.delayed(const Duration(milliseconds: 10)),
       );
-      await tester.pump();
+      // With a duration, because a route transition is an animation and a
+      // pump of no length advances no time.
+      await tester.pump(const Duration(milliseconds: 32));
     }
   }
 
@@ -153,8 +155,18 @@ void main() {
     await waitFor(tester, find.byType(NotepadPage));
 
     await tester.runAsync(wiring.session.lock);
-    await tester.pump();
-    await tester.pump();
+    for (
+      var pumps = 0;
+      pumps < 60 && find.byType(NotepadPage).evaluate().isNotEmpty;
+      pumps++
+    ) {
+      await tester.runAsync(
+        () => Future<void>.delayed(const Duration(milliseconds: 10)),
+      );
+      // With a duration, because a route transition is an animation and a
+      // pump of no length advances no time.
+      await tester.pump(const Duration(milliseconds: 32));
+    }
 
     expect(
       find.byType(NotepadPage),
