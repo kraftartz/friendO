@@ -254,6 +254,10 @@ class _FriendoAppState extends State<FriendoApp> {
         ),
       ),
     ],
-    child: const HomeShell(),
+    child: HomeShell(
+      friends: _friends,
+      databases: widget.session.databases,
+      dayChange: _dayChange,
+    ),
   );
 }
